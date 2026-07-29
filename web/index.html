@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ResaleHub - 3-Party Booking Resale Marketplace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --primary: #0F9D58;
@@ -158,6 +160,7 @@
       display: inline-block;
       flex-shrink: 0;
     }
+
     .city-pill {
       display: inline-flex;
       align-items: center;
@@ -170,25 +173,29 @@
       font-weight: 600;
       color: #1a1a1a;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       transition: all 0.2s;
       user-select: none;
     }
+
     .city-pill:hover {
       border-color: var(--primary);
-      box-shadow: 0 4px 14px rgba(15,157,88,0.12);
+      box-shadow: 0 4px 14px rgba(15, 157, 88, 0.12);
     }
+
     .city-pill .pin-icon {
       color: var(--primary);
       font-size: 15px;
       line-height: 1;
     }
+
     .city-pill .arrow-icon {
       color: #888;
       font-size: 13px;
       margin-left: 2px;
       transition: transform 0.2s;
     }
+
     .city-pill.open .arrow-icon {
       transform: rotate(90deg);
     }
@@ -202,17 +209,29 @@
       background: white;
       border: 1px solid var(--border-light);
       border-radius: 16px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
       min-width: 220px;
       z-index: 200;
       overflow: hidden;
       animation: dropIn 0.18s ease;
     }
-    .city-dropdown.open { display: block; }
-    @keyframes dropIn {
-      from { opacity:0; transform: translateY(-6px); }
-      to   { opacity:1; transform: translateY(0); }
+
+    .city-dropdown.open {
+      display: block;
     }
+
+    @keyframes dropIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .city-dropdown-header {
       padding: 12px 16px 8px;
       font-size: 11px;
@@ -222,6 +241,7 @@
       letter-spacing: 0.06em;
       border-bottom: 1px solid var(--border-light);
     }
+
     .city-option {
       display: flex;
       align-items: center;
@@ -233,14 +253,19 @@
       cursor: pointer;
       transition: background 0.15s;
     }
+
     .city-option:hover {
       background: var(--bg-mint);
     }
+
     .city-option.selected {
       color: var(--primary);
-      background: rgba(15,157,88,0.06);
+      background: rgba(15, 157, 88, 0.06);
     }
-    .city-option .city-emoji { font-size: 16px; }
+
+    .city-option .city-emoji {
+      font-size: 16px;
+    }
 
     /* Load More Button */
     .load-more-wrap {
@@ -248,6 +273,7 @@
       justify-content: center;
       margin: 8px 0 40px;
     }
+
     .load-more-btn {
       background: white;
       border: 2px solid var(--primary);
@@ -261,14 +287,16 @@
       align-items: center;
       gap: 10px;
       transition: all 0.25s;
-      box-shadow: 0 4px 16px rgba(15,157,88,0.1);
+      box-shadow: 0 4px 16px rgba(15, 157, 88, 0.1);
     }
+
     .load-more-btn:hover {
       background: var(--primary);
       color: white;
-      box-shadow: 0 8px 24px rgba(15,157,88,0.25);
+      box-shadow: 0 8px 24px rgba(15, 157, 88, 0.25);
       transform: translateY(-2px);
     }
+
     .load-more-btn:disabled {
       opacity: 0.4;
       cursor: default;
@@ -284,7 +312,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
       flex: 1;
     }
 
@@ -332,6 +360,7 @@
       position: relative;
       flex-shrink: 0;
     }
+
     .more-chip {
       background: white;
       border: 1.5px solid var(--border-light);
@@ -347,15 +376,21 @@
       gap: 6px;
       color: var(--dark-forest);
     }
-    .more-chip:hover, .more-chip.open {
+
+    .more-chip:hover,
+    .more-chip.open {
       border-color: var(--primary);
       color: var(--primary);
     }
+
     .more-chip .chevron {
       font-size: 11px;
       transition: transform 0.2s;
     }
-    .more-chip.open .chevron { transform: rotate(180deg); }
+
+    .more-chip.open .chevron {
+      transform: rotate(180deg);
+    }
 
     .more-dropdown {
       display: none;
@@ -365,13 +400,17 @@
       background: white;
       border: 1px solid var(--border-light);
       border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
       min-width: 200px;
       z-index: 300;
       overflow: hidden;
       animation: dropIn 0.18s ease;
     }
-    .more-dropdown.open { display: block; }
+
+    .more-dropdown.open {
+      display: block;
+    }
+
     .more-cat-option {
       display: flex;
       align-items: center;
@@ -384,13 +423,15 @@
       transition: background 0.15s;
       white-space: nowrap;
     }
+
     .more-cat-option:hover {
       background: var(--bg-mint);
       color: var(--primary);
     }
+
     .more-cat-option.active {
       color: var(--primary);
-      background: rgba(15,157,88,0.07);
+      background: rgba(15, 157, 88, 0.07);
     }
 
     /* Grid */
@@ -516,6 +557,30 @@
       border-radius: 6px;
     }
 
+    /* Countdown Timer */
+    .countdown-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 7px 10px;
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #c53030;
+    }
+
+    .countdown-strip .fire {
+      font-size: 14px;
+    }
+
+    .countdown-strip .timer-val {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.03em;
+    }
+
     /* Modal / Detail View */
     .modal-overlay {
       display: none;
@@ -596,6 +661,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Top Navigation -->
@@ -609,7 +675,9 @@
     </div>
 
     <div style="display:flex; align-items:center; gap:12px;">
-      <button onclick="openLoginModal()" style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑 Login Portal</button>
+      <button onclick="openLoginModal()"
+        style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
+        Login Portal</button>
 
       <div class="role-switcher">
         <span class="role-badge">View Mode:</span>
@@ -627,7 +695,7 @@
     <div class="hero">
       <div class="hero-content">
         <h1>Available Deals</h1>
-        <p>Connect with Service Providers & Original Buyers to claim hotel, venue & event slots at 30% - 50% OFF.</p>
+        <p>Connect with Service Providers & Original Buyers to claim hotel, venue & event.</p>
         <div class="stats-row">
           <div class="stat-pill">✓ 100% Host Verified</div>
           <div class="stat-pill">⚡ 3-Party Escrow Transfer</div>
@@ -647,24 +715,35 @@
         </div>
         <div class="city-dropdown" id="cityDropdown">
           <div class="city-dropdown-header">Select a City</div>
-          <div class="city-option selected" onclick="setCity('All', '📍 All Cities')"><span class="city-emoji">📍</span> All Cities</div>
-          <div class="city-option" onclick="setCity('New York', '🗽 New York')"><span class="city-emoji">🗽</span> New York</div>
-          <div class="city-option" onclick="setCity('Los Angeles', '🌴 Los Angeles')"><span class="city-emoji">🌴</span> Los Angeles</div>
-          <div class="city-option" onclick="setCity('Chicago', '🏙️ Chicago')"><span class="city-emoji">🏙️</span> Chicago</div>
-          <div class="city-option" onclick="setCity('Miami', '🌊 Miami')"><span class="city-emoji">🌊</span> Miami</div>
-          <div class="city-option" onclick="setCity('San Francisco', '🌉 San Francisco')"><span class="city-emoji">🌉</span> San Francisco</div>
-          <div class="city-option" onclick="setCity('Austin', '🎸 Austin')"><span class="city-emoji">🎸</span> Austin</div>
-          <div class="city-option" onclick="setCity('Denver', '⛰️ Denver')"><span class="city-emoji">⛰️</span> Denver</div>
-          <div class="city-option" onclick="setCity('Toronto', '🍁 Toronto')"><span class="city-emoji">🍁</span> Toronto</div>
-          <div class="city-option" onclick="setCity('Maldives', '🏝️ Maldives')"><span class="city-emoji">🏝️</span> Maldives</div>
-          <div class="city-option" onclick="setCity('Europe', '🏰 Europe')"><span class="city-emoji">🏰</span> Europe</div>
+          <div class="city-option selected" onclick="setCity('All', '📍 All Cities')"><span class="city-emoji">📍</span>
+            All Cities</div>
+          <div class="city-option" onclick="setCity('Hyderabad', '🏙️ Hyderabad')"><span class="city-emoji">🏙️</span>
+            Hyderabad</div>
+          <div class="city-option" onclick="setCity('Jaipur', '🏰 Jaipur')"><span class="city-emoji">🏰</span> Jaipur
+          </div>
+          <div class="city-option" onclick="setCity('Goa', '🌊 Goa')"><span class="city-emoji">🌊</span> Goa</div>
+          <div class="city-option" onclick="setCity('Munnar', '🌿 Munnar')"><span class="city-emoji">🌿</span> Munnar
+          </div>
+          <div class="city-option" onclick="setCity('Vijayawada', '🎉 Vijayawada')"><span class="city-emoji">🎉</span>
+            Vijayawada</div>
+          <div class="city-option" onclick="setCity('Warangal', '🍽️ Warangal')"><span class="city-emoji">🍽️</span>
+            Warangal</div>
+          <div class="city-option" onclick="setCity('Mumbai', '🌆 Mumbai')"><span class="city-emoji">🌆</span> Mumbai
+          </div>
+          <div class="city-option" onclick="setCity('Delhi', '🏛️ Delhi')"><span class="city-emoji">🏛️</span> Delhi
+          </div>
+          <div class="city-option" onclick="setCity('Bangalore', '💻 Bangalore')"><span class="city-emoji">💻</span>
+            Bangalore</div>
+          <div class="city-option" onclick="setCity('Chennai', '🎭 Chennai')"><span class="city-emoji">🎭</span> Chennai
+          </div>
         </div>
       </div>
 
       <!-- Search Input -->
       <div class="search-box">
         <span style="color:var(--primary); font-weight:bold;">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search hotels, venues, photography, catering, or locations..." oninput="renderListings()">
+        <input type="text" id="searchInput" placeholder="Search hotels, venues, photography, catering, or locations..."
+          oninput="renderListings()">
       </div>
     </div>
 
@@ -680,14 +759,17 @@
 
       <!-- More dropdown -->
       <div class="more-chip-wrap" id="moreChipWrap">
-        <button class="more-chip" id="moreChip" onclick="toggleMoreDropdown()">More <span class="chevron">▾</span></button>
+        <button class="more-chip" id="moreChip" onclick="toggleMoreDropdown()">More <span
+            class="chevron">▾</span></button>
         <div class="more-dropdown" id="moreDropdown">
-          <div class="more-cat-option" onclick="setMoreCategory('Spa & Wellness', '🧖 Spa &amp; Wellness', this)">🧖 Spa &amp; Wellness</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Spa & Wellness', '🧖 Spa &amp; Wellness', this)">🧖 Spa
+            &amp; Wellness</div>
           <div class="more-cat-option" onclick="setMoreCategory('Transport', '🚗 Transport', this)">🚗 Transport</div>
           <div class="more-cat-option" onclick="setMoreCategory('Classes', '🎓 Classes', this)">🎓 Classes</div>
           <div class="more-cat-option" onclick="setMoreCategory('Concerts', '🎵 Concerts', this)">🎵 Concerts</div>
           <div class="more-cat-option" onclick="setMoreCategory('Sports', '⚽ Sports', this)">⚽ Sports</div>
-          <div class="more-cat-option" onclick="setMoreCategory('Travel Packages', '✈️ Travel Packages', this)">✈️ Travel Packages</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Travel Packages', '✈️ Travel Packages', this)">✈️
+            Travel Packages</div>
         </div>
       </div>
     </div>
@@ -717,24 +799,421 @@
 
   <script>
     const mockListings = [
-      { id: 'l-001', title: 'Luxury Oceanfront Suite - 3 Nights', category: 'Hotels', providerName: 'Grand Hyatt Maldives', location: 'South Male Atoll, Maldives', originalPrice: 1800, resalePrice: 1050, discount: 42, depositLost: 900, eventDate: 'Aug 15, 2026', img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800', verified: true, step: 1 },
-      { id: 'l-002', title: 'Botanical Garden Wedding Venue', category: 'Venues', providerName: 'Oakridge Estate & Gardens', location: 'Napa Valley, California', originalPrice: 4500, resalePrice: 2700, discount: 40, depositLost: 2000, eventDate: 'Sep 02, 2026', img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800', verified: true, step: 2 },
-      { id: 'l-003', title: 'Full-Day Premium Photography', category: 'Photography', providerName: 'Lumina Studios', location: 'Manhattan, New York', originalPrice: 2200, resalePrice: 1320, discount: 40, depositLost: 800, eventDate: 'Aug 28, 2026', img: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800', verified: true, step: 1 },
-      { id: 'l-004', title: 'Gourmet 5-Course Banquet Catering', category: 'Catering', providerName: 'Artisan Culinary Group', location: 'Downtown Chicago, IL', originalPrice: 3200, resalePrice: 1920, discount: 40, depositLost: 1500, eventDate: 'Aug 20, 2026', img: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800', verified: true, step: 1 },
-      { id: 'l-005', title: 'Annual VIP Gym Pass (Transferable)', category: 'Gyms', providerName: 'Equinox Fitness Club', location: 'San Francisco, CA', originalPrice: 1500, resalePrice: 750, discount: 50, depositLost: 1500, eventDate: 'Oct 01, 2026', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', verified: true, step: 1 },
-      { id: 'l-006', title: 'Front-Row VIP Tech Gala Pass', category: 'Events', providerName: 'TechSummit Global', location: 'Austin Convention Center, TX', originalPrice: 1200, resalePrice: 660, discount: 45, depositLost: 1200, eventDate: 'Aug 10, 2026', img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', verified: true, step: 1 },
-      { id: 'l-007', title: 'Swiss Alps Chalet - 4 Nights', category: 'Hotels', providerName: 'Alpine Crest Lodge', location: 'Zermatt, Switzerland', originalPrice: 2400, resalePrice: 1440, discount: 40, depositLost: 1200, eventDate: 'Sep 10, 2026', img: 'https://images.unsplash.com/photo-1502784444187-359ac186c5bb?w=800', verified: true, step: 1 },
-      { id: 'l-008', title: 'Modern Glass Ballroom Venue', category: 'Venues', providerName: 'Skyline Glasshouse', location: 'Seattle, Washington', originalPrice: 5000, resalePrice: 3000, discount: 40, depositLost: 2500, eventDate: 'Oct 15, 2026', img: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800', verified: true, step: 1 },
-      { id: 'l-009', title: 'Cinematic Drone & Video Package', category: 'Photography', providerName: 'AeroVision Media', location: 'Los Angeles, CA', originalPrice: 1600, resalePrice: 960, discount: 40, depositLost: 600, eventDate: 'Aug 25, 2026', img: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800', verified: true, step: 1 },
-      { id: 'l-010', title: 'Live Sushi Bar & Buffet Station', category: 'Catering', providerName: 'OmaKase Executive Catering', location: 'Miami Beach, Florida', originalPrice: 2800, resalePrice: 1680, discount: 40, depositLost: 1000, eventDate: 'Aug 22, 2026', img: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800', verified: true, step: 1 },
-      { id: 'l-011', title: 'CrossFit Unlimited 6-Month Pass', category: 'Gyms', providerName: 'IronVault Fitness', location: 'Denver, Colorado', originalPrice: 900, resalePrice: 450, discount: 50, depositLost: 900, eventDate: 'Sep 20, 2026', img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800', verified: true, step: 1 },
-      { id: 'l-012', title: 'Formula 1 Paddock Club Pass', category: 'Events', providerName: 'Grand Prix International', location: 'Las Vegas Strip Circuit', originalPrice: 3500, resalePrice: 1950, discount: 44, depositLost: 3500, eventDate: 'Nov 18, 2026', img: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800', verified: true, step: 1 },
-      { id: 'l-013', title: 'Boutique Heritage Villa Stay', category: 'Hotels', providerName: 'Villa Rosa Florence', location: 'Tuscany, Italy', originalPrice: 1400, resalePrice: 770, discount: 45, depositLost: 700, eventDate: 'Sep 05, 2026', img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800', verified: true, step: 1 },
-      { id: 'l-014', title: 'Rooftop Lounge Event Reservation', category: 'Venues', providerName: 'Skybar 360 Towers', location: 'Toronto, Canada', originalPrice: 2100, resalePrice: 1155, discount: 45, depositLost: 1000, eventDate: 'Aug 30, 2026', img: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800', verified: true, step: 1 },
-      { id: 'l-015', title: 'Fashion & Commercial Shoot', category: 'Photography', providerName: 'Vogue Vision Labs', location: 'SoHo, New York', originalPrice: 1800, resalePrice: 990, discount: 45, depositLost: 900, eventDate: 'Aug 18, 2026', img: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800', verified: true, step: 1 },
-      { id: 'l-016', title: 'Artisanal Cocktail & Tapas Bar', category: 'Catering', providerName: 'Mixology Masters', location: 'Brooklyn, NY', originalPrice: 1900, resalePrice: 1045, discount: 45, depositLost: 800, eventDate: 'Sep 12, 2026', img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800', verified: true, step: 1 },
-      { id: 'l-017', title: 'Pilates & Wellness Club Pass', category: 'Gyms', providerName: 'Core Balance Studio', location: 'Austin, Texas', originalPrice: 800, resalePrice: 440, discount: 45, depositLost: 800, eventDate: 'Oct 10, 2026', img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', verified: true, step: 1 },
-      { id: 'l-018', title: 'EDM Music Festival Weekend VIP', category: 'Events', providerName: 'Electric Horizon Fest', location: 'Orlando, Florida', originalPrice: 950, resalePrice: 475, discount: 50, depositLost: 950, eventDate: 'Aug 14, 2026', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', verified: true, step: 1 }
+      {
+        id: 'in-001',
+        title: 'Cancelled Hotel Room – 2 Nights',
+        category: 'Hotels',
+        providerName: 'Jaipur Palace Hotel',
+        location: 'Jaipur, Rajasthan',
+        originalPrice: 8000,
+        resalePrice: 4800,
+        discount: 40,
+        depositLost: 4000,
+        eventDate: 'Aug 05, 2026',
+        deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000 + 6 * 60 * 60 * 1000), // 2d 6h
+        img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+        verified: true, step: 1,
+        reason: 'Travel plans changed due to family emergency.'
+      },
+      {
+        id: 'in-002',
+        title: 'Cancelled Home Stay – 3 Nights',
+        category: 'Hotels',
+        providerName: 'Goa Breeze Home Stay',
+        location: 'Goa',
+        originalPrice: 6000,
+        resalePrice: 3900,
+        discount: 35,
+        depositLost: 3000,
+        eventDate: 'Aug 10, 2026',
+        deadline: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000), // 4d 3h
+        img: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800',
+        verified: true, step: 1,
+        reason: 'Visa rejection forced cancellation.'
+      },
+      {
+        id: 'in-003',
+        title: 'Cancelled Farm House – Weekend Stay',
+        category: 'Venues',
+        providerName: 'Green Valley Farm Stay',
+        location: 'Hyderabad, Telangana',
+        originalPrice: 12000,
+        resalePrice: 8400,
+        discount: 30,
+        depositLost: 6000,
+        eventDate: 'Aug 09, 2026',
+        deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000 + 14 * 60 * 60 * 1000), // 1d 14h
+        img: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800',
+        verified: true, step: 1,
+        reason: 'Event postponed due to rain forecast.'
+      },
+      {
+        id: 'in-004',
+        title: 'Cancelled Resort Booking – 4 Nights',
+        category: 'Hotels',
+        providerName: 'Munnar Hills Resort',
+        location: 'Munnar, Kerala',
+        originalPrice: 20000,
+        resalePrice: 12000,
+        discount: 40,
+        depositLost: 10000,
+        eventDate: 'Aug 15, 2026',
+        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 5d 2h
+        img: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800',
+        verified: true, step: 1,
+        reason: 'Flight cancelled, trip scrapped.'
+      },
+      {
+        id: 'in-005',
+        title: 'Cancelled Marriage Hall – Full Day',
+        category: 'Venues',
+        providerName: 'Royal Grand Marriage Hall',
+        location: 'Vijayawada, Andhra Pradesh',
+        originalPrice: 150000,
+        resalePrice: 75000,
+        discount: 50,
+        depositLost: 80000,
+        eventDate: 'Aug 22, 2026',
+        deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000 + 8 * 60 * 60 * 1000), // 3d 8h
+        img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800',
+        verified: true, step: 2,
+        reason: 'Wedding date shifted to December.'
+      },
+      {
+        id: 'in-006',
+        title: 'Cancelled Birthday Decoration Service',
+        category: 'Events',
+        providerName: 'Dream Decors Studio',
+        location: 'Hyderabad, Telangana',
+        originalPrice: 15000,
+        resalePrice: 12000,
+        discount: 20,
+        depositLost: 8000,
+        eventDate: 'Aug 08, 2026',
+        deadline: new Date(Date.now() + 0 * 24 * 60 * 60 * 1000 + 18 * 60 * 60 * 1000), // 18h
+        img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800',
+        verified: true, step: 1,
+        reason: 'Venue changed, decor package no longer needed.'
+      },
+      {
+        id: 'in-007',
+        title: 'Cancelled 100-Plate Food Catering',
+        category: 'Catering',
+        providerName: 'Spice Route Caterers',
+        location: 'Warangal, Telangana',
+        originalPrice: 50000,
+        resalePrice: 32500,
+        discount: 35,
+        depositLost: 25000,
+        eventDate: 'Aug 12, 2026',
+        deadline: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000 + 10 * 60 * 60 * 1000), // 6d 10h
+        img: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800',
+        verified: true, step: 1,
+        reason: 'Function cancelled, deposit non-refundable.'
+      },
+      {
+        id: 'in-008',
+        title: 'Cancelled 9-Month Gym Membership',
+        category: 'Gyms',
+        providerName: 'Iron Will Fitness Club',
+        location: 'Hyderabad, Telangana',
+        originalPrice: 18000,
+        resalePrice: 7200,
+        discount: 60,
+        depositLost: 18000,
+        eventDate: 'Oct 30, 2026',
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 60 * 1000), // 7d 5h
+        img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800',
+        verified: true, step: 1,
+        reason: 'Relocating to another city.'
+      },
+      {
+        id: 'in-009',
+        title: 'Cancelled Makeup & Bridal Styling – Aug 8',
+        category: 'Photography',
+        providerName: 'Glam Studio by Priya',
+        location: 'Hyderabad, Telangana',
+        originalPrice: 10000,
+        resalePrice: 5000,
+        discount: 50,
+        depositLost: 5000,
+        eventDate: 'Aug 08, 2026',
+        deadline: new Date(Date.now() + 0 * 24 * 60 * 60 * 1000 + 22 * 60 * 60 * 1000), // 22h
+        img: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800',
+        verified: true, step: 1,
+        reason: 'Wedding cancelled last minute.'
+      },
+
+      // ── 30 NEW LISTINGS ──────────────────────────────────────────────────
+      {
+        id: 'in-010', title: 'Cancelled Rooftop Pool Party Package', category: 'Venues',
+        providerName: 'Sky Lounge Events', location: 'Mumbai, Maharashtra',
+        originalPrice: 40000, resalePrice: 24000, discount: 40, depositLost: 20000,
+        eventDate: 'Aug 14, 2026', deadline: new Date(Date.now() + 3 * 86400000 + 5 * 3600000),
+        img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800', verified: true, step: 1,
+        reason: 'Sponsor pulled out at last minute.'
+      },
+
+      {
+        id: 'in-011', title: 'Cancelled Mehendi & Sangeet Night Decor', category: 'Events',
+        providerName: 'Aarav Celebrations', location: 'Delhi, NCR',
+        originalPrice: 35000, resalePrice: 21000, discount: 40, depositLost: 18000,
+        eventDate: 'Aug 11, 2026', deadline: new Date(Date.now() + 1 * 86400000 + 9 * 3600000),
+        img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800', verified: true, step: 1,
+        reason: 'Event merged into single-day function.'
+      },
+
+      {
+        id: 'in-012', title: 'Cancelled Ooty Hill Station Hotel – 3 Nights', category: 'Hotels',
+        providerName: 'Blue Mountain Retreat', location: 'Ooty, Tamil Nadu',
+        originalPrice: 14000, resalePrice: 9100, discount: 35, depositLost: 7000,
+        eventDate: 'Aug 18, 2026', deadline: new Date(Date.now() + 6 * 86400000 + 2 * 3600000),
+        img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', verified: true, step: 1,
+        reason: 'Health issue prevented travel.'
+      },
+
+      {
+        id: 'in-013', title: 'Cancelled 200-Plate Wedding Catering', category: 'Catering',
+        providerName: 'Shree Caterers & Co.', location: 'Pune, Maharashtra',
+        originalPrice: 90000, resalePrice: 58500, discount: 35, depositLost: 45000,
+        eventDate: 'Aug 20, 2026', deadline: new Date(Date.now() + 4 * 86400000 + 11 * 3600000),
+        img: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800', verified: true, step: 1,
+        reason: 'Guest count drastically reduced.'
+      },
+
+      {
+        id: 'in-014', title: 'Cancelled Pre-Wedding Photography Session', category: 'Photography',
+        providerName: 'Capture Moments Studio', location: 'Agra, Uttar Pradesh',
+        originalPrice: 22000, resalePrice: 11000, discount: 50, depositLost: 11000,
+        eventDate: 'Aug 08, 2026', deadline: new Date(Date.now() + 0 * 86400000 + 16 * 3600000),
+        img: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800', verified: true, step: 1,
+        reason: 'Couple rescheduled to winter.'
+      },
+
+      {
+        id: 'in-015', title: 'Cancelled Annual Yoga & Meditation Retreat', category: 'Gyms',
+        providerName: 'Ananda Wellness Centre', location: 'Rishikesh, Uttarakhand',
+        originalPrice: 25000, resalePrice: 12500, discount: 50, depositLost: 15000,
+        eventDate: 'Sep 01, 2026', deadline: new Date(Date.now() + 8 * 86400000 + 3 * 3600000),
+        img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', verified: true, step: 1,
+        reason: 'Trainer relocated abroad.'
+      },
+
+      {
+        id: 'in-016', title: 'Cancelled Banquet Hall – Corporate Event', category: 'Venues',
+        providerName: 'The Grand Presidency', location: 'Chennai, Tamil Nadu',
+        originalPrice: 80000, resalePrice: 48000, discount: 40, depositLost: 40000,
+        eventDate: 'Aug 25, 2026', deadline: new Date(Date.now() + 5 * 86400000 + 7 * 3600000),
+        img: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800', verified: true, step: 1,
+        reason: 'Company meeting moved online.'
+      },
+
+      {
+        id: 'in-017', title: 'Cancelled Classical Dance Performance Tickets (4)', category: 'Events',
+        providerName: 'Kalakshetra Foundation', location: 'Chennai, Tamil Nadu',
+        originalPrice: 6000, resalePrice: 3600, discount: 40, depositLost: 3000,
+        eventDate: 'Aug 09, 2026', deadline: new Date(Date.now() + 0 * 86400000 + 20 * 3600000),
+        img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', verified: true, step: 1,
+        reason: 'Out-of-station trip clashes with event.'
+      },
+
+      {
+        id: 'in-018', title: 'Cancelled Luxury Spa Day Package (2 Persons)', category: 'Spa & Wellness',
+        providerName: 'Elemis Spa by Marriott', location: 'Bangalore, Karnataka',
+        originalPrice: 12000, resalePrice: 7200, discount: 40, depositLost: 6000,
+        eventDate: 'Aug 16, 2026', deadline: new Date(Date.now() + 2 * 86400000 + 14 * 3600000),
+        img: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800', verified: true, step: 1,
+        reason: 'Anniversary date changed.'
+      },
+
+      {
+        id: 'in-019', title: 'Cancelled Taxi Airport Transfer + Sightseeing', category: 'Transport',
+        providerName: 'GoIndia Cabs', location: 'Jaipur, Rajasthan',
+        originalPrice: 4500, resalePrice: 2700, discount: 40, depositLost: 2000,
+        eventDate: 'Aug 07, 2026', deadline: new Date(Date.now() + 0 * 86400000 + 12 * 3600000),
+        img: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800', verified: true, step: 1,
+        reason: 'Flight cancelled, trip aborted.'
+      },
+
+      {
+        id: 'in-020', title: 'Cancelled DJ Night + Sound System – 5 Hrs', category: 'Events',
+        providerName: 'Bass Nation DJs', location: 'Hyderabad, Telangana',
+        originalPrice: 28000, resalePrice: 16800, discount: 40, depositLost: 14000,
+        eventDate: 'Aug 13, 2026', deadline: new Date(Date.now() + 1 * 86400000 + 18 * 3600000),
+        img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', verified: true, step: 1,
+        reason: 'Venue switched to outdoor; DJ slot not needed.'
+      },
+
+      {
+        id: 'in-021', title: 'Cancelled Cooking Class – Italian Cuisine (8 Seats)', category: 'Classes',
+        providerName: 'Chef Marco Kitchen Studio', location: 'Bangalore, Karnataka',
+        originalPrice: 9600, resalePrice: 5760, discount: 40, depositLost: 4800,
+        eventDate: 'Aug 10, 2026', deadline: new Date(Date.now() + 1 * 86400000 + 6 * 3600000),
+        img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800', verified: true, step: 1,
+        reason: 'Participant group cancelled plans.'
+      },
+
+      {
+        id: 'in-022', title: 'Cancelled Houseboat Stay – Alleppey Backwaters', category: 'Hotels',
+        providerName: 'Kerala Dream Houseboats', location: 'Alleppey, Kerala',
+        originalPrice: 18000, resalePrice: 11700, discount: 35, depositLost: 9000,
+        eventDate: 'Aug 22, 2026', deadline: new Date(Date.now() + 7 * 86400000 + 9 * 3600000),
+        img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800', verified: true, step: 1,
+        reason: 'Friend group unable to coordinate dates.'
+      },
+
+      {
+        id: 'in-023', title: 'Cancelled Couple Photoshoot – Bioluminescence Beach', category: 'Photography',
+        providerName: 'Shimmer Lens Studio', location: 'Goa',
+        originalPrice: 15000, resalePrice: 9000, discount: 40, depositLost: 7500,
+        eventDate: 'Aug 17, 2026', deadline: new Date(Date.now() + 3 * 86400000 + 20 * 3600000),
+        img: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800', verified: true, step: 1,
+        reason: 'Couple postponed honeymoon trip.'
+      },
+
+      {
+        id: 'in-024', title: 'Cancelled IPL Afterparty Venue – Full Hall', category: 'Venues',
+        providerName: 'Powerplay Events Pvt.', location: 'Mumbai, Maharashtra',
+        originalPrice: 120000, resalePrice: 72000, discount: 40, depositLost: 60000,
+        eventDate: 'Aug 19, 2026', deadline: new Date(Date.now() + 4 * 86400000 + 2 * 3600000),
+        img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800', verified: true, step: 2,
+        reason: 'Event organiser shut down operations.'
+      },
+
+      {
+        id: 'in-025', title: 'Cancelled Carnatic Music Concert – 3 Passes', category: 'Concerts',
+        providerName: 'Thyagaraja Sabha Trust', location: 'Chennai, Tamil Nadu',
+        originalPrice: 4500, resalePrice: 2700, discount: 40, depositLost: 2200,
+        eventDate: 'Aug 12, 2026', deadline: new Date(Date.now() + 2 * 86400000 + 8 * 3600000),
+        img: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800', verified: true, step: 1,
+        reason: 'Family function conflict.'
+      },
+
+      {
+        id: 'in-026', title: 'Cancelled Zumba + Dance Fitness 6-Month Pass', category: 'Gyms',
+        providerName: 'RhythmFit Studio', location: 'Pune, Maharashtra',
+        originalPrice: 10800, resalePrice: 5400, discount: 50, depositLost: 10800,
+        eventDate: 'Oct 01, 2026', deadline: new Date(Date.now() + 9 * 86400000 + 1 * 3600000),
+        img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', verified: true, step: 1,
+        reason: 'Moving city for job transfer.'
+      },
+
+      {
+        id: 'in-027', title: 'Cancelled Cycling Tour – Coorg Coffee Estates', category: 'Sports',
+        providerName: 'Pedal Trek Adventures', location: 'Coorg, Karnataka',
+        originalPrice: 8000, resalePrice: 4800, discount: 40, depositLost: 4000,
+        eventDate: 'Aug 23, 2026', deadline: new Date(Date.now() + 5 * 86400000 + 15 * 3600000),
+        img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800', verified: true, step: 1,
+        reason: 'Participant fractured ankle.'
+      },
+
+      {
+        id: 'in-028', title: 'Cancelled Rajasthan Heritage Train Tour Package', category: 'Travel Packages',
+        providerName: 'Royal Rajasthan Holidays', location: 'Jodhpur, Rajasthan',
+        originalPrice: 55000, resalePrice: 35750, discount: 35, depositLost: 27500,
+        eventDate: 'Sep 05, 2026', deadline: new Date(Date.now() + 10 * 86400000 + 4 * 3600000),
+        img: 'https://images.unsplash.com/photo-1502784444187-359ac186c5bb?w=800', verified: true, step: 1,
+        reason: 'Client family emergency forced cancellation.'
+      },
+
+      {
+        id: 'in-029', title: 'Cancelled Bridal Hair & Makeup – Morning Slot', category: 'Spa & Wellness',
+        providerName: 'Luxe Looks Salon', location: 'Vijayawada, Andhra Pradesh',
+        originalPrice: 8000, resalePrice: 4800, discount: 40, depositLost: 4000,
+        eventDate: 'Aug 08, 2026', deadline: new Date(Date.now() + 0 * 86400000 + 10 * 3600000),
+        img: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800', verified: true, step: 1,
+        reason: 'Wedding shifted; no longer needs morning slot.'
+      },
+
+      {
+        id: 'in-030', title: 'Cancelled Paragliding Session – Bir Billing', category: 'Sports',
+        providerName: 'Sky Wings Adventure', location: 'Bir, Himachal Pradesh',
+        originalPrice: 3500, resalePrice: 2100, discount: 40, depositLost: 1750,
+        eventDate: 'Aug 24, 2026', deadline: new Date(Date.now() + 6 * 86400000 + 18 * 3600000),
+        img: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800', verified: true, step: 1,
+        reason: 'Weather window missed, next slot too far.'
+      },
+
+      {
+        id: 'in-031', title: 'Cancelled Indoor Cricket Academy – 3-Month Batch', category: 'Sports',
+        providerName: 'RCB Cricket Academy', location: 'Bangalore, Karnataka',
+        originalPrice: 21000, resalePrice: 13650, discount: 35, depositLost: 10500,
+        eventDate: 'Sep 15, 2026', deadline: new Date(Date.now() + 7 * 86400000 + 11 * 3600000),
+        img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800', verified: true, step: 1,
+        reason: 'Student got placed out of city.'
+      },
+
+      {
+        id: 'in-032', title: 'Cancelled Photography Drone Shoot – Corporate', category: 'Photography',
+        providerName: 'AirFrame Media Works', location: 'Hyderabad, Telangana',
+        originalPrice: 30000, resalePrice: 18000, discount: 40, depositLost: 15000,
+        eventDate: 'Aug 15, 2026', deadline: new Date(Date.now() + 2 * 86400000 + 16 * 3600000),
+        img: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800', verified: true, step: 1,
+        reason: 'Project shelved; budget cut.'
+      },
+
+      {
+        id: 'in-033', title: 'Cancelled 5-Star Dinner Reservation for 10', category: 'Catering',
+        providerName: 'ITC Grand Kakatiya', location: 'Hyderabad, Telangana',
+        originalPrice: 25000, resalePrice: 16250, discount: 35, depositLost: 12500,
+        eventDate: 'Aug 09, 2026', deadline: new Date(Date.now() + 1 * 86400000 + 3 * 3600000),
+        img: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800', verified: true, step: 1,
+        reason: 'Office celebration postponed.'
+      },
+
+      {
+        id: 'in-034', title: 'Cancelled Dandiya Night Event – 50 Passes', category: 'Events',
+        providerName: 'Navratri Utsav Club', location: 'Ahmedabad, Gujarat',
+        originalPrice: 20000, resalePrice: 10000, discount: 50, depositLost: 12000,
+        eventDate: 'Oct 02, 2026', deadline: new Date(Date.now() + 11 * 86400000 + 8 * 3600000),
+        img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', verified: true, step: 1,
+        reason: 'Society event cancelled due to permissions.'
+      },
+
+      {
+        id: 'in-035', title: 'Cancelled Eco-Cabin Forest Stay – 2 Nights', category: 'Hotels',
+        providerName: 'Aranya Forest Retreats', location: 'Coorg, Karnataka',
+        originalPrice: 11000, resalePrice: 7150, discount: 35, depositLost: 5500,
+        eventDate: 'Aug 21, 2026', deadline: new Date(Date.now() + 4 * 86400000 + 19 * 3600000),
+        img: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800', verified: true, step: 1,
+        reason: 'Work deadline extended; trip postponed.'
+      },
+
+      {
+        id: 'in-036', title: 'Cancelled Online Photography Masterclass – 8 Seats', category: 'Classes',
+        providerName: 'Pixel Perfect Academy', location: 'Bangalore, Karnataka',
+        originalPrice: 6400, resalePrice: 4160, discount: 35, depositLost: 3200,
+        eventDate: 'Aug 10, 2026', deadline: new Date(Date.now() + 1 * 86400000 + 7 * 3600000),
+        img: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800', verified: true, step: 1,
+        reason: 'Instructor unavailable due to personal reason.'
+      },
+
+      {
+        id: 'in-037', title: 'Cancelled Open-Air Concert – Fusion Band Night', category: 'Concerts',
+        providerName: 'Strings & Beats Collective', location: 'Pune, Maharashtra',
+        originalPrice: 7500, resalePrice: 4500, discount: 40, depositLost: 3750,
+        eventDate: 'Aug 16, 2026', deadline: new Date(Date.now() + 2 * 86400000 + 22 * 3600000),
+        img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', verified: true, step: 1,
+        reason: 'Venue double-booked.'
+      },
+
+      {
+        id: 'in-038', title: 'Cancelled Ladakh Road-Trip Package – 7 Days', category: 'Travel Packages',
+        providerName: 'Mountain Moto Trails', location: 'Leh, Ladakh',
+        originalPrice: 70000, resalePrice: 42000, discount: 40, depositLost: 35000,
+        eventDate: 'Sep 10, 2026', deadline: new Date(Date.now() + 9 * 86400000 + 14 * 3600000),
+        img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', verified: true, step: 1,
+        reason: 'Bike permit denied.'
+      },
+
+      {
+        id: 'in-039', title: 'Cancelled Tent House & Stage Setup', category: 'Venues',
+        providerName: 'Sri Balaji Tent Decorators', location: 'Warangal, Telangana',
+        originalPrice: 45000, resalePrice: 27000, discount: 40, depositLost: 22000,
+        eventDate: 'Aug 13, 2026', deadline: new Date(Date.now() + 1 * 86400000 + 22 * 3600000),
+        img: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800', verified: true, step: 1,
+        reason: 'Function cancelled, deposit forfeited.'
+      }
     ];
 
     let currentCategory = 'All';
@@ -744,16 +1223,23 @@
     let visibleCount = PAGE_SIZE;
 
     const cityKeywords = {
-      'New York':     ['new york', 'manhattan', 'brooklyn', 'soho'],
-      'Los Angeles':  ['los angeles'],
-      'Chicago':      ['chicago'],
-      'Miami':        ['miami'],
-      'San Francisco':['san francisco'],
-      'Austin':       ['austin'],
-      'Denver':       ['denver'],
-      'Toronto':      ['toronto'],
-      'Maldives':     ['maldives'],
-      'Europe':       ['italy', 'switzerland', 'florence', 'tuscany', 'zermatt']
+      'Hyderabad': ['hyderabad'],
+      'Jaipur': ['jaipur', 'jodhpur'],
+      'Goa': ['goa'],
+      'Munnar': ['munnar'],
+      'Vijayawada': ['vijayawada'],
+      'Warangal': ['warangal'],
+      'Mumbai': ['mumbai', 'maharashtra'],
+      'Delhi': ['delhi', 'ncr'],
+      'Bangalore': ['bangalore', 'karnataka', 'coorg'],
+      'Chennai': ['chennai', 'tamil nadu', 'ooty'],
+      'Pune': ['pune'],
+      'Ahmedabad': ['ahmedabad', 'gujarat'],
+      'Rishikesh': ['rishikesh', 'uttarakhand'],
+      'Agra': ['agra', 'uttar pradesh'],
+      'Kerala': ['alleppey', 'kerala'],
+      'Himachal': ['bir', 'himachal'],
+      'Ladakh': ['leh', 'ladakh']
     };
 
     function matchesCity(listing, city) {
@@ -766,11 +1252,23 @@
     function getFiltered() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       return mockListings.filter(l => {
-        const matchesCat  = currentCategory === 'All' || l.category === currentCategory;
+        const matchesCat = currentCategory === 'All' || l.category === currentCategory;
         const matchesCityF = matchesCity(l, currentCity);
         const matchesSearch = !search || l.title.toLowerCase().includes(search) || l.location.toLowerCase().includes(search);
         return matchesCat && matchesCityF && matchesSearch;
       });
+    }
+
+    function fmtCountdown(deadline) {
+      const diff = deadline - Date.now();
+      if (diff <= 0) return '⏰ Expired';
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      if (d > 0) return `${d}d ${h}h ${m}m left`;
+      if (h > 0) return `${h}h ${m}m ${s}s left`;
+      return `${m}m ${s}s left`;
     }
 
     function renderListings() {
@@ -794,23 +1292,40 @@
           <div class="card-img-wrap">
             <img src="${l.img}" class="card-img" alt="${l.title}">
             <div class="discount-badge">-${l.discount}% OFF</div>
-            <div class="verified-badge">✓ Host Verified</div>
+            <div class="verified-badge">✓ Verified</div>
           </div>
           <div class="card-body">
             <div class="card-category">${l.category}</div>
             <div class="card-title">${l.title}</div>
             <div class="card-meta">📍 ${l.location}</div>
-            <div class="card-meta">📅 ${l.eventDate} | Host: ${l.providerName}</div>
             <div class="price-row">
               <div>
                 <div class="orig-price">₹${l.originalPrice.toLocaleString('en-IN')}</div>
                 <div class="resale-price">₹${l.resalePrice.toLocaleString('en-IN')}</div>
               </div>
-              <div class="deposit-lost-tag">Seller Lost ₹${l.depositLost.toLocaleString('en-IN')}</div>
+              <div class="deposit-lost-tag">Save ₹${(l.originalPrice - l.resalePrice).toLocaleString('en-IN')}</div>
+            </div>
+            <div class="countdown-strip" id="cd-${l.id}">
+              <span class="fire">🔥</span>
+              <span class="timer-val">${l.deadline ? fmtCountdown(l.deadline) : '📅 ' + l.eventDate}</span>
             </div>
           </div>
         </div>
       `).join('');
+
+      startCountdowns();
+    }
+
+    let countdownInterval = null;
+    function startCountdowns() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        mockListings.forEach(l => {
+          if (!l.deadline) return;
+          const el = document.getElementById('cd-' + l.id);
+          if (el) el.querySelector('.timer-val').textContent = fmtCountdown(l.deadline);
+        });
+      }, 1000);
     }
 
     function loadMore() {
@@ -847,7 +1362,7 @@
     }
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       const wrap = document.getElementById('cityPillWrap');
       if (!wrap.contains(e.target)) {
         document.getElementById('cityPill').classList.remove('open');
@@ -895,7 +1410,7 @@
     }
 
     // Close More dropdown on outside click
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       const wrap = document.getElementById('moreChipWrap');
       if (wrap && !wrap.contains(e.target)) {
         document.getElementById('moreChip').classList.remove('open');
@@ -1031,34 +1546,47 @@
       </div>
 
       <!-- Login Tabs -->
-      <div style="display:flex; gap:8px; margin-bottom:20px; background:var(--bg-mint); padding:4px; border-radius:12px;">
-        <button id="tabUser" onclick="switchLoginTab('user')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--primary); color:white; cursor:pointer;">👤 User Login</button>
-        <button id="tabProvider" onclick="switchLoginTab('provider')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--bg-mint); color:var(--text-dark); cursor:pointer;">🏢 Provider Login</button>
+      <div
+        style="display:flex; gap:8px; margin-bottom:20px; background:var(--bg-mint); padding:4px; border-radius:12px;">
+        <button id="tabUser" onclick="switchLoginTab('user')"
+          style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--primary); color:white; cursor:pointer;">👤
+          User Login</button>
+        <button id="tabProvider" onclick="switchLoginTab('provider')"
+          style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--bg-mint); color:var(--text-dark); cursor:pointer;">🏢
+          Provider Login</button>
       </div>
 
       <!-- User Login Form -->
       <div id="userForm">
         <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Select User Type:</label>
-        <select id="userRoleSelect" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:14px; font-size:14px;">
+        <select id="userRoleSelect"
+          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:14px; font-size:14px;">
           <option value="buyer">New Buyer (Browse & Claim Deals)</option>
           <option value="seller">Original Buyer (Resell Booking)</option>
         </select>
 
-        <input type="email" value="buyer@resale.com" placeholder="Email Address" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
-        <input type="password" value="password123" placeholder="Password" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
+        <input type="email" value="buyer@resale.com" placeholder="Email Address"
+          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
+        <input type="password" value="password123" placeholder="Password"
+          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
         <button class="btn-primary" onclick="submitUserLogin()">Sign In as User</button>
       </div>
 
       <!-- Service Provider Login Form -->
       <div id="providerForm" style="display:none;">
         <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Business / Hotel Name:</label>
-        <input type="text" value="Grand Hyatt Hotels" placeholder="e.g. Marriott / Grand Hyatt" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
-        
-        <input type="email" value="provider@grandhyatt.com" placeholder="Business Email" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
-        <input type="password" value="provider123" placeholder="Password" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
-        <button class="btn-primary" style="background:var(--dark-forest);" onclick="submitProviderLogin()">Sign In as Service Provider</button>
+        <input type="text" value="Grand Hyatt Hotels" placeholder="e.g. Marriott / Grand Hyatt"
+          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
+
+        <input type="email" value="provider@grandhyatt.com" placeholder="Business Email"
+          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
+        <input type="password" value="provider123" placeholder="Password"
+          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
+        <button class="btn-primary" style="background:var(--dark-forest);" onclick="submitProviderLogin()">Sign In as
+          Service Provider</button>
       </div>
     </div>
   </div>
 </body>
+
 </html>

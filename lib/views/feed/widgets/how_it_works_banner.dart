@@ -34,7 +34,7 @@ class HowItWorksBanner extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _buildStep('1', 'Seller Lists', 'Original buyer uploads cancelled slot'),
+              _buildStep('1', 'Seller Lists', 'Original buyer uploads cancelled slot'), 
               const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textMuted),
               _buildStep('2', 'Host Verifies', 'Hotel/Venue approves transfer'),
               const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textMuted),
