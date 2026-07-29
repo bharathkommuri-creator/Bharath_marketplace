@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Emerald White & Green Color Palette
-  static const Color primaryGreen = Color(0xFF0F9D58);qq
+  static const Color primaryGreen = Color(0xFF0F9D58);
   static const Color accentMint = Color(0xFF00C853);
   static const Color lightMintBg = Color(0xFFF0FDF4);
   static const Color darkForest = Color(0xFF064E3B);
