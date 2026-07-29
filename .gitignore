@@ -1,0 +1,14 @@
+# Flutter / Dart build outputs
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# IDE / OS settings
+.vscode/
+.idea/
+*.swp
+*.lock
+.DS_Store
