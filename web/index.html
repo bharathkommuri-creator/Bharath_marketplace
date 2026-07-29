@@ -144,6 +144,137 @@
       font-weight: 600;
     }
 
+    /* City + Search Row */
+    .city-search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    /* City Pill Selector */
+    .city-pill-wrap {
+      position: relative;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .city-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px 9px 14px;
+      background: white;
+      border: 1.5px solid var(--border-light);
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .city-pill:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(15,157,88,0.12);
+    }
+    .city-pill .pin-icon {
+      color: var(--primary);
+      font-size: 15px;
+      line-height: 1;
+    }
+    .city-pill .arrow-icon {
+      color: #888;
+      font-size: 13px;
+      margin-left: 2px;
+      transition: transform 0.2s;
+    }
+    .city-pill.open .arrow-icon {
+      transform: rotate(90deg);
+    }
+
+    /* City Dropdown */
+    .city-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+      min-width: 220px;
+      z-index: 200;
+      overflow: hidden;
+      animation: dropIn 0.18s ease;
+    }
+    .city-dropdown.open { display: block; }
+    @keyframes dropIn {
+      from { opacity:0; transform: translateY(-6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .city-dropdown-header {
+      padding: 12px 16px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .city-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .city-option:hover {
+      background: var(--bg-mint);
+    }
+    .city-option.selected {
+      color: var(--primary);
+      background: rgba(15,157,88,0.06);
+    }
+    .city-option .city-emoji { font-size: 16px; }
+
+    /* Load More Button */
+    .load-more-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 8px 0 40px;
+    }
+    .load-more-btn {
+      background: white;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 15px;
+      padding: 14px 48px;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s;
+      box-shadow: 0 4px 16px rgba(15,157,88,0.1);
+    }
+    .load-more-btn:hover {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 8px 24px rgba(15,157,88,0.25);
+      transform: translateY(-2px);
+    }
+    .load-more-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      transform: none;
+    }
+
     /* Search Bar */
     .search-box {
       background: white;
@@ -154,7 +285,7 @@
       align-items: center;
       gap: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      margin-bottom: 24px;
+      flex: 1;
     }
 
     .search-box input {
@@ -196,6 +327,72 @@
       box-shadow: 0 4px 12px rgba(15, 157, 88, 0.25);
     }
 
+    /* More dropdown */
+    .more-chip-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .more-chip {
+      background: white;
+      border: 1.5px solid var(--border-light);
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--dark-forest);
+    }
+    .more-chip:hover, .more-chip.open {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .more-chip .chevron {
+      font-size: 11px;
+      transition: transform 0.2s;
+    }
+    .more-chip.open .chevron { transform: rotate(180deg); }
+
+    .more-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      min-width: 200px;
+      z-index: 300;
+      overflow: hidden;
+      animation: dropIn 0.18s ease;
+    }
+    .more-dropdown.open { display: block; }
+    .more-cat-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .more-cat-option:hover {
+      background: var(--bg-mint);
+      color: var(--primary);
+    }
+    .more-cat-option.active {
+      color: var(--primary);
+      background: rgba(15,157,88,0.07);
+    }
+
     /* Grid */
     .section-title {
       font-size: 20px;
@@ -208,14 +405,14 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
       margin-bottom: 40px;
     }
 
     .card {
       background: white;
-      border-radius: 20px;
+      border-radius: 16px;
       border: 1px solid var(--border-light);
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(15, 157, 88, 0.05);
@@ -230,7 +427,7 @@
 
     .card-img-wrap {
       position: relative;
-      height: 180px;
+      height: 130px;
     }
 
     .card-img {
@@ -429,20 +626,46 @@
     <!-- Hero Banner -->
     <div class="hero">
       <div class="hero-content">
-        <h1>Resell Non-Refundable Bookings</h1>
+        <h1>Available Deals</h1>
         <p>Connect with Service Providers & Original Buyers to claim hotel, venue & event slots at 30% - 50% OFF.</p>
         <div class="stats-row">
           <div class="stat-pill">✓ 100% Host Verified</div>
           <div class="stat-pill">⚡ 3-Party Escrow Transfer</div>
-          <div class="stat-pill">💰 $420 Avg. Saved</div>
+          <div class="stat-pill">💰 ₹35,000 Avg. Saved</div>
         </div>
       </div>
     </div>
 
-    <!-- Search Input -->
-    <div class="search-box">
-      <span style="color:var(--primary); font-weight:bold;">🔍</span>
-      <input type="text" id="searchInput" placeholder="Search hotels, venues, photography, catering, or locations..." oninput="filterListings()">
+    <!-- City Pill + Search in one row -->
+    <div class="city-search-row">
+      <!-- City Pill Selector -->
+      <div class="city-pill-wrap" id="cityPillWrap">
+        <div class="city-pill" id="cityPill" onclick="toggleCityDropdown()">
+          <span class="pin-icon">📍</span>
+          <span id="cityPillLabel">All Cities</span>
+          <span class="arrow-icon">›</span>
+        </div>
+        <div class="city-dropdown" id="cityDropdown">
+          <div class="city-dropdown-header">Select a City</div>
+          <div class="city-option selected" onclick="setCity('All', '📍 All Cities')"><span class="city-emoji">📍</span> All Cities</div>
+          <div class="city-option" onclick="setCity('New York', '🗽 New York')"><span class="city-emoji">🗽</span> New York</div>
+          <div class="city-option" onclick="setCity('Los Angeles', '🌴 Los Angeles')"><span class="city-emoji">🌴</span> Los Angeles</div>
+          <div class="city-option" onclick="setCity('Chicago', '🏙️ Chicago')"><span class="city-emoji">🏙️</span> Chicago</div>
+          <div class="city-option" onclick="setCity('Miami', '🌊 Miami')"><span class="city-emoji">🌊</span> Miami</div>
+          <div class="city-option" onclick="setCity('San Francisco', '🌉 San Francisco')"><span class="city-emoji">🌉</span> San Francisco</div>
+          <div class="city-option" onclick="setCity('Austin', '🎸 Austin')"><span class="city-emoji">🎸</span> Austin</div>
+          <div class="city-option" onclick="setCity('Denver', '⛰️ Denver')"><span class="city-emoji">⛰️</span> Denver</div>
+          <div class="city-option" onclick="setCity('Toronto', '🍁 Toronto')"><span class="city-emoji">🍁</span> Toronto</div>
+          <div class="city-option" onclick="setCity('Maldives', '🏝️ Maldives')"><span class="city-emoji">🏝️</span> Maldives</div>
+          <div class="city-option" onclick="setCity('Europe', '🏰 Europe')"><span class="city-emoji">🏰</span> Europe</div>
+        </div>
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-box">
+        <span style="color:var(--primary); font-weight:bold;">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search hotels, venues, photography, catering, or locations..." oninput="renderListings()">
+      </div>
     </div>
 
     <!-- Multi-Category Filter Pills -->
@@ -454,6 +677,19 @@
       <button class="category-chip" onclick="setCategory('Catering', this)">🍽️ Catering</button>
       <button class="category-chip" onclick="setCategory('Gyms', this)">🏋️ Gyms</button>
       <button class="category-chip" onclick="setCategory('Events', this)">🎟️ Events</button>
+
+      <!-- More dropdown -->
+      <div class="more-chip-wrap" id="moreChipWrap">
+        <button class="more-chip" id="moreChip" onclick="toggleMoreDropdown()">More <span class="chevron">▾</span></button>
+        <div class="more-dropdown" id="moreDropdown">
+          <div class="more-cat-option" onclick="setMoreCategory('Spa & Wellness', '🧖 Spa &amp; Wellness', this)">🧖 Spa &amp; Wellness</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Transport', '🚗 Transport', this)">🚗 Transport</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Classes', '🎓 Classes', this)">🎓 Classes</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Concerts', '🎵 Concerts', this)">🎵 Concerts</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Sports', '⚽ Sports', this)">⚽ Sports</div>
+          <div class="more-cat-option" onclick="setMoreCategory('Travel Packages', '✈️ Travel Packages', this)">✈️ Travel Packages</div>
+        </div>
+      </div>
     </div>
 
     <!-- Category Header -->
@@ -464,6 +700,11 @@
 
     <!-- Listings Grid -->
     <div class="grid" id="listingsGrid"></div>
+
+    <!-- Load More -->
+    <div class="load-more-wrap">
+      <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">⬇ Load More Deals</button>
+    </div>
   </div>
 
   <!-- FAB -->
@@ -476,114 +717,79 @@
 
   <script>
     const mockListings = [
-      {
-        id: 'l-001',
-        title: 'Luxury Oceanfront Suite - 3 Nights',
-        category: 'Hotels',
-        providerName: 'Grand Hyatt Maldives',
-        location: 'South Male Atoll, Maldives',
-        originalPrice: 1800,
-        resalePrice: 1050,
-        discount: 42,
-        depositLost: 900,
-        eventDate: 'Aug 14, 2026',
-        img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800',
-        verified: true,
-        step: 1
-      },
-      {
-        id: 'l-002',
-        title: 'Botanical Garden Wedding & Party Venue',
-        category: 'Venues',
-        providerName: 'Oakridge Estate & Gardens',
-        location: 'Napa Valley, California',
-        originalPrice: 4500,
-        resalePrice: 2700,
-        discount: 40,
-        depositLost: 2000,
-        eventDate: 'Sep 02, 2026',
-        img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800',
-        verified: true,
-        step: 2
-      },
-      {
-        id: 'l-003',
-        title: 'Full-Day Premium Wedding & Portrait Photography',
-        category: 'Photography',
-        providerName: 'Lumina Studio Studios',
-        location: 'Manhattan, New York',
-        originalPrice: 2200,
-        resalePrice: 1320,
-        discount: 40,
-        depositLost: 800,
-        eventDate: 'Aug 28, 2026',
-        img: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800',
-        verified: true,
-        step: 1
-      },
-      {
-        id: 'l-004',
-        title: 'Gourmet 5-Course Banquet Catering (80 Guests)',
-        category: 'Catering',
-        providerName: 'Artisan Culinary Group',
-        location: 'Downtown Chicago, IL',
-        originalPrice: 3200,
-        resalePrice: 1920,
-        discount: 40,
-        depositLost: 1500,
-        eventDate: 'Aug 20, 2026',
-        img: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800',
-        verified: true,
-        step: 1
-      },
-      {
-        id: 'l-005',
-        title: 'Annual VIP All-Access Gym Pass (Transferable)',
-        category: 'Gyms',
-        providerName: 'Equinox Fitness Club',
-        location: 'San Francisco, CA',
-        originalPrice: 1500,
-        resalePrice: 750,
-        discount: 50,
-        depositLost: 1500,
-        eventDate: 'Oct 01, 2026',
-        img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800',
-        verified: true,
-        step: 1
-      },
-      {
-        id: 'l-006',
-        title: 'Front-Row VIP Conference & Tech Gala Pass',
-        category: 'Events',
-        providerName: 'TechSummit Global',
-        location: 'Austin Convention Center, TX',
-        originalPrice: 1200,
-        resalePrice: 660,
-        discount: 45,
-        depositLost: 1200,
-        eventDate: 'Aug 10, 2026',
-        img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800',
-        verified: true,
-        step: 1
-      }
+      { id: 'l-001', title: 'Luxury Oceanfront Suite - 3 Nights', category: 'Hotels', providerName: 'Grand Hyatt Maldives', location: 'South Male Atoll, Maldives', originalPrice: 1800, resalePrice: 1050, discount: 42, depositLost: 900, eventDate: 'Aug 15, 2026', img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800', verified: true, step: 1 },
+      { id: 'l-002', title: 'Botanical Garden Wedding Venue', category: 'Venues', providerName: 'Oakridge Estate & Gardens', location: 'Napa Valley, California', originalPrice: 4500, resalePrice: 2700, discount: 40, depositLost: 2000, eventDate: 'Sep 02, 2026', img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800', verified: true, step: 2 },
+      { id: 'l-003', title: 'Full-Day Premium Photography', category: 'Photography', providerName: 'Lumina Studios', location: 'Manhattan, New York', originalPrice: 2200, resalePrice: 1320, discount: 40, depositLost: 800, eventDate: 'Aug 28, 2026', img: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800', verified: true, step: 1 },
+      { id: 'l-004', title: 'Gourmet 5-Course Banquet Catering', category: 'Catering', providerName: 'Artisan Culinary Group', location: 'Downtown Chicago, IL', originalPrice: 3200, resalePrice: 1920, discount: 40, depositLost: 1500, eventDate: 'Aug 20, 2026', img: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800', verified: true, step: 1 },
+      { id: 'l-005', title: 'Annual VIP Gym Pass (Transferable)', category: 'Gyms', providerName: 'Equinox Fitness Club', location: 'San Francisco, CA', originalPrice: 1500, resalePrice: 750, discount: 50, depositLost: 1500, eventDate: 'Oct 01, 2026', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', verified: true, step: 1 },
+      { id: 'l-006', title: 'Front-Row VIP Tech Gala Pass', category: 'Events', providerName: 'TechSummit Global', location: 'Austin Convention Center, TX', originalPrice: 1200, resalePrice: 660, discount: 45, depositLost: 1200, eventDate: 'Aug 10, 2026', img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', verified: true, step: 1 },
+      { id: 'l-007', title: 'Swiss Alps Chalet - 4 Nights', category: 'Hotels', providerName: 'Alpine Crest Lodge', location: 'Zermatt, Switzerland', originalPrice: 2400, resalePrice: 1440, discount: 40, depositLost: 1200, eventDate: 'Sep 10, 2026', img: 'https://images.unsplash.com/photo-1502784444187-359ac186c5bb?w=800', verified: true, step: 1 },
+      { id: 'l-008', title: 'Modern Glass Ballroom Venue', category: 'Venues', providerName: 'Skyline Glasshouse', location: 'Seattle, Washington', originalPrice: 5000, resalePrice: 3000, discount: 40, depositLost: 2500, eventDate: 'Oct 15, 2026', img: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800', verified: true, step: 1 },
+      { id: 'l-009', title: 'Cinematic Drone & Video Package', category: 'Photography', providerName: 'AeroVision Media', location: 'Los Angeles, CA', originalPrice: 1600, resalePrice: 960, discount: 40, depositLost: 600, eventDate: 'Aug 25, 2026', img: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800', verified: true, step: 1 },
+      { id: 'l-010', title: 'Live Sushi Bar & Buffet Station', category: 'Catering', providerName: 'OmaKase Executive Catering', location: 'Miami Beach, Florida', originalPrice: 2800, resalePrice: 1680, discount: 40, depositLost: 1000, eventDate: 'Aug 22, 2026', img: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800', verified: true, step: 1 },
+      { id: 'l-011', title: 'CrossFit Unlimited 6-Month Pass', category: 'Gyms', providerName: 'IronVault Fitness', location: 'Denver, Colorado', originalPrice: 900, resalePrice: 450, discount: 50, depositLost: 900, eventDate: 'Sep 20, 2026', img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800', verified: true, step: 1 },
+      { id: 'l-012', title: 'Formula 1 Paddock Club Pass', category: 'Events', providerName: 'Grand Prix International', location: 'Las Vegas Strip Circuit', originalPrice: 3500, resalePrice: 1950, discount: 44, depositLost: 3500, eventDate: 'Nov 18, 2026', img: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800', verified: true, step: 1 },
+      { id: 'l-013', title: 'Boutique Heritage Villa Stay', category: 'Hotels', providerName: 'Villa Rosa Florence', location: 'Tuscany, Italy', originalPrice: 1400, resalePrice: 770, discount: 45, depositLost: 700, eventDate: 'Sep 05, 2026', img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800', verified: true, step: 1 },
+      { id: 'l-014', title: 'Rooftop Lounge Event Reservation', category: 'Venues', providerName: 'Skybar 360 Towers', location: 'Toronto, Canada', originalPrice: 2100, resalePrice: 1155, discount: 45, depositLost: 1000, eventDate: 'Aug 30, 2026', img: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800', verified: true, step: 1 },
+      { id: 'l-015', title: 'Fashion & Commercial Shoot', category: 'Photography', providerName: 'Vogue Vision Labs', location: 'SoHo, New York', originalPrice: 1800, resalePrice: 990, discount: 45, depositLost: 900, eventDate: 'Aug 18, 2026', img: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800', verified: true, step: 1 },
+      { id: 'l-016', title: 'Artisanal Cocktail & Tapas Bar', category: 'Catering', providerName: 'Mixology Masters', location: 'Brooklyn, NY', originalPrice: 1900, resalePrice: 1045, discount: 45, depositLost: 800, eventDate: 'Sep 12, 2026', img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800', verified: true, step: 1 },
+      { id: 'l-017', title: 'Pilates & Wellness Club Pass', category: 'Gyms', providerName: 'Core Balance Studio', location: 'Austin, Texas', originalPrice: 800, resalePrice: 440, discount: 45, depositLost: 800, eventDate: 'Oct 10, 2026', img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', verified: true, step: 1 },
+      { id: 'l-018', title: 'EDM Music Festival Weekend VIP', category: 'Events', providerName: 'Electric Horizon Fest', location: 'Orlando, Florida', originalPrice: 950, resalePrice: 475, discount: 50, depositLost: 950, eventDate: 'Aug 14, 2026', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', verified: true, step: 1 }
     ];
 
     let currentCategory = 'All';
+    let currentCity = 'All';
     let currentRole = 'buyer';
+    const PAGE_SIZE = 9;
+    let visibleCount = PAGE_SIZE;
+
+    const cityKeywords = {
+      'New York':     ['new york', 'manhattan', 'brooklyn', 'soho'],
+      'Los Angeles':  ['los angeles'],
+      'Chicago':      ['chicago'],
+      'Miami':        ['miami'],
+      'San Francisco':['san francisco'],
+      'Austin':       ['austin'],
+      'Denver':       ['denver'],
+      'Toronto':      ['toronto'],
+      'Maldives':     ['maldives'],
+      'Europe':       ['italy', 'switzerland', 'florence', 'tuscany', 'zermatt']
+    };
+
+    function matchesCity(listing, city) {
+      if (city === 'All') return true;
+      const loc = listing.location.toLowerCase();
+      const kws = cityKeywords[city] || [city.toLowerCase()];
+      return kws.some(k => loc.includes(k));
+    }
+
+    function getFiltered() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      return mockListings.filter(l => {
+        const matchesCat  = currentCategory === 'All' || l.category === currentCategory;
+        const matchesCityF = matchesCity(l, currentCity);
+        const matchesSearch = !search || l.title.toLowerCase().includes(search) || l.location.toLowerCase().includes(search);
+        return matchesCat && matchesCityF && matchesSearch;
+      });
+    }
 
     function renderListings() {
       const grid = document.getElementById('listingsGrid');
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      
-      const filtered = mockListings.filter(l => {
-        const matchesCat = currentCategory === 'All' || l.category === currentCategory;
-        const matchesSearch = !search || l.title.toLowerCase().includes(search) || l.location.toLowerCase().includes(search);
-        return matchesCat && matchesSearch;
-      });
+      const filtered = getFiltered();
+      const toShow = filtered.slice(0, visibleCount);
 
       document.getElementById('countBadge').innerText = `${filtered.length} Deals Available`;
 
-      grid.innerHTML = filtered.map(l => `
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      if (visibleCount >= filtered.length) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = '✓ All Deals Shown';
+      } else {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = `⬇ Load More Deals (${filtered.length - visibleCount} more)`;
+      }
+
+      grid.innerHTML = toShow.map(l => `
         <div class="card" onclick="openDetail('${l.id}')">
           <div class="card-img-wrap">
             <img src="${l.img}" class="card-img" alt="${l.title}">
@@ -597,20 +803,108 @@
             <div class="card-meta">📅 ${l.eventDate} | Host: ${l.providerName}</div>
             <div class="price-row">
               <div>
-                <div class="orig-price">$${l.originalPrice}</div>
-                <div class="resale-price">$${l.resalePrice}</div>
+                <div class="orig-price">₹${l.originalPrice.toLocaleString('en-IN')}</div>
+                <div class="resale-price">₹${l.resalePrice.toLocaleString('en-IN')}</div>
               </div>
-              <div class="deposit-lost-tag">Seller Lost $${l.depositLost}</div>
+              <div class="deposit-lost-tag">Seller Lost ₹${l.depositLost.toLocaleString('en-IN')}</div>
             </div>
           </div>
         </div>
       `).join('');
     }
 
+    function loadMore() {
+      visibleCount += PAGE_SIZE;
+      renderListings();
+      // smooth scroll to newly loaded cards
+      const grid = document.getElementById('listingsGrid');
+      grid.lastElementChild && grid.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function toggleCityDropdown() {
+      const pill = document.getElementById('cityPill');
+      const dropdown = document.getElementById('cityDropdown');
+      pill.classList.toggle('open');
+      dropdown.classList.toggle('open');
+    }
+
+    function setCity(city, label) {
+      currentCity = city;
+      visibleCount = PAGE_SIZE;
+      // Update pill label
+      document.getElementById('cityPillLabel').textContent = label.replace(/^\S+\s/, '').trim();
+      // Update pill to show pin + new label
+      const pillEl = document.getElementById('cityPill');
+      pillEl.querySelector('#cityPillLabel').textContent = label;
+      // Mark selected option
+      document.querySelectorAll('.city-option').forEach(o => {
+        o.classList.toggle('selected', o.textContent.trim() === label.trim());
+      });
+      // Close dropdown
+      document.getElementById('cityPill').classList.remove('open');
+      document.getElementById('cityDropdown').classList.remove('open');
+      renderListings();
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const wrap = document.getElementById('cityPillWrap');
+      if (!wrap.contains(e.target)) {
+        document.getElementById('cityPill').classList.remove('open');
+        document.getElementById('cityDropdown').classList.remove('open');
+      }
+    });
+
     function setCategory(cat, btn) {
       currentCategory = cat;
+      visibleCount = PAGE_SIZE;
+      // Deactivate main chips
       document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      // Reset More chip label and items
+      document.getElementById('moreChip').innerHTML = 'More <span class="chevron">▾</span>';
+      document.getElementById('moreChip').classList.remove('open');
+      document.getElementById('moreDropdown').classList.remove('open');
+      document.querySelectorAll('.more-cat-option').forEach(o => o.classList.remove('active'));
+      renderListings();
+    }
+
+    function toggleMoreDropdown() {
+      const chip = document.getElementById('moreChip');
+      const dropdown = document.getElementById('moreDropdown');
+      chip.classList.toggle('open');
+      dropdown.classList.toggle('open');
+    }
+
+    function setMoreCategory(cat, label, el) {
+      currentCategory = cat;
+      visibleCount = PAGE_SIZE;
+      // Deactivate main chips
+      document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
+      // Highlight More chip with selected name
+      const chip = document.getElementById('moreChip');
+      chip.innerHTML = `${label} <span class="chevron">▾</span>`;
+      chip.classList.add('open');
+      // Highlight selected option
+      document.querySelectorAll('.more-cat-option').forEach(o => o.classList.remove('active'));
+      el.classList.add('active');
+      // Close dropdown
+      chip.classList.remove('open');
+      document.getElementById('moreDropdown').classList.remove('open');
+      renderListings();
+    }
+
+    // Close More dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const wrap = document.getElementById('moreChipWrap');
+      if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('moreChip').classList.remove('open');
+        document.getElementById('moreDropdown').classList.remove('open');
+      }
+    });
+
+    function filterListings() {
+      visibleCount = PAGE_SIZE;
       renderListings();
     }
 
@@ -633,16 +927,16 @@
         
         <div style="background:var(--bg-mint); padding:16px; border-radius:16px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span>Original Price:</span> <s>$${item.originalPrice}</s>
+            <span>Original Price:</span> <s>₹${item.originalPrice.toLocaleString('en-IN')}</s>
           </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--badge-red);">
-            <span>Seller Deposit Lost:</span> <b>-$${item.depositLost}</b>
+            <span>Seller Deposit Lost:</span> <b>-₹${item.depositLost.toLocaleString('en-IN')}</b>
           </div>
           <hr style="margin:12px 0; border:none; border-top:1px solid var(--border-light)">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-weight:800; font-size:20px; color:var(--primary);">$${item.resalePrice}</div>
-              <div style="font-size:12px; color:var(--primary); font-weight:700;">You Save $${item.originalPrice - item.resalePrice} (${item.discount}% OFF)</div>
+              <div style="font-weight:800; font-size:20px; color:var(--primary);">₹${item.resalePrice.toLocaleString('en-IN')}</div>
+              <div style="font-size:12px; color:var(--primary); font-weight:700;">You Save ₹${(item.originalPrice - item.resalePrice).toLocaleString('en-IN')} (${item.discount}% OFF)</div>
             </div>
             <span style="background:white; padding:6px 12px; border-radius:20px; font-weight:700; font-size:12px; color:var(--dark-forest);">📅 ${item.eventDate}</span>
           </div>
@@ -662,11 +956,11 @@
             <b>Host (${item.providerName}):</b> Official Verification: Booking #${item.id} is active and transferable upon guest request.
           </div>
           <div style="background:#F8FAFC; padding:10px; border-radius:10px; font-size:12px;">
-            <b>Seller:</b> Reselling due to schedule conflict. Deposit of $${item.depositLost} is non-refundable.
+            <b>Seller:</b> Reselling due to schedule conflict. Deposit of ₹${item.depositLost.toLocaleString('en-IN')} is non-refundable.
           </div>
         </div>
 
-        <button class="btn-primary" onclick="claimSlot('${item.id}')">Buy / Claim Slot Now ($${item.resalePrice})</button>
+        <button class="btn-primary" onclick="claimSlot('${item.id}')">Buy / Claim Slot Now (₹${item.resalePrice.toLocaleString('en-IN')})</button>
       `;
 
       modal.style.display = 'flex';

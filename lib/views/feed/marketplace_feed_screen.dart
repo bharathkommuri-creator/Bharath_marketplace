@@ -272,10 +272,10 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   sliver: SliverGrid(
                     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 400,
-                      mainAxisExtent: 310,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                      maxCrossAxisExtent: 260,
+                      mainAxisExtent: 250,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => ListingCard(listing: filteredListings[index]),

@@ -45,14 +45,14 @@ class ListingCard extends StatelessWidget {
               children: [
                 Image.network(
                   listing.booking.imageUrl,
-                  height: 160,
+                  height: 125,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    height: 160,
+                    height: 125,
                     color: AppTheme.lightMintBg,
                     child: const Center(
-                      child: Icon(Icons.hotel, color: AppTheme.primaryGreen, size: 40),
+                      child: Icon(Icons.hotel, color: AppTheme.primaryGreen, size: 36),
                     ),
                   ),
                 ),
@@ -71,15 +71,15 @@ class ListingCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Discount Badge (Emerald Mint Green Tag)
+                // Discount Badge
                 Positioned(
-                  top: 12,
-                  left: 12,
+                  top: 8,
+                  left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryGreen,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2),
@@ -92,7 +92,7 @@ class ListingCard extends StatelessWidget {
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                        fontSize: 11,
                       ),
                     ),
                   ),
@@ -100,22 +100,22 @@ class ListingCard extends StatelessWidget {
                 // Verified Provider Badge
                 if (listing.booking.isVerified)
                   Positioned(
-                    top: 12,
-                    right: 12,
+                    top: 8,
+                    right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         children: const [
-                          Icon(Icons.verified_rounded, color: AppTheme.primaryGreen, size: 14),
-                          SizedBox(width: 4),
+                          Icon(Icons.verified_rounded, color: AppTheme.primaryGreen, size: 12),
+                          SizedBox(width: 3),
                           Text(
-                            'Host Verified',
+                            'Verified',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.darkForest,
                             ),
@@ -126,17 +126,17 @@ class ListingCard extends StatelessWidget {
                   ),
                 // Category Chip
                 Positioned(
-                  bottom: 12,
-                  left: 12,
+                  bottom: 8,
+                  left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(6),
+                      color: Colors.black.withOpacity(0.65),
+                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       listing.booking.category,
-                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -145,7 +145,7 @@ class ListingCard extends StatelessWidget {
 
             // Card Body Content
             Padding(
-              padding: const EdgeInsets.all(14.0),
+              padding: const EdgeInsets.all(10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -154,40 +154,40 @@ class ListingCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textDark,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
 
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 14, color: AppTheme.textMuted),
-                      const SizedBox(width: 4),
+                      const Icon(Icons.location_on_outlined, size: 12, color: AppTheme.textMuted),
+                      const SizedBox(width: 3),
                       Expanded(
                         child: Text(
                           listing.booking.location,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
 
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today_outlined, size: 14, color: AppTheme.primaryGreen),
-                      const SizedBox(width: 4),
+                      const Icon(Icons.calendar_today_outlined, size: 12, color: AppTheme.primaryGreen),
+                      const SizedBox(width: 3),
                       Text(
-                        'Date: ${DateFormat('MMM dd, yyyy').format(listing.booking.eventDate)}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.darkForest),
+                        DateFormat('MMM dd, yyyy').format(listing.booking.eventDate),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.darkForest),
                       ),
                     ],
                   ),
-                  const Divider(height: 20, color: AppTheme.borderLight),
+                  const Divider(height: 14, color: AppTheme.borderLight),
 
                   // Pricing & Savings Row
                   Row(
@@ -199,7 +199,7 @@ class ListingCard extends StatelessWidget {
                           Text(
                             currencyFormatter.format(listing.booking.originalPrice),
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               color: AppTheme.textMuted,
                               decoration: TextDecoration.lineThrough,
                             ),
@@ -207,7 +207,7 @@ class ListingCard extends StatelessWidget {
                           Text(
                             currencyFormatter.format(listing.resalePrice),
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.primaryGreen,
                             ),
@@ -217,15 +217,15 @@ class ListingCard extends StatelessWidget {
 
                       // Seller Deposit Lost Badge
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppTheme.lightMintBg,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'Seller Lost \$${listing.depositLost.toInt()}',
+                          'Save \$${listing.buyerSavings.toInt()}',
                           style: const TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.darkForest,
                           ),
