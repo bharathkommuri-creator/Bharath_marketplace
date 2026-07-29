@@ -411,13 +411,17 @@
       </div>
     </div>
 
-    <div class="role-switcher">
-      <span class="role-badge">View Mode:</span>
-      <select id="roleSelect" class="role-select" onchange="switchRole(this.value)">
-        <option value="buyer">New Buyer (Claim Slot)</option>
-        <option value="seller">Original Seller (List Booking)</option>
-        <option value="provider">Service Provider (Verify Transfer)</option>
-      </select>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button onclick="openLoginModal()" style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑 Login Portal</button>
+
+      <div class="role-switcher">
+        <span class="role-badge">View Mode:</span>
+        <select id="roleSelect" class="role-select" onchange="switchRole(this.value)">
+          <option value="buyer">New Buyer (Claim Slot)</option>
+          <option value="seller">Original Seller (List Booking)</option>
+          <option value="provider">Service Provider (Verify Transfer)</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -681,8 +685,86 @@
       alert('Opening Seller Booking Upload Form...');
     }
 
+    function openLoginModal() {
+      document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function switchLoginTab(tab) {
+      if (tab === 'user') {
+        document.getElementById('userForm').style.display = 'block';
+        document.getElementById('providerForm').style.display = 'none';
+        document.getElementById('tabUser').style.background = 'var(--primary)';
+        document.getElementById('tabUser').style.color = 'white';
+        document.getElementById('tabProvider').style.background = 'var(--bg-mint)';
+        document.getElementById('tabProvider').style.color = 'var(--text-dark)';
+      } else {
+        document.getElementById('userForm').style.display = 'none';
+        document.getElementById('providerForm').style.display = 'block';
+        document.getElementById('tabProvider').style.background = 'var(--dark-forest)';
+        document.getElementById('tabProvider').style.color = 'white';
+        document.getElementById('tabUser').style.background = 'var(--bg-mint)';
+        document.getElementById('tabUser').style.color = 'var(--text-dark)';
+      }
+    }
+
+    function submitUserLogin() {
+      const role = document.getElementById('userRoleSelect').value;
+      switchRole(role);
+      alert('Successfully logged in as General User (' + (role === 'buyer' ? 'Buyer' : 'Seller') + ')!');
+      closeLoginModal();
+    }
+
+    function submitProviderLogin() {
+      switchRole('provider');
+      alert('Successfully authenticated as Service Provider / Vendor Host!');
+      closeLoginModal();
+    }
+
     // Initialize
     renderListings();
   </script>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card" style="max-width:440px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="font-size:20px; font-weight:800; color:var(--dark-forest);">🔑 ResaleHub Login</h2>
+        <span onclick="closeLoginModal()" style="cursor:pointer; font-size:20px; font-weight:bold;">✕</span>
+      </div>
+
+      <!-- Login Tabs -->
+      <div style="display:flex; gap:8px; margin-bottom:20px; background:var(--bg-mint); padding:4px; border-radius:12px;">
+        <button id="tabUser" onclick="switchLoginTab('user')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--primary); color:white; cursor:pointer;">👤 User Login</button>
+        <button id="tabProvider" onclick="switchLoginTab('provider')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--bg-mint); color:var(--text-dark); cursor:pointer;">🏢 Provider Login</button>
+      </div>
+
+      <!-- User Login Form -->
+      <div id="userForm">
+        <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Select User Type:</label>
+        <select id="userRoleSelect" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:14px; font-size:14px;">
+          <option value="buyer">New Buyer (Browse & Claim Deals)</option>
+          <option value="seller">Original Buyer (Resell Booking)</option>
+        </select>
+
+        <input type="email" value="buyer@resale.com" placeholder="Email Address" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
+        <input type="password" value="password123" placeholder="Password" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
+        <button class="btn-primary" onclick="submitUserLogin()">Sign In as User</button>
+      </div>
+
+      <!-- Service Provider Login Form -->
+      <div id="providerForm" style="display:none;">
+        <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Business / Hotel Name:</label>
+        <input type="text" value="Grand Hyatt Hotels" placeholder="e.g. Marriott / Grand Hyatt" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
+        
+        <input type="email" value="provider@grandhyatt.com" placeholder="Business Email" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
+        <input type="password" value="provider123" placeholder="Password" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
+        <button class="btn-primary" style="background:var(--dark-forest);" onclick="submitProviderLogin()">Sign In as Service Provider</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

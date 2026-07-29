@@ -5,6 +5,7 @@ import '../../models/resale_listing.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/marketplace_provider.dart';
 import '../../theme/app_theme.dart';
+import '../auth/auth_screen.dart';
 import '../seller/create_listing_screen.dart';
 import 'widgets/category_selector.dart';
 import 'widgets/how_it_works_banner.dart';
@@ -57,6 +58,35 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
           ],
         ),
         actions: [
+          // Login / Account Portal Button
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AuthScreen()),
+              );
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryGreen,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                  SizedBox(width: 6),
+                  Text(
+                    'Login Portal',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
           // Role Toggle Dropdown for quick testing
           PopupMenuButton<UserRole>(
             tooltip: 'Switch 3-Party Perspective',
