@@ -118,7 +118,7 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
                     'Discover Resold Booking Slots',
                     style: TextStyle(
                       fontSize: 22,
-                      fontWeight: FontWeight.extrabold,
+                      fontWeight: FontWeight.w800,
                       color: AppTheme.textDark,
                     ),
                   ),

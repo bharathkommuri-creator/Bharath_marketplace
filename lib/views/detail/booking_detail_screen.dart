@@ -169,7 +169,7 @@ class BookingDetailScreen extends StatelessWidget {
                             ),
                             Text(
                               currency.format(listing.resalePrice),
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.extrabold, color: AppTheme.primaryGreen),
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppTheme.primaryGreen),
                             ),
                           ],
                         ),
