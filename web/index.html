@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResaleHub - 3-Party Booking Resale Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0F9D58;
+      --primary-hover: #0B8043;
+      --accent: #00C853;
+      --bg-mint: #F0FDF4;
+      --dark-forest: #064E3B;
+      --text-dark: #0F172A;
+      --text-muted: #64748B;
+      --card-white: #FFFFFF;
+      --border-light: #E2E8F0;
+      --badge-red: #DC2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: #F8FAFC;
+      color: var(--text-dark);
+      padding-bottom: 60px;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--card-white);
+      border-bottom: 1px solid var(--border-light);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(15, 157, 88, 0.05);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      background: var(--bg-mint);
+      color: var(--primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--dark-forest);
+    }
+
+    .role-switcher {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-mint);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(15, 157, 88, 0.2);
+    }
+
+    .role-badge {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark-forest);
+    }
+
+    .role-select {
+      background: transparent;
+      border: none;
+      font-weight: 700;
+      color: var(--primary);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #0F9D58 0%, #064E3B 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px rgba(15, 157, 88, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .hero-content p {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Search Bar */
+    .search-box {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      margin-bottom: 24px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 15px;
+      padding: 8px 0;
+    }
+
+    /* Category Bar */
+    .category-bar {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 28px;
+    }
+
+    .category-chip {
+      background: white;
+      border: 1.5px solid var(--border-light);
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-chip.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(15, 157, 88, 0.25);
+    }
+
+    /* Grid */
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(15, 157, 88, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(15, 157, 88, 0.12);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      height: 180px;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .discount-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    .verified-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--dark-forest);
+      font-weight: 700;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .card-category {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid var(--border-light);
+      padding-top: 12px;
+    }
+
+    .orig-price {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .resale-price {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .deposit-lost-tag {
+      background: var(--bg-mint);
+      color: var(--dark-forest);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    /* Modal / Detail View */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: white;
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 24px;
+      padding: 28px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 14px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--primary);
+      color: white;
+      padding: 16px 28px;
+      border-radius: 30px;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(15, 157, 88, 0.3);
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .stepper {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0;
+      background: var(--bg-mint);
+      padding: 16px;
+      border-radius: 16px;
+    }
+
+    .step-item {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .step-item.active {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <div class="navbar">
+    <div class="brand">
+      <div class="brand-icon">⇄</div>
+      <div>
+        <div class="brand-title">ResaleHub</div>
+        <div style="font-size:11px; color:var(--text-muted);">3-Party Booking Resale Marketplace</div>
+      </div>
+    </div>
+
+    <div class="role-switcher">
+      <span class="role-badge">View Mode:</span>
+      <select id="roleSelect" class="role-select" onchange="switchRole(this.value)">
+        <option value="buyer">New Buyer (Claim Slot)</option>
+        <option value="seller">Original Seller (List Booking)</option>
+        <option value="provider">Service Provider (Verify Transfer)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Hero Banner -->
+    <div class="hero">
+      <div class="hero-content">
+        <h1>Resell Non-Refundable Bookings</h1>
+        <p>Connect with Service Providers & Original Buyers to claim hotel, venue & event slots at 30% - 50% OFF.</p>
+        <div class="stats-row">
+          <div class="stat-pill">✓ 100% Host Verified</div>
+          <div class="stat-pill">⚡ 3-Party Escrow Transfer</div>
+          <div class="stat-pill">💰 $420 Avg. Saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-box">
+      <span style="color:var(--primary); font-weight:bold;">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search hotels, venues, photography, catering, or locations..." oninput="filterListings()">
+    </div>
+
+    <!-- Multi-Category Filter Pills -->
+    <div class="category-bar">
+      <button class="category-chip active" onclick="setCategory('All', this)">🌐 All Categories</button>
+      <button class="category-chip" onclick="setCategory('Hotels', this)">🏨 Hotels</button>
+      <button class="category-chip" onclick="setCategory('Venues', this)">🏰 Venues</button>
+      <button class="category-chip" onclick="setCategory('Photography', this)">📷 Photography</button>
+      <button class="category-chip" onclick="setCategory('Catering', this)">🍽️ Catering</button>
+      <button class="category-chip" onclick="setCategory('Gyms', this)">🏋️ Gyms</button>
+      <button class="category-chip" onclick="setCategory('Events', this)">🎟️ Events</button>
+    </div>
+
+    <!-- Category Header -->
+    <div class="section-title">
+      <span id="sectionTitle">Available Resale Listings Across Categories</span>
+      <span style="font-size:13px; color:var(--primary); font-weight:700;" id="countBadge">6 Deals Available</span>
+    </div>
+
+    <!-- Listings Grid -->
+    <div class="grid" id="listingsGrid"></div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openCreateModal()">+ List Canceled Booking</button>
+
+  <!-- Detail / 3-Party Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-card" id="modalContent"></div>
+  </div>
+
+  <script>
+    const mockListings = [
+      {
+        id: 'l-001',
+        title: 'Luxury Oceanfront Suite - 3 Nights',
+        category: 'Hotels',
+        providerName: 'Grand Hyatt Maldives',
+        location: 'South Male Atoll, Maldives',
+        originalPrice: 1800,
+        resalePrice: 1050,
+        discount: 42,
+        depositLost: 900,
+        eventDate: 'Aug 14, 2026',
+        img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800',
+        verified: true,
+        step: 1
+      },
+      {
+        id: 'l-002',
+        title: 'Botanical Garden Wedding & Party Venue',
+        category: 'Venues',
+        providerName: 'Oakridge Estate & Gardens',
+        location: 'Napa Valley, California',
+        originalPrice: 4500,
+        resalePrice: 2700,
+        discount: 40,
+        depositLost: 2000,
+        eventDate: 'Sep 02, 2026',
+        img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800',
+        verified: true,
+        step: 2
+      },
+      {
+        id: 'l-003',
+        title: 'Full-Day Premium Wedding & Portrait Photography',
+        category: 'Photography',
+        providerName: 'Lumina Studio Studios',
+        location: 'Manhattan, New York',
+        originalPrice: 2200,
+        resalePrice: 1320,
+        discount: 40,
+        depositLost: 800,
+        eventDate: 'Aug 28, 2026',
+        img: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800',
+        verified: true,
+        step: 1
+      },
+      {
+        id: 'l-004',
+        title: 'Gourmet 5-Course Banquet Catering (80 Guests)',
+        category: 'Catering',
+        providerName: 'Artisan Culinary Group',
+        location: 'Downtown Chicago, IL',
+        originalPrice: 3200,
+        resalePrice: 1920,
+        discount: 40,
+        depositLost: 1500,
+        eventDate: 'Aug 20, 2026',
+        img: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800',
+        verified: true,
+        step: 1
+      },
+      {
+        id: 'l-005',
+        title: 'Annual VIP All-Access Gym Pass (Transferable)',
+        category: 'Gyms',
+        providerName: 'Equinox Fitness Club',
+        location: 'San Francisco, CA',
+        originalPrice: 1500,
+        resalePrice: 750,
+        discount: 50,
+        depositLost: 1500,
+        eventDate: 'Oct 01, 2026',
+        img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800',
+        verified: true,
+        step: 1
+      },
+      {
+        id: 'l-006',
+        title: 'Front-Row VIP Conference & Tech Gala Pass',
+        category: 'Events',
+        providerName: 'TechSummit Global',
+        location: 'Austin Convention Center, TX',
+        originalPrice: 1200,
+        resalePrice: 660,
+        discount: 45,
+        depositLost: 1200,
+        eventDate: 'Aug 10, 2026',
+        img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800',
+        verified: true,
+        step: 1
+      }
+    ];
+
+    let currentCategory = 'All';
+    let currentRole = 'buyer';
+
+    function renderListings() {
+      const grid = document.getElementById('listingsGrid');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      
+      const filtered = mockListings.filter(l => {
+        const matchesCat = currentCategory === 'All' || l.category === currentCategory;
+        const matchesSearch = !search || l.title.toLowerCase().includes(search) || l.location.toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+
+      document.getElementById('countBadge').innerText = `${filtered.length} Deals Available`;
+
+      grid.innerHTML = filtered.map(l => `
+        <div class="card" onclick="openDetail('${l.id}')">
+          <div class="card-img-wrap">
+            <img src="${l.img}" class="card-img" alt="${l.title}">
+            <div class="discount-badge">-${l.discount}% OFF</div>
+            <div class="verified-badge">✓ Host Verified</div>
+          </div>
+          <div class="card-body">
+            <div class="card-category">${l.category}</div>
+            <div class="card-title">${l.title}</div>
+            <div class="card-meta">📍 ${l.location}</div>
+            <div class="card-meta">📅 ${l.eventDate} | Host: ${l.providerName}</div>
+            <div class="price-row">
+              <div>
+                <div class="orig-price">$${l.originalPrice}</div>
+                <div class="resale-price">$${l.resalePrice}</div>
+              </div>
+              <div class="deposit-lost-tag">Seller Lost $${l.depositLost}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderListings();
+    }
+
+    function switchRole(role) {
+      currentRole = role;
+      alert(`Switched perspective to: ${role.toUpperCase()}`);
+    }
+
+    function openDetail(id) {
+      const item = mockListings.find(l => l.id === id);
+      const modal = document.getElementById('detailModal');
+      const content = document.getElementById('modalContent');
+
+      content.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h2>${item.title}</h2>
+          <button onclick="closeModal()" style="border:none; background:none; font-size:24px; cursor:pointer;">✕</button>
+        </div>
+        <img src="${item.img}" style="width:100%; height:220px; object-fit:cover; border-radius:16px; margin-bottom:16px;">
+        
+        <div style="background:var(--bg-mint); padding:16px; border-radius:16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span>Original Price:</span> <s>$${item.originalPrice}</s>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--badge-red);">
+            <span>Seller Deposit Lost:</span> <b>-$${item.depositLost}</b>
+          </div>
+          <hr style="margin:12px 0; border:none; border-top:1px solid var(--border-light)">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:800; font-size:20px; color:var(--primary);">$${item.resalePrice}</div>
+              <div style="font-size:12px; color:var(--primary); font-weight:700;">You Save $${item.originalPrice - item.resalePrice} (${item.discount}% OFF)</div>
+            </div>
+            <span style="background:white; padding:6px 12px; border-radius:20px; font-weight:700; font-size:12px; color:var(--dark-forest);">📅 ${item.eventDate}</span>
+          </div>
+        </div>
+
+        <div style="font-weight:700; margin-bottom:8px;">3-Party Transfer Progress</div>
+        <div class="stepper">
+          <div class="step-item ${item.step >= 1 ? 'active' : ''}">1. Listed</div>
+          <div class="step-item ${item.step >= 2 ? 'active' : ''}">2. Buyer Claimed</div>
+          <div class="step-item ${item.step >= 3 ? 'active' : ''}">3. Host Verified</div>
+          <div class="step-item ${item.step >= 4 ? 'active' : ''}">4. Complete</div>
+        </div>
+
+        <div style="border:1px solid var(--border-light); border-radius:16px; padding:16px; margin-bottom:20px;">
+          <div style="font-weight:700; font-size:14px; margin-bottom:12px;">💬 3-Party Chat (Provider - Seller - Buyer)</div>
+          <div style="background:#F8FAFC; padding:10px; border-radius:10px; font-size:12px; margin-bottom:8px;">
+            <b>Host (${item.providerName}):</b> Official Verification: Booking #${item.id} is active and transferable upon guest request.
+          </div>
+          <div style="background:#F8FAFC; padding:10px; border-radius:10px; font-size:12px;">
+            <b>Seller:</b> Reselling due to schedule conflict. Deposit of $${item.depositLost} is non-refundable.
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="claimSlot('${item.id}')">Buy / Claim Slot Now ($${item.resalePrice})</button>
+      `;
+
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').style.display = 'none';
+    }
+
+    function claimSlot(id) {
+      alert('Success! Slot claimed. Funds are held in 3-party escrow until Provider verifies reservation.');
+      closeModal();
+    }
+
+    function openCreateModal() {
+      alert('Opening Seller Booking Upload Form...');
+    }
+
+    // Initialize
+    renderListings();
+  </script>
+</body>
+</html>
