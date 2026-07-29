@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/marketplace_provider.dart';
@@ -9,6 +10,12 @@ import 'views/feed/marketplace_feed_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Supabase.initialize(
+    url: 'https://vpcaqnhypswvnjgqvwks.supabase.co',
+    anonKey: 'sb_publishable_yEfM--GMDtwnTTmSmQAHoQ_kistod28',
+  );
+
   runApp(const ResaleMarketplaceApp());
 }
 
