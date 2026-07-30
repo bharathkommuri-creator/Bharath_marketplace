@@ -12,8 +12,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   await Supabase.initialize(
-    url: 'https://vpcaqnhypswvnjgqvwks.supabase.co',
-    anonKey: 'sb_publishable_yEfM--GMDtwnTTmSmQAHoQ_kistod28',
+    url: 'https://upcaqahypupwxjgpzwks.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2FxYWh5cHVwd3hqZ3B6d2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMTg0ODAsImV4cCI6MjEwMDg5NDQ4MH0.DUCjsjMnG8ANUg1PeGyESU3AA9NrwLh1y05_jPrVb68',
   );
 
   runApp(const ResaleMarketplaceApp());

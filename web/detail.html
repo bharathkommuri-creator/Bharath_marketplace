@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deal Detail – ResaleHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0F9D58; --dark-forest: #064E3B;
+      --bg-mint: #F0FDF4; --text-dark: #0F172A;
+      --text-muted: #64748B; --border-light: #E2E8F0;
+      --badge-red: #DC2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F8FAFC; color: var(--text-dark); min-height: 100vh; }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: white; border-bottom: 1px solid var(--border-light);
+      padding: 14px 24px; display: flex; align-items: center; gap: 14px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 10px rgba(15,157,88,0.06);
+    }
+    .back-btn {
+      background: var(--bg-mint); border: none; color: var(--primary);
+      font-weight: 700; font-size: 14px; padding: 8px 16px;
+      border-radius: 20px; cursor: pointer; text-decoration: none;
+      transition: background 0.2s; display:flex; align-items:center; gap:6px;
+    }
+    .back-btn:hover { background: #d1fae5; }
+    .brand-title { font-size: 18px; font-weight: 800; color: var(--dark-forest); }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px; max-width: 1160px; margin: 28px auto;
+      padding: 0 20px 60px; align-items: start;
+    }
+    @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+
+    /* ── Left: Deal detail ── */
+    .hero-img {
+      width: 100%; height: 240px; object-fit: cover;
+      border-radius: 18px; margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-green  { background: var(--primary); color: white; }
+    .badge-mint   { background: var(--bg-mint); color: var(--dark-forest); border: 1px solid #a7f3d0; }
+    .badge-red    { background: #fef2f2; color: var(--badge-red); border: 1px solid #fecaca; }
+    h1 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle {
+      font-size: 13px; color: var(--text-muted); margin-bottom: 16px;
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .countdown-banner {
+      background: #fff5f5; border: 1.5px solid #fca5a5;
+      border-radius: 12px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; color: #b91c1c; font-size: 14px; margin-bottom: 18px;
+    }
+    .price-card { background: var(--bg-mint); border-radius: 16px; padding: 18px; margin-bottom: 18px; }
+    .price-row-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; }
+    .orig-price { text-decoration: line-through; color: var(--text-muted); }
+    .resale-price-big { font-size: 28px; font-weight: 800; color: var(--primary); }
+    .save-tag { background: white; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; color: var(--dark-forest); }
+    .divider { border: none; border-top: 1px solid var(--border-light); margin: 12px 0; }
+    .section-head { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+    .stepper { display: flex; gap: 4px; background: var(--bg-mint); padding: 12px; border-radius: 12px; margin-bottom: 18px; }
+    .step-item { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: var(--text-muted); }
+    .step-item.active { color: var(--primary); }
+    .reason-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px; font-size: 12px; color: #92400e; margin-bottom: 18px; }
+
+    /* ── Right: Chat panel ── */
+    .chat-col {
+      background: white; border-radius: 20px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      display: flex; flex-direction: column;
+      height: 720px; position: sticky; top: 80px; overflow: hidden;
+    }
+
+    /* Role switcher banner at top */
+    .role-switcher-top {
+      padding: 10px 14px;
+      background: var(--dark-forest);
+      border-radius: 20px 20px 0 0;
+    }
+    .role-switcher-top h3 { color: white; font-size: 14px; font-weight: 800; margin-bottom: 8px; }
+    .role-tabs { display: flex; gap: 6px; }
+    .role-tab {
+      flex: 1; padding: 7px 4px; border-radius: 10px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.08);
+      transition: all 0.15s; text-align: center;
+    }
+    .role-tab:hover { background: rgba(255,255,255,0.15); }
+    .role-tab.active { background: white; color: var(--dark-forest); border-color: white; }
+
+    /* Participant bar */
+    .participants {
+      display: flex; gap: 8px; padding: 10px 14px;
+      border-bottom: 1px solid var(--border-light); background: #fafafa; flex-wrap: wrap;
+    }
+    .participant {
+      display: flex; align-items: center; gap: 6px;
+      background: white; border: 1px solid var(--border-light);
+      border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; }
+    .dot-seller   { background: #3b82f6; }
+    .dot-provider { background: #22c55e; }
+    .dot-buyer    { background: #f59e0b; }
+
+    /* Messages */
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px; background: #F8FAFC;
+    }
+    .msg { display: flex; gap: 8px; max-width: 88%; }
+    .msg.them  { align-self: flex-start; }
+    .msg.you   { align-self: flex-end; flex-direction: row-reverse; }
+    .msg.system { align-self: center; max-width: 100%; }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0; margin-top: 2px;
+    }
+    .av-seller   { background: #dbeafe; }
+    .av-provider { background: #dcfce7; }
+    .av-buyer    { background: #fef3c7; }
+    .av-you      { background: #e0e7ff; }
+
+    .bubble {
+      border-radius: 16px; padding: 9px 13px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .msg.them  .bubble { background: white; border: 1px solid var(--border-light); border-radius: 4px 16px 16px 16px; }
+    .msg.you   .bubble { background: var(--dark-forest); color: white; border-radius: 16px 4px 16px 16px; }
+
+    .msg-sender { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; }
+    .msg.you .msg-sender { text-align: right; }
+    .msg-time { font-size: 10px; opacity: 0.5; margin-top: 3px; }
+    .msg.you .msg-time { text-align: right; }
+
+    .system-pill {
+      background: #e2e8f0; color: var(--text-muted);
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; text-align: center;
+    }
+
+    /* Typing indicator */
+    .typing-indicator { display: none; align-self: flex-start; }
+    .typing-indicator.visible { display: flex; }
+    .typing-bubble {
+      background: white; border: 1px solid var(--border-light);
+      border-radius: 4px 16px 16px 16px; padding: 10px 14px;
+      display: flex; gap: 4px; align-items: center;
+    }
+    .typing-bubble span {
+      width: 7px; height: 7px; background: var(--text-muted);
+      border-radius: 50%; animation: bounce 1.2s infinite;
+      display: inline-block;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40%           { transform: translateY(-5px); }
+    }
+
+    /* Input area */
+    .chat-input-area {
+      padding: 10px 12px; border-top: 1px solid var(--border-light);
+      display: flex; gap: 8px; align-items: flex-end; background: white;
+    }
+    .you-label {
+      font-size: 10px; font-weight: 700; color: var(--primary); margin-bottom: 4px;
+    }
+    .chat-input {
+      flex: 1; border: 1.5px solid var(--border-light);
+      border-radius: 14px; padding: 9px 13px;
+      font-size: 13px; resize: none; outline: none; font-family: inherit;
+      line-height: 1.4; max-height: 90px; transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--primary); }
+    .send-btn {
+      background: var(--primary); color: white; border: none;
+      border-radius: 12px; padding: 10px 15px;
+      font-size: 17px; cursor: pointer; flex-shrink: 0;
+      transition: background 0.2s; display: flex; align-items: center;
+    }
+    .send-btn:hover { background: var(--dark-forest); }
+
+    .not-found { text-align: center; padding: 80px 20px; color: var(--text-muted); max-width:500px; margin:0 auto; }
+    .not-found h2 { font-size: 22px; margin-bottom: 10px; color: var(--text-dark); }
+
+    /* ── Chat header bar (replaces role-switcher-top) ── */
+    .chat-header-bar {
+      background: var(--dark-forest); color: white;
+      padding: 14px 16px; border-radius: 20px 20px 0 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .chat-header-title { font-size: 14px; font-weight: 800; }
+    .chat-header-sub   { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+    .switch-role-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: white; border-radius: 20px; padding: 5px 12px;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .switch-role-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── Role picker overlay ── */
+    .role-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(6,78,59,0.82); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .role-picker {
+      background: white; border-radius: 24px; padding: 36px 32px;
+      max-width: 400px; width: 90%; text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .role-picker h2 { font-size: 20px; font-weight: 800; color: var(--dark-forest); margin-bottom: 6px; }
+    .role-picker p  { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+    .role-cards { display: flex; flex-direction: column; gap: 12px; }
+    .role-card {
+      display: flex; align-items: center; gap: 14px;
+      border: 2px solid var(--border-light); border-radius: 16px;
+      padding: 14px 18px; cursor: pointer; text-align: left;
+      transition: all 0.18s; background: white;
+    }
+    .role-card:hover { border-color: var(--primary); background: var(--bg-mint); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(15,157,88,0.12); }
+    .role-card-icon { font-size: 28px; flex-shrink: 0; }
+    .role-card-label { font-size: 15px; font-weight: 800; color: var(--text-dark); }
+    .role-card-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="back-btn" href="javascript:history.back()">← Back</a>
+  <div class="brand-title">⇄ ResaleHub</div>
+</nav>
+
+<!-- Role picker overlay (shown on first load) -->
+<div class="role-overlay" id="roleOverlay">
+  <div class="role-picker">
+    <h2>Who are you?</h2>
+    <p>Choose your role to enter the <b>Secure Deal Chat</b>.<br>You will only see the other two parties.</p>
+    <div class="role-cards">
+      <div class="role-card" onclick="chooseRole('buyer')">
+        <div class="role-card-icon">👤</div>
+        <div>
+          <div class="role-card-label">Interested Buyer</div>
+          <div class="role-card-desc">I want to purchase this cancelled booking</div>
+        </div>
+      </div>
+      <div class="role-card" onclick="chooseRole('seller')">
+        <div class="role-card-icon">🙋</div>
+        <div>
+          <div class="role-card-label">Seller (Original Buyer)</div>
+          <div class="role-card-desc">I listed this cancelled booking for resale</div>
+        </div>
+      </div>
+      <div class="role-card" onclick="chooseRole('provider')">
+        <div class="role-card-icon">🏢</div>
+        <div>
+          <div class="role-card-label">Service Provider</div>
+          <div class="role-card-desc">I am the hotel / venue / service business</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pageContent"></div>
+
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = 'https://upcaqahypupwxjgpzwks.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2FxYWh5cHVwd3hqZ3B6d2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMTg0ODAsImV4cCI6MjEwMDg5NDQ4MH0.DUCjsjMnG8ANUg1PeGyESU3AA9NrwLh1y05_jPrVb68';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ── Supabase chat helpers ─────────────────────────────────────────── */
+async function saveChatMessage(adId, role, text) {
+  try {
+    const { error } = await sb.from('transfer_chats').insert({
+      ad_id: adId,
+      sender_role: role === 'provider' ? 'service_provider' : role,
+      message: text,
+    });
+    if (error) console.warn('Supabase insert error:', error.message);
+  } catch(e) { console.warn('Chat save failed:', e); }
+}
+
+async function loadChatHistory(adId) {
+  try {
+    const { data, error } = await sb
+      .from('transfer_chats')
+      .select('sender_role, message, created_at')
+      .eq('ad_id', adId)
+      .order('created_at', { ascending: true })
+      .limit(100);
+    if (error) { console.warn('Load history error:', error.message); return []; }
+    return (data || []).map(r => ({
+      role: r.sender_role === 'service_provider' ? 'provider' : r.sender_role,
+      text: r.message,
+      time: new Date(r.created_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }),
+    }));
+  } catch(e) { return []; }
+}
+
+function subscribeToChat(adId) {
+  sb.channel('chat-' + adId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transfer_chats',
+        filter: 'ad_id=eq.' + adId }, payload => {
+      const r = payload.new;
+      const role = r.sender_role === 'service_provider' ? 'provider' : r.sender_role;
+      const alreadyAdded = messages.some(m => m._id === r.id);
+      if (!alreadyAdded) {
+        messages.push({
+          _id: r.id, role, text: r.message,
+          time: new Date(r.created_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }),
+        });
+        renderMessages();
+      }
+    })
+    .subscribe();
+}
+
+/* ── All Listings ──────────────────────────────────────────────────────── */
+const mockListings = [
+  { id:'in-001', title:'Cancelled Hotel Room – 2 Nights', category:'Hotels', providerName:'Jaipur Palace Hotel', location:'Jaipur, Rajasthan', originalPrice:8000, resalePrice:4800, discount:40, depositLost:4000, eventDate:'Aug 05, 2026', deadline:new Date(Date.now()+2*86400000+6*3600000), img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800', verified:true, step:1, reason:'Travel plans changed due to family emergency.' },
+  { id:'in-002', title:'Cancelled Home Stay – 3 Nights', category:'Hotels', providerName:'Goa Breeze Home Stay', location:'Goa', originalPrice:6000, resalePrice:3900, discount:35, depositLost:3000, eventDate:'Aug 10, 2026', deadline:new Date(Date.now()+4*86400000+3*3600000), img:'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800', verified:true, step:1, reason:'Visa rejection forced cancellation.' },
+  { id:'in-003', title:'Cancelled Farm House – Weekend Stay', category:'Venues', providerName:'Green Valley Farm Stay', location:'Hyderabad, Telangana', originalPrice:12000, resalePrice:8400, discount:30, depositLost:6000, eventDate:'Aug 09, 2026', deadline:new Date(Date.now()+1*86400000+14*3600000), img:'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800', verified:true, step:1, reason:'Event postponed due to rain forecast.' },
+  { id:'in-004', title:'Cancelled Resort Booking – 4 Nights', category:'Hotels', providerName:'Munnar Hills Resort', location:'Munnar, Kerala', originalPrice:20000, resalePrice:12000, discount:40, depositLost:10000, eventDate:'Aug 15, 2026', deadline:new Date(Date.now()+5*86400000+2*3600000), img:'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800', verified:true, step:1, reason:'Flight cancelled, trip scrapped.' },
+  { id:'in-005', title:'Cancelled Marriage Hall – Full Day', category:'Venues', providerName:'Royal Grand Marriage Hall', location:'Vijayawada, Andhra Pradesh', originalPrice:150000, resalePrice:75000, discount:50, depositLost:80000, eventDate:'Aug 22, 2026', deadline:new Date(Date.now()+3*86400000+8*3600000), img:'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800', verified:true, step:2, reason:'Wedding date shifted to December.' },
+  { id:'in-006', title:'Cancelled Birthday Decoration Service', category:'Events', providerName:'Dream Decors Studio', location:'Hyderabad, Telangana', originalPrice:15000, resalePrice:12000, discount:20, depositLost:8000, eventDate:'Aug 08, 2026', deadline:new Date(Date.now()+0*86400000+18*3600000), img:'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800', verified:true, step:1, reason:'Venue changed, decor package no longer needed.' },
+  { id:'in-007', title:'Cancelled 100-Plate Food Catering', category:'Catering', providerName:'Spice Route Caterers', location:'Warangal, Telangana', originalPrice:50000, resalePrice:32500, discount:35, depositLost:25000, eventDate:'Aug 12, 2026', deadline:new Date(Date.now()+6*86400000+10*3600000), img:'https://images.unsplash.com/photo-1555244162-803834f70033?w=800', verified:true, step:1, reason:'Function cancelled, deposit non-refundable.' },
+  { id:'in-008', title:'Cancelled 9-Month Gym Membership', category:'Gyms', providerName:'Iron Will Fitness Club', location:'Hyderabad, Telangana', originalPrice:18000, resalePrice:7200, discount:60, depositLost:18000, eventDate:'Oct 30, 2026', deadline:new Date(Date.now()+7*86400000+5*3600000), img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', verified:true, step:1, reason:'Relocating to another city.' },
+  { id:'in-009', title:'Cancelled Makeup & Bridal Styling – Aug 8', category:'Photography', providerName:'Glam Studio by Priya', location:'Hyderabad, Telangana', originalPrice:10000, resalePrice:5000, discount:50, depositLost:5000, eventDate:'Aug 08, 2026', deadline:new Date(Date.now()+0*86400000+22*3600000), img:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800', verified:true, step:1, reason:'Wedding cancelled last minute.' },
+  { id:'in-010', title:'Cancelled Rooftop Pool Party Package', category:'Venues', providerName:'Sky Lounge Events', location:'Mumbai, Maharashtra', originalPrice:40000, resalePrice:24000, discount:40, depositLost:20000, eventDate:'Aug 14, 2026', deadline:new Date(Date.now()+3*86400000+5*3600000), img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800', verified:true, step:1, reason:'Sponsor pulled out at last minute.' },
+  { id:'in-011', title:'Cancelled Mehendi & Sangeet Night Decor', category:'Events', providerName:'Aarav Celebrations', location:'Delhi, NCR', originalPrice:35000, resalePrice:21000, discount:40, depositLost:18000, eventDate:'Aug 11, 2026', deadline:new Date(Date.now()+1*86400000+9*3600000), img:'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800', verified:true, step:1, reason:'Event merged into single-day function.' },
+  { id:'in-012', title:'Cancelled Ooty Hill Station Hotel – 3 Nights', category:'Hotels', providerName:'Blue Mountain Retreat', location:'Ooty, Tamil Nadu', originalPrice:14000, resalePrice:9100, discount:35, depositLost:7000, eventDate:'Aug 18, 2026', deadline:new Date(Date.now()+6*86400000+2*3600000), img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', verified:true, step:1, reason:'Health issue prevented travel.' },
+  { id:'in-013', title:'Cancelled 200-Plate Wedding Catering', category:'Catering', providerName:'Shree Caterers & Co.', location:'Pune, Maharashtra', originalPrice:90000, resalePrice:58500, discount:35, depositLost:45000, eventDate:'Aug 20, 2026', deadline:new Date(Date.now()+4*86400000+11*3600000), img:'https://images.unsplash.com/photo-1555244162-803834f70033?w=800', verified:true, step:1, reason:'Guest count drastically reduced.' },
+  { id:'in-014', title:'Cancelled Pre-Wedding Photography Session', category:'Photography', providerName:'Capture Moments Studio', location:'Agra, Uttar Pradesh', originalPrice:22000, resalePrice:11000, discount:50, depositLost:11000, eventDate:'Aug 08, 2026', deadline:new Date(Date.now()+0*86400000+16*3600000), img:'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800', verified:true, step:1, reason:'Couple rescheduled to winter.' },
+  { id:'in-015', title:'Cancelled Annual Yoga & Meditation Retreat', category:'Gyms', providerName:'Ananda Wellness Centre', location:'Rishikesh, Uttarakhand', originalPrice:25000, resalePrice:12500, discount:50, depositLost:15000, eventDate:'Sep 01, 2026', deadline:new Date(Date.now()+8*86400000+3*3600000), img:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', verified:true, step:1, reason:'Trainer relocated abroad.' },
+  { id:'in-016', title:'Cancelled Banquet Hall – Corporate Event', category:'Venues', providerName:'The Grand Presidency', location:'Chennai, Tamil Nadu', originalPrice:80000, resalePrice:48000, discount:40, depositLost:40000, eventDate:'Aug 25, 2026', deadline:new Date(Date.now()+5*86400000+7*3600000), img:'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800', verified:true, step:1, reason:'Company meeting moved online.' },
+  { id:'in-017', title:'Cancelled Classical Dance Performance Tickets (4)', category:'Events', providerName:'Kalakshetra Foundation', location:'Chennai, Tamil Nadu', originalPrice:6000, resalePrice:3600, discount:40, depositLost:3000, eventDate:'Aug 09, 2026', deadline:new Date(Date.now()+0*86400000+20*3600000), img:'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', verified:true, step:1, reason:'Out-of-station trip clashes with event.' },
+  { id:'in-018', title:'Cancelled Luxury Spa Day Package (2 Persons)', category:'Spa & Wellness', providerName:'Elemis Spa by Marriott', location:'Bangalore, Karnataka', originalPrice:12000, resalePrice:7200, discount:40, depositLost:6000, eventDate:'Aug 16, 2026', deadline:new Date(Date.now()+2*86400000+14*3600000), img:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800', verified:true, step:1, reason:'Anniversary date changed.' },
+  { id:'in-019', title:'Cancelled Taxi Airport Transfer + Sightseeing', category:'Transport', providerName:'GoIndia Cabs', location:'Jaipur, Rajasthan', originalPrice:4500, resalePrice:2700, discount:40, depositLost:2000, eventDate:'Aug 07, 2026', deadline:new Date(Date.now()+0*86400000+12*3600000), img:'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800', verified:true, step:1, reason:'Flight cancelled, trip aborted.' },
+  { id:'in-020', title:'Cancelled DJ Night + Sound System – 5 Hrs', category:'Events', providerName:'Bass Nation DJs', location:'Hyderabad, Telangana', originalPrice:28000, resalePrice:16800, discount:40, depositLost:14000, eventDate:'Aug 13, 2026', deadline:new Date(Date.now()+1*86400000+18*3600000), img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', verified:true, step:1, reason:'Venue switched to outdoor; DJ slot not needed.' },
+  { id:'in-021', title:'Cancelled Cooking Class – Italian Cuisine (8 Seats)', category:'Classes', providerName:'Chef Marco Kitchen Studio', location:'Bangalore, Karnataka', originalPrice:9600, resalePrice:5760, discount:40, depositLost:4800, eventDate:'Aug 10, 2026', deadline:new Date(Date.now()+1*86400000+6*3600000), img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800', verified:true, step:1, reason:'Participant group cancelled plans.' },
+  { id:'in-022', title:'Cancelled Houseboat Stay – Alleppey Backwaters', category:'Hotels', providerName:'Kerala Dream Houseboats', location:'Alleppey, Kerala', originalPrice:18000, resalePrice:11700, discount:35, depositLost:9000, eventDate:'Aug 22, 2026', deadline:new Date(Date.now()+7*86400000+9*3600000), img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800', verified:true, step:1, reason:'Friend group unable to coordinate dates.' },
+  { id:'in-023', title:'Cancelled Couple Photoshoot – Bioluminescence Beach', category:'Photography', providerName:'Shimmer Lens Studio', location:'Goa', originalPrice:15000, resalePrice:9000, discount:40, depositLost:7500, eventDate:'Aug 17, 2026', deadline:new Date(Date.now()+3*86400000+20*3600000), img:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800', verified:true, step:1, reason:'Couple postponed honeymoon trip.' },
+  { id:'in-024', title:'Cancelled IPL Afterparty Venue – Full Hall', category:'Venues', providerName:'Powerplay Events Pvt.', location:'Mumbai, Maharashtra', originalPrice:120000, resalePrice:72000, discount:40, depositLost:60000, eventDate:'Aug 19, 2026', deadline:new Date(Date.now()+4*86400000+2*3600000), img:'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800', verified:true, step:2, reason:'Event organiser shut down operations.' },
+  { id:'in-025', title:'Cancelled Carnatic Music Concert – 3 Passes', category:'Concerts', providerName:'Thyagaraja Sabha Trust', location:'Chennai, Tamil Nadu', originalPrice:4500, resalePrice:2700, discount:40, depositLost:2200, eventDate:'Aug 12, 2026', deadline:new Date(Date.now()+2*86400000+8*3600000), img:'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800', verified:true, step:1, reason:'Family function conflict.' },
+  { id:'in-026', title:'Cancelled Zumba + Dance Fitness 6-Month Pass', category:'Gyms', providerName:'RhythmFit Studio', location:'Pune, Maharashtra', originalPrice:10800, resalePrice:5400, discount:50, depositLost:10800, eventDate:'Oct 01, 2026', deadline:new Date(Date.now()+9*86400000+1*3600000), img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', verified:true, step:1, reason:'Moving city for job transfer.' },
+  { id:'in-027', title:'Cancelled Cycling Tour – Coorg Coffee Estates', category:'Sports', providerName:'Pedal Trek Adventures', location:'Coorg, Karnataka', originalPrice:8000, resalePrice:4800, discount:40, depositLost:4000, eventDate:'Aug 23, 2026', deadline:new Date(Date.now()+5*86400000+15*3600000), img:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800', verified:true, step:1, reason:'Participant fractured ankle.' },
+  { id:'in-028', title:'Cancelled Rajasthan Heritage Train Tour Package', category:'Travel Packages', providerName:'Royal Rajasthan Holidays', location:'Jodhpur, Rajasthan', originalPrice:55000, resalePrice:35750, discount:35, depositLost:27500, eventDate:'Sep 05, 2026', deadline:new Date(Date.now()+10*86400000+4*3600000), img:'https://images.unsplash.com/photo-1502784444187-359ac186c5bb?w=800', verified:true, step:1, reason:'Client family emergency forced cancellation.' },
+  { id:'in-029', title:'Cancelled Bridal Hair & Makeup – Morning Slot', category:'Spa & Wellness', providerName:'Luxe Looks Salon', location:'Vijayawada, Andhra Pradesh', originalPrice:8000, resalePrice:4800, discount:40, depositLost:4000, eventDate:'Aug 08, 2026', deadline:new Date(Date.now()+0*86400000+10*3600000), img:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800', verified:true, step:1, reason:'Wedding shifted; no longer needs morning slot.' },
+  { id:'in-030', title:'Cancelled Paragliding Session – Bir Billing', category:'Sports', providerName:'Sky Wings Adventure', location:'Bir, Himachal Pradesh', originalPrice:3500, resalePrice:2100, discount:40, depositLost:1750, eventDate:'Aug 24, 2026', deadline:new Date(Date.now()+6*86400000+18*3600000), img:'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800', verified:true, step:1, reason:'Weather window missed, next slot too far.' },
+  { id:'in-031', title:'Cancelled Indoor Cricket Academy – 3-Month Batch', category:'Sports', providerName:'RCB Cricket Academy', location:'Bangalore, Karnataka', originalPrice:21000, resalePrice:13650, discount:35, depositLost:10500, eventDate:'Sep 15, 2026', deadline:new Date(Date.now()+7*86400000+11*3600000), img:'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800', verified:true, step:1, reason:'Student got placed out of city.' },
+  { id:'in-032', title:'Cancelled Photography Drone Shoot – Corporate', category:'Photography', providerName:'AirFrame Media Works', location:'Hyderabad, Telangana', originalPrice:30000, resalePrice:18000, discount:40, depositLost:15000, eventDate:'Aug 15, 2026', deadline:new Date(Date.now()+2*86400000+16*3600000), img:'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800', verified:true, step:1, reason:'Project shelved; budget cut.' },
+  { id:'in-033', title:'Cancelled 5-Star Dinner Reservation for 10', category:'Catering', providerName:'ITC Grand Kakatiya', location:'Hyderabad, Telangana', originalPrice:25000, resalePrice:16250, discount:35, depositLost:12500, eventDate:'Aug 09, 2026', deadline:new Date(Date.now()+1*86400000+3*3600000), img:'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800', verified:true, step:1, reason:'Office celebration postponed.' },
+  { id:'in-034', title:'Cancelled Dandiya Night Event – 50 Passes', category:'Events', providerName:'Navratri Utsav Club', location:'Ahmedabad, Gujarat', originalPrice:20000, resalePrice:10000, discount:50, depositLost:12000, eventDate:'Oct 02, 2026', deadline:new Date(Date.now()+11*86400000+8*3600000), img:'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', verified:true, step:1, reason:'Society event cancelled due to permissions.' },
+  { id:'in-035', title:'Cancelled Eco-Cabin Forest Stay – 2 Nights', category:'Hotels', providerName:'Aranya Forest Retreats', location:'Coorg, Karnataka', originalPrice:11000, resalePrice:7150, discount:35, depositLost:5500, eventDate:'Aug 21, 2026', deadline:new Date(Date.now()+4*86400000+19*3600000), img:'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800', verified:true, step:1, reason:'Work deadline extended; trip postponed.' },
+  { id:'in-036', title:'Cancelled Online Photography Masterclass – 8 Seats', category:'Classes', providerName:'Pixel Perfect Academy', location:'Bangalore, Karnataka', originalPrice:6400, resalePrice:4160, discount:35, depositLost:3200, eventDate:'Aug 10, 2026', deadline:new Date(Date.now()+1*86400000+7*3600000), img:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800', verified:true, step:1, reason:'Instructor unavailable due to personal reason.' },
+  { id:'in-037', title:'Cancelled Open-Air Concert – Fusion Band Night', category:'Concerts', providerName:'Strings & Beats Collective', location:'Pune, Maharashtra', originalPrice:7500, resalePrice:4500, discount:40, depositLost:3750, eventDate:'Aug 16, 2026', deadline:new Date(Date.now()+2*86400000+22*3600000), img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800', verified:true, step:1, reason:'Venue double-booked.' },
+  { id:'in-038', title:'Cancelled Ladakh Road-Trip Package – 7 Days', category:'Travel Packages', providerName:'Mountain Moto Trails', location:'Leh, Ladakh', originalPrice:70000, resalePrice:42000, discount:40, depositLost:35000, eventDate:'Sep 10, 2026', deadline:new Date(Date.now()+9*86400000+14*3600000), img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', verified:true, step:1, reason:'Bike permit denied.' },
+  { id:'in-039', title:'Cancelled Tent House & Stage Setup', category:'Venues', providerName:'Sri Balaji Tent Decorators', location:'Warangal, Telangana', originalPrice:45000, resalePrice:27000, discount:40, depositLost:22000, eventDate:'Aug 13, 2026', deadline:new Date(Date.now()+1*86400000+22*3600000), img:'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800', verified:true, step:1, reason:'Function cancelled, deposit forfeited.' }
+];
+
+/* ── Helpers ─────────────────────────────────────────────────────────── */
+function fmt(n) { return n.toLocaleString('en-IN'); }
+
+function fmtCountdown(dl) {
+  const d = dl - Date.now();
+  if (d <= 0) return '⏰ Offer Expired';
+  const days = Math.floor(d / 86400000);
+  const hrs  = Math.floor((d % 86400000) / 3600000);
+  const mins = Math.floor((d % 3600000)  / 60000);
+  const secs = Math.floor((d % 60000)    / 1000);
+  if (days > 0) return `Offer closes in ${days}d ${hrs}h ${mins}m`;
+  if (hrs  > 0) return `Offer closes in ${hrs}h ${mins}m ${secs}s`;
+  return `Offer closes in ${mins}m ${secs}s — Hurry!`;
+}
+
+function nowT() {
+  return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+}
+
+/* ── Chat state ──────────────────────────────────────────────────────── */
+let currentRole = 'buyer'; // 'buyer' | 'seller' | 'provider'
+let messages = [];
+let item = null;
+
+/*
+  Role rules:
+  - buyer    → sees seller & provider. "You" = buyer
+  - seller   → sees buyer  & provider. "You" = seller
+  - provider → sees seller & buyer.    "You" = provider
+*/
+
+const ROLE_META = {
+  buyer:    { emoji: '👤', label: 'You (Buyer)',               dotClass: 'dot-buyer',    avClass: 'av-buyer'    },
+  seller:   { emoji: '🙋', label: 'Seller (Original Buyer)',   dotClass: 'dot-seller',   avClass: 'av-seller'   },
+  provider: { emoji: '🏢', label: 'Service Provider',          dotClass: 'dot-provider', avClass: 'av-provider' },
+};
+
+function othersFor(role) {
+  if (role === 'buyer')    return ['seller', 'provider'];
+  if (role === 'seller')   return ['buyer',  'provider'];
+  if (role === 'provider') return ['seller', 'buyer'];
+  return [];
+}
+
+function seedMessages(it) {
+  messages = [
+    { role:'system', text:'🔒 ResaleHub Secure Chat — monitored for safety. Only share booking details here.' },
+    { role:'provider', text:`Hi! I'm from ${it.providerName}. Booking #${it.id} on ${it.eventDate} is active and fully transferable. I can issue a new confirmation once the deal goes through.`, time:'10:02 AM' },
+    { role:'seller',   text:`Hello! I'm the original buyer. I cancelled because: "${it.reason}". I've paid ₹${fmt(it.depositLost)} as deposit. Offering the slot at ₹${fmt(it.resalePrice)} — a ${it.discount}% discount.`, time:'10:05 AM' },
+    { role:'provider', text:`Confirmed ✅. We will directly re-issue the booking in the new buyer's name. No hidden fees. Full transfer within 24 hrs.`, time:'10:07 AM' },
+  ];
+}
+
+/* Replies the OTHER two parties would give back to "you" */
+const REPLIES = {
+  buyer: {
+    seller:   [`Thanks for your interest! I can share the original booking receipt if you need proof.`, `The slot is 100% genuine. Feel free to ask me anything before you decide.`, `I'm just trying to recover part of my deposit — this is a real deal.`],
+    provider: [`Great to have you on board! We confirm the booking is valid and transferable.`, `We'll send you a new booking confirmation email once you agree to the transfer.`, `No problem — call us at our helpline and we'll verify the booking details directly.`],
+  },
+  seller: {
+    buyer:    [`Can you share a copy of the booking ID or invoice?`, `Is the price negotiable at all?`, `Looks good! Can the provider confirm the transfer here in this chat?`],
+    provider: [`Could you formally confirm the booking details in this chat for the buyer's trust?`, `What's the process for the official name change on the booking?`, `Is there any cancellation fee for the new buyer once transfer is done?`],
+  },
+  provider: {
+    seller:   [`We've cross-verified your booking. Please share your booking reference so we can proceed.`, `Our records show the booking is active. We can start the transfer once both parties agree.`, `Confirmed — the slot on ${item ? item.eventDate : 'the date'} is still available.`],
+    buyer:    [`Welcome! We'll guide you through the transfer. It's completely safe.`, `Once you confirm, we'll email you the booking details within 24 hours.`, `We can also schedule a call if you'd like to verify before agreeing.`],
+  },
+};
+
+function pickReply(role, responderRole) {
+  const pool = (REPLIES[role] || {})[responderRole];
+  if (!pool) return 'Got it! Let me know if you need anything.';
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* ── Render messages ─────────────────────────────────────────────────── */
+function renderMessages() {
+  const container = document.getElementById('msgArea');
+  if (!container) return;
+
+  container.innerHTML = messages.map(m => {
+    if (m.role === 'system') {
+      return `<div class="msg system"><div class="system-pill">${m.text}</div></div>`;
+    }
+
+    const isYou = m.role === currentRole;
+    const meta  = ROLE_META[m.role] || {};
+
+    return `
+      <div class="msg ${isYou ? 'you' : 'them'}">
+        <div class="avatar ${isYou ? 'av-you' : meta.avClass}">${meta.emoji}</div>
+        <div style="flex:1; ${isYou ? 'text-align:right;' : ''}">
+          <div class="msg-sender">${isYou ? 'You' : meta.label}</div>
+          <div class="bubble">${m.text}</div>
+          <div class="msg-time">${m.time || ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ── Update participant bar based on role ────────────────────────────── */
+function updateParticipants() {
+  const bar = document.getElementById('participantBar');
+  const sub = document.getElementById('chatHeaderSub');
+  if (!bar) return;
+  const others = othersFor(currentRole);
+  const roleNames = { buyer:'Buyer', seller:'Seller', provider:'Service Provider' };
+  if (sub) sub.textContent = `You are the ${roleNames[currentRole]} — chatting with the other 2 parties`;
+  bar.innerHTML = `
+    <span style="font-size:11px; font-weight:700; color:var(--text-muted); align-self:center;">In this chat:</span>
+    ${others.map(r => {
+      const m = ROLE_META[r];
+      const label = r === 'provider' ? (item ? item.providerName : 'Service Provider') : m.label;
+      return `<div class="participant"><div class="dot ${m.dotClass}"></div>${m.emoji} ${label}</div>`;
+    }).join('')}`;
+}
+
+/* ── Update input label ──────────────────────────────────────────────── */
+function updateInputLabel() {
+  const el = document.getElementById('youLabel');
+  if (el) el.textContent = `✍️ Sending as ${ROLE_META[currentRole].label}`;
+}
+
+/* ── Role picker: choose & dismiss overlay ────────────────────── */
+async function chooseRole(role) {
+  currentRole = role;
+  document.getElementById('roleOverlay').style.display = 'none';
+  updateParticipants();
+  updateInputLabel();
+
+  // Load DB history for this listing and merge with seed messages
+  if (item) {
+    const history = await loadChatHistory(item.id);
+    if (history.length > 0) {
+      // Replace seeded messages with real DB messages (keep system notice)
+      messages = [
+        { role:'system', text:'🔒 ResaleHub Secure Chat — monitored for safety. Only share booking details here.' },
+        ...history
+      ];
+    }
+    subscribeToChat(item.id);
+  }
+  renderMessages();
+}
+
+function showRolePicker() {
+  document.getElementById('roleOverlay').style.display = 'flex';
+}
+
+/* ── Send message ────────────────────────────────────────────────────── */
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  messages.push({ role: currentRole, text, time: nowT() });
+  input.value = '';
+  input.style.height = 'auto';
+  renderMessages();
+
+  // Show typing indicator then auto-reply from ONE of the other two parties
+  const typingEl = document.getElementById('typingIndicator');
+  if (typingEl) { typingEl.classList.add('visible'); }
+
+  setTimeout(() => {
+    if (typingEl) typingEl.classList.remove('visible');
+
+    const others   = othersFor(currentRole);
+    const respRole = others[Math.floor(Math.random() * others.length)];
+    const reply    = pickReply(currentRole, respRole);
+    messages.push({ role: respRole, text: reply, time: nowT() });
+    renderMessages();
+  }, 1300);
+}
+
+/* ── Render full page ────────────────────────────────────────────────── */
+function render(it) {
+  item = it;
+  document.title = `${it.title} – ResaleHub`;
+  seedMessages(it);
+
+  document.getElementById('pageContent').innerHTML = `
+  <div class="layout">
+
+    <!-- LEFT: Deal Info -->
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-green">-${it.discount}% OFF</span>
+        <span class="badge badge-mint">${it.category}</span>
+        <span class="badge badge-mint">✓ Verified</span>
+        ${it.step >= 2 ? '<span class="badge badge-red">🔴 Claimed</span>' : ''}
+      </div>
+      <h1>${it.title}</h1>
+      <div class="subtitle">
+        <span>📍 ${it.location}</span>
+        <span>📅 <b>${it.eventDate}</b></span>
+        <span>🏢 ${it.providerName}</span>
+      </div>
+      <img src="${it.img}" class="hero-img" alt="${it.title}">
+
+      <div class="countdown-banner">
+        <span style="font-size:20px;">🔥</span>
+        <span id="cdTimer">${fmtCountdown(it.deadline)}</span>
+      </div>
+
+      <div class="price-card">
+        <div class="price-row-item">
+          <span style="color:var(--text-muted);">Original Price</span>
+          <span class="orig-price">₹${fmt(it.originalPrice)}</span>
+        </div>
+        <div class="price-row-item">
+          <span style="color:var(--badge-red); font-weight:700;">Seller's Deposit Lost</span>
+          <span style="color:var(--badge-red); font-weight:700;">-₹${fmt(it.depositLost)}</span>
+        </div>
+        <hr class="divider">
+        <div class="price-row-item" style="align-items:flex-end;">
+          <div>
+            <div class="resale-price-big">₹${fmt(it.resalePrice)}</div>
+            <div style="font-size:12px; color:var(--primary); font-weight:700; margin-top:2px;">
+              You Save ₹${fmt(it.originalPrice - it.resalePrice)} (${it.discount}% OFF)
+            </div>
+          </div>
+          <span class="save-tag">📅 ${it.eventDate}</span>
+        </div>
+      </div>
+
+      ${it.reason ? `<div class="reason-box"><b>💬 Why listed?</b><br>${it.reason}</div>` : ''}
+
+      <div class="section-head">Transfer Progress</div>
+      <div class="stepper">
+        <div class="step-item ${it.step >= 1 ? 'active' : ''}">1. Listed</div>
+        <div class="step-item ${it.step >= 2 ? 'active' : ''}">2. Chat Started</div>
+        <div class="step-item ${it.step >= 3 ? 'active' : ''}">3. Host Verified</div>
+        <div class="step-item ${it.step >= 4 ? 'active' : ''}">4. Complete</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chat Panel -->
+    <div class="chat-col">
+
+      <!-- Chat header (no tabs) -->
+      <div class="chat-header-bar">
+        <div>
+          <div class="chat-header-title">💬 Secure Deal Chat</div>
+          <div class="chat-header-sub" id="chatHeaderSub">Loading…</div>
+        </div>
+        <button class="switch-role-btn" onclick="showRolePicker()">⇄ Switch Role</button>
+      </div>
+
+      <!-- Participant bar (shows the OTHER two parties) -->
+      <div class="participants" id="participantBar"></div>
+
+      <!-- Messages -->
+      <div class="chat-messages" id="msgArea">
+        <!-- seeded in JS -->
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="msg typing-indicator" id="typingIndicator" style="padding:0 14px 8px;">
+        <div class="avatar av-seller">💬</div>
+        <div class="typing-bubble">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-area">
+        <div style="flex:1;">
+          <div class="you-label" id="youLabel">✍️ Sending as You (Buyer)</div>
+          <textarea class="chat-input" id="chatInput" rows="1"
+            placeholder="Type a message…"
+            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+        </div>
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+
+  </div>`;
+
+  updateParticipants();
+  updateInputLabel();
+  renderMessages();
+
+  // Countdown tick
+  setInterval(() => {
+    const el = document.getElementById('cdTimer');
+    if (el) el.textContent = fmtCountdown(it.deadline);
+  }, 1000);
+}
+
+/* ── Bootstrap ───────────────────────────────────────────────────────── */
+const _params = new URLSearchParams(window.location.search);
+const found   = mockListings.find(l => l.id === _params.get('id'));
+const _roleParam = _params.get('role'); // 'buyer' | 'seller' | 'provider' (from chats page)
+
+if (found) {
+  render(found);
+  // If role is passed via URL, skip the picker and auto-enter
+  if (_roleParam && ['buyer','seller','provider'].includes(_roleParam)) {
+    chooseRole(_roleParam);
+  }
+} else {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="not-found">
+      <h2>Ad Not Found</h2>
+      <p>This listing may have expired or been removed.</p><br>
+      <a href="index.html" style="color:var(--primary);font-weight:700;">← Back to All Deals</a>
+    </div>`;
+}
+</script>
+</body>
+</html>

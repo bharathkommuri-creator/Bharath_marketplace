@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Free Ad – ResaleHub</title>
+  <meta name="description" content="Post your cancelled booking for free on ResaleHub. Sell hotel rooms, marriage halls, catering, gym memberships and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0F9D58; --dark: #064E3B;
+      --bg: #F0FDF4; --white: #ffffff;
+      --text: #0F172A; --muted: #64748B;
+      --border: #E2E8F0; --red: #DC2626;
+      --amber: #F59E0B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F8FAFC; color: var(--text); }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: white; border-bottom: 1px solid var(--border);
+      padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(15,157,88,0.07);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-icon { font-size: 18px; background: var(--dark); color: white; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .brand-title { font-size: 18px; font-weight: 800; color: var(--dark); }
+
+    /* ── Progress steps ── */
+    .steps-bar { background: white; border-bottom: 1px solid var(--border); padding: 14px 0; }
+    .steps { max-width: 680px; margin: 0 auto; display: flex; align-items: center; padding: 0 20px; gap: 0; }
+    .step { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0;
+    }
+    .step-num.done    { background: var(--primary); color: white; }
+    .step-num.active  { background: var(--amber); color: #1a1a1a; }
+    .step-num.pending { background: var(--border); color: var(--muted); }
+    .step-label { font-size: 11px; font-weight: 700; }
+    .step-label.active { color: var(--amber); }
+    .step-label.done   { color: var(--primary); }
+    .step-label.pending{ color: var(--muted); }
+    .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 6px; }
+    .step-line.done { background: var(--primary); }
+
+    /* ── Layout ── */
+    .page { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; display: grid; grid-template-columns: 1fr 320px; gap: 28px; }
+    @media (max-width: 768px) { .page { grid-template-columns: 1fr; } .sidebar { order: -1; } }
+
+    /* ── Card ── */
+    .card {
+      background: white; border-radius: 20px; border: 1px solid var(--border);
+      padding: 28px; margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .card-sub   { font-size: 12px; color: var(--muted); margin-bottom: 22px; }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;
+    }
+    .field label span.req { color: var(--red); margin-left: 2px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 12px; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color 0.18s; color: var(--text);
+      background: white;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field-hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+    /* ── Price calculator ── */
+    .price-preview {
+      background: var(--bg); border: 1px solid #bbf7d0; border-radius: 14px;
+      padding: 16px; margin-top: 10px; display: none;
+    }
+    .price-preview.visible { display: block; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; }
+    .price-row.total { border-top: 1px solid #bbf7d0; padding-top: 10px; margin-top: 6px; font-weight: 800; font-size: 15px; }
+    .discount-badge { background: var(--red); color: white; border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 800; }
+
+    /* ── Category pills ── */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .cat-pill {
+      border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 8px;
+      text-align: center; cursor: pointer; transition: all 0.15s;
+      font-size: 11px; font-weight: 700; color: var(--muted);
+    }
+    .cat-pill .cat-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .cat-pill:hover, .cat-pill.selected { border-color: var(--primary); background: var(--bg); color: var(--dark); }
+    .cat-pill.selected { background: #dcfce7; }
+
+    /* ── Photo upload ── */
+    .photo-upload {
+      border: 2px dashed var(--border); border-radius: 16px; padding: 30px;
+      text-align: center; cursor: pointer; transition: all 0.18s;
+    }
+    .photo-upload:hover { border-color: var(--primary); background: var(--bg); }
+    .photo-upload-icon { font-size: 36px; margin-bottom: 8px; }
+    .photo-previews { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .photo-thumb {
+      width: 80px; height: 80px; border-radius: 10px; object-fit: cover;
+      border: 2px solid var(--border); position: relative;
+    }
+    .photo-thumb-del {
+      position: absolute; top: -6px; right: -6px; background: var(--red);
+      color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+
+    /* ── Sidebar ── */
+    .tips-card { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 18px; padding: 22px; margin-bottom: 18px; }
+    .tips-card h4 { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 12px; }
+    .tip { display: flex; gap: 10px; margin-bottom: 10px; font-size: 13px; color: #78350f; line-height: 1.5; }
+
+    .trust-card { background: var(--bg); border: 1px solid #bbf7d0; border-radius: 18px; padding: 22px; }
+    .trust-card h4 { font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 12px; }
+    .trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dark); margin-bottom: 10px; }
+
+    /* ── Submit button ── */
+    .submit-btn {
+      width: 100%; padding: 16px; border-radius: 16px; border: none;
+      background: linear-gradient(135deg, var(--primary), var(--dark));
+      color: white; font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+      box-shadow: 0 6px 20px rgba(15,157,88,0.3);
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(15,157,88,0.4); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .free-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #fef3c7; color: #92400e; padding: 5px 14px;
+      border-radius: 20px; font-size: 12px; font-weight: 700;
+      border: 1px solid #fcd34d; margin-bottom: 18px;
+    }
+
+    /* ── Success modal ── */
+    .success-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(6,78,59,0.85); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .success-overlay.show { display: flex; }
+    .success-box {
+      background: white; border-radius: 24px; padding: 44px 36px;
+      max-width: 420px; width: 90%; text-align: center;
+      animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn { from { transform: scale(0.85); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .success-icon { font-size: 64px; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a class="brand" href="index.html">
+    <div class="brand-icon">⇄</div>
+    <div class="brand-title">ResaleHub</div>
+  </a>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div id="authNavArea"></div>
+    <a href="index.html" style="font-size:13px; color:var(--muted); text-decoration:none;">← Back to Listings</a>
+  </div>
+</nav>
+
+<!-- Progress bar -->
+<div class="steps-bar">
+  <div class="steps">
+    <div class="step">
+      <div class="step-num active" id="s1">1</div>
+      <div class="step-label active">Category</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step">
+      <div class="step-num pending" id="s2">2</div>
+      <div class="step-label pending" id="sl2">Details</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step">
+      <div class="step-num pending" id="s3">3</div>
+      <div class="step-label pending" id="sl3">Pricing</div>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step">
+      <div class="step-num pending" id="s4">4</div>
+      <div class="step-label pending" id="sl4">Contact</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <!-- LEFT: Form -->
+  <div>
+    <!-- FREE badge -->
+    <div class="free-badge">✨ 100% Free to Post · No Commission</div>
+
+    <!-- Step 1: Category -->
+    <div class="card" id="step1Card">
+      <div class="card-title">📂 What are you selling?</div>
+      <div class="card-sub">Choose the category that best describes your cancelled booking</div>
+      <div class="cat-grid">
+        <div class="cat-pill" onclick="selectCat(this,'Hotels')"><span class="cat-icon">🏨</span>Hotels & Resorts</div>
+        <div class="cat-pill" onclick="selectCat(this,'Venues')"><span class="cat-icon">🏛️</span>Marriage Hall / Venue</div>
+        <div class="cat-pill" onclick="selectCat(this,'Catering')"><span class="cat-icon">🍽️</span>Food Catering</div>
+        <div class="cat-pill" onclick="selectCat(this,'Events')"><span class="cat-icon">🎉</span>Event & Decoration</div>
+        <div class="cat-pill" onclick="selectCat(this,'Photography')"><span class="cat-icon">📸</span>Photography / Makeup</div>
+        <div class="cat-pill" onclick="selectCat(this,'Gyms')"><span class="cat-icon">💪</span>Gym Membership</div>
+        <div class="cat-pill" onclick="selectCat(this,'Spa & Wellness')"><span class="cat-icon">🌿</span>Spa & Wellness</div>
+        <div class="cat-pill" onclick="selectCat(this,'Travel Packages')"><span class="cat-icon">✈️</span>Travel Package</div>
+        <div class="cat-pill" onclick="selectCat(this,'Sports')"><span class="cat-icon">🏏</span>Sports & Activities</div>
+        <div class="cat-pill" onclick="selectCat(this,'Concerts')"><span class="cat-icon">🎶</span>Concert / Show Tickets</div>
+        <div class="cat-pill" onclick="selectCat(this,'Classes')"><span class="cat-icon">🎓</span>Classes & Workshops</div>
+        <div class="cat-pill" onclick="selectCat(this,'Transport')"><span class="cat-icon">🚗</span>Transport / Cab Booking</div>
+      </div>
+      <input type="hidden" id="selectedCat" value="">
+    </div>
+
+    <!-- Step 2: Details -->
+    <div class="card" id="step2Card">
+      <div class="card-title">📝 Booking Details</div>
+      <div class="card-sub">Tell buyers exactly what they are getting</div>
+
+      <div class="field">
+        <label>Ad Title <span class="req">*</span></label>
+        <input type="text" id="adTitle" placeholder="e.g. Cancelled 2-Night Hotel Booking – Jaipur Palace" maxlength="100">
+        <div class="field-hint">Make it clear and specific. Max 100 characters.</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>City / Location <span class="req">*</span></label>
+          <select id="adCity">
+            <option value="">Select City</option>
+            <option>Hyderabad</option><option>Bangalore</option><option>Mumbai</option>
+            <option>Delhi NCR</option><option>Chennai</option><option>Pune</option>
+            <option>Jaipur</option><option>Goa</option><option>Kolkata</option>
+            <option>Ahmedabad</option><option>Surat</option><option>Visakhapatnam</option>
+            <option>Vijayawada</option><option>Warangal</option><option>Kochi</option>
+            <option>Munnar</option><option>Ooty</option><option>Alleppey</option>
+            <option>Rishikesh</option><option>Leh / Ladakh</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Area / Locality</label>
+          <input type="text" id="adArea" placeholder="e.g. Banjara Hills, Connaught Place">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Event / Booking Date <span class="req">*</span></label>
+          <input type="date" id="adEventDate">
+        </div>
+        <div class="field">
+          <label>Booking Duration</label>
+          <input type="text" id="adDuration" placeholder="e.g. 2 nights, 1 day, 6 months">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Service / Venue Provider Name <span class="req">*</span></label>
+        <input type="text" id="adProvider" placeholder="e.g. Jaipur Palace Hotel, Dream Decors Studio">
+      </div>
+
+      <div class="field">
+        <label>Why are you cancelling? <span class="req">*</span></label>
+        <select id="adReason">
+          <option value="">Select Reason</option>
+          <option>Travel plans changed</option>
+          <option>Flight / transport cancelled</option>
+          <option>Wedding / event date changed</option>
+          <option>Health / personal emergency</option>
+          <option>Visa rejection</option>
+          <option>Work / office commitment</option>
+          <option>Budget constraint</option>
+          <option>Venue changed</option>
+          <option>Relocating to another city</option>
+          <option>Guest count reduced</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Additional Description</label>
+        <textarea id="adDesc" placeholder="Share more details: amenities, inclusions, what's covered, any special notes for buyer…"></textarea>
+      </div>
+
+      <div class="field">
+        <label>📎 Booking Proof (Invoice / Confirmation Screenshot)</label>
+        <div class="photo-upload" onclick="document.getElementById('proofInput').click()">
+          <div class="photo-upload-icon">📄</div>
+          <div style="font-size:14px; font-weight:700; color:var(--muted);">Upload Booking Confirmation</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">PDF, JPG or PNG · Max 5MB · Builds buyer trust</div>
+        </div>
+        <input type="file" id="proofInput" accept="image/*,.pdf" style="display:none" onchange="previewProof(this)">
+        <div id="proofPreview" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="field">
+        <label>📷 Photos (Optional but highly recommended)</label>
+        <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+          <div class="photo-upload-icon">📷</div>
+          <div style="font-size:14px; font-weight:700; color:var(--muted);">Add Photos of the Venue / Hotel</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">Up to 5 photos · Ads with photos get 3× more responses</div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="previewPhotos(this)">
+        <div class="photo-previews" id="photoPreviews"></div>
+      </div>
+    </div>
+
+    <!-- Step 3: Pricing -->
+    <div class="card" id="step3Card">
+      <div class="card-title">💰 Pricing & Discount</div>
+      <div class="card-sub">Set a competitive price to attract buyers quickly</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Original Booking Price (₹) <span class="req">*</span></label>
+          <input type="number" id="origPrice" placeholder="e.g. 15000" min="0" oninput="calcDiscount()">
+        </div>
+        <div class="field">
+          <label>Deposit / Advance Paid (₹)</label>
+          <input type="number" id="depositPaid" placeholder="e.g. 5000" min="0">
+          <div class="field-hint">Amount you already paid to provider</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Your Resale Price (₹) <span class="req">*</span></label>
+        <input type="number" id="resalePrice" placeholder="e.g. 9000" min="0" oninput="calcDiscount()">
+        <div class="field-hint">💡 Tip: Offer at least 20–50% off to get quick inquiries</div>
+      </div>
+
+      <!-- Live discount preview -->
+      <div class="price-preview" id="pricePreview">
+        <div class="price-row">
+          <span style="color:var(--muted);">Original Price</span>
+          <span style="text-decoration:line-through; color:var(--muted);" id="prevOrig">₹0</span>
+        </div>
+        <div class="price-row">
+          <span>Your Resale Price</span>
+          <span style="font-weight:700; color:var(--dark);" id="prevResale">₹0</span>
+        </div>
+        <div class="price-row total">
+          <span>Buyer Saves</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:var(--primary);" id="prevSave">₹0</span>
+            <span class="discount-badge" id="prevDisc">0% OFF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Contact -->
+    <div class="card" id="step4Card">
+      <div class="card-title">📞 Your Contact Details</div>
+      <div class="card-sub">Only shared with verified buyers through Secure Deal Chat</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="contactName" placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label>Mobile Number <span class="req">*</span></label>
+          <input type="tel" id="contactPhone" placeholder="10-digit mobile" maxlength="10">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email Address <span class="req">*</span></label>
+        <input type="email" id="contactEmail" placeholder="yourname@email.com">
+      </div>
+
+      <div class="field">
+        <label>Preferred Contact Method</label>
+        <select id="contactPref">
+          <option>WhatsApp + Chat on ResaleHub</option>
+          <option>Chat on ResaleHub only</option>
+          <option>Call + Chat on ResaleHub</option>
+          <option>Email + Chat on ResaleHub</option>
+        </select>
+      </div>
+
+      <div style="background:#fef3c7; border:1px solid #fcd34d; border-radius:12px; padding:14px; font-size:12px; color:#78350f; line-height:1.6; margin-bottom:20px;">
+        🛡️ <b>Your phone number is never shown publicly.</b> All communication happens through our Secure 3-Party Deal Chat to protect you and the buyer.
+      </div>
+
+      <!-- Terms -->
+      <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:20px;">
+        <input type="checkbox" id="agreeTerms" style="width:16px; height:16px; margin-top:2px; flex-shrink:0; accent-color:var(--primary);">
+        <label for="agreeTerms" style="font-size:13px; color:var(--muted); cursor:pointer; line-height:1.5;">
+          I agree to ResaleHub's <a href="#" style="color:var(--primary);">Terms of Use</a> and <a href="#" style="color:var(--primary);">Posting Guidelines</a>. I confirm this is a genuine cancelled booking.
+        </label>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitAd()">
+        🚀 Post My Free Ad
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Sidebar -->
+  <div class="sidebar">
+    <div class="tips-card">
+      <h4>💡 Tips to Sell Fast</h4>
+      <div class="tip"><span>📸</span><span>Add real photos of the hotel/venue — ads with photos get 3× more views</span></div>
+      <div class="tip"><span>💰</span><span>Price at least 25–40% below original to attract serious buyers</span></div>
+      <div class="tip"><span>📄</span><span>Upload the booking confirmation — it builds instant trust</span></div>
+      <div class="tip"><span>📅</span><span>Post early — deals close 7 days before the event date</span></div>
+      <div class="tip"><span>💬</span><span>Respond quickly in chat — buyers go to the fastest responder</span></div>
+    </div>
+
+    <div class="trust-card">
+      <h4>✅ Why ResaleHub?</h4>
+      <div class="trust-item"><span>🔒</span><span>3-Party Secure Chat protects all parties</span></div>
+      <div class="trust-item"><span>✅</span><span>Provider verifies before transfer</span></div>
+      <div class="trust-item"><span>💸</span><span>Zero commission — keep 100% of resale price</span></div>
+      <div class="trust-item"><span>⚡</span><span>Go live in under 2 minutes</span></div>
+      <div class="trust-item"><span>🏆</span><span>10,000+ successful transfers</span></div>
+    </div>
+
+    <div style="background:white; border:1px solid var(--border); border-radius:18px; padding:22px; text-align:center; margin-top:18px;">
+      <div style="font-size:24px; margin-bottom:8px;">📞</div>
+      <div style="font-weight:800; font-size:14px; margin-bottom:6px;">Need Help Posting?</div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:14px;">Our team will post your ad for free</div>
+      <a href="tel:+918888888888" style="background:var(--primary); color:white; padding:10px 20px; border-radius:12px; font-size:13px; font-weight:700; text-decoration:none; display:block;">📞 Call 1800-123-RESALE</a>
+    </div>
+  </div>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon">🎉</div>
+    <h2 style="font-size:22px; font-weight:800; margin-bottom:8px;">Ad Posted Successfully!</h2>
+    <p style="font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:24px;">Your listing is now live. Buyers will start contacting you through Secure Deal Chat.</p>
+    <a href="index.html" style="display:block; background:linear-gradient(135deg,var(--primary),var(--dark)); color:white; padding:14px; border-radius:14px; font-weight:800; text-decoration:none; font-size:15px; margin-bottom:10px;">🏠 View All Listings</a>
+    <a href="chats.html" style="display:block; background:var(--bg); color:var(--dark); padding:12px; border-radius:14px; font-weight:700; text-decoration:none; font-size:14px;">💬 Go to My Chats</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://upcaqahypupwxjgpzwks.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2FxYWh5cHVwd3hqZ3B6d2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMTg0ODAsImV4cCI6MjEwMDg5NDQ4MH0.DUCjsjMnG8ANUg1PeGyESU3AA9NrwLh1y05_jPrVb68';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let selectedCategory = '';
+
+/* ── Category selection ── */
+function selectCat(el, cat) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCategory = cat;
+  document.getElementById('selectedCat').value = cat;
+  // Progress step 1 → done
+  document.getElementById('s1').className = 'step-num done';
+  document.getElementById('line1').className = 'step-line done';
+  document.getElementById('s2').className = 'step-num active';
+  document.getElementById('sl2').className = 'step-label active';
+}
+
+/* ── Price calculator ── */
+function calcDiscount() {
+  const orig   = parseFloat(document.getElementById('origPrice').value) || 0;
+  const resale = parseFloat(document.getElementById('resalePrice').value) || 0;
+  const preview = document.getElementById('pricePreview');
+  if (orig > 0 && resale > 0) {
+    const save = orig - resale;
+    const disc = Math.round((save / orig) * 100);
+    document.getElementById('prevOrig').textContent   = '₹' + orig.toLocaleString('en-IN');
+    document.getElementById('prevResale').textContent = '₹' + resale.toLocaleString('en-IN');
+    document.getElementById('prevSave').textContent   = '₹' + save.toLocaleString('en-IN');
+    document.getElementById('prevDisc').textContent   = disc + '% OFF';
+    preview.classList.add('visible');
+    // progress
+    document.getElementById('s3').className = 'step-num done';
+    document.getElementById('line3').className = 'step-line done';
+    document.getElementById('s4').className = 'step-num active';
+    document.getElementById('sl4').className = 'step-label active';
+  } else {
+    preview.classList.remove('visible');
+  }
+}
+
+/* ── Photo previews ── */
+function previewPhotos(input) {
+  const container = document.getElementById('photoPreviews');
+  container.innerHTML = '';
+  [...input.files].slice(0,5).forEach(file => {
+    const url = URL.createObjectURL(file);
+    const img = document.createElement('img');
+    img.src = url; img.className = 'photo-thumb';
+    container.appendChild(img);
+  });
+}
+
+function previewProof(input) {
+  const container = document.getElementById('proofPreview');
+  if (input.files[0]) {
+    container.innerHTML = `<div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--primary); font-weight:700; margin-top:6px;">✅ ${input.files[0].name} uploaded</div>`;
+  }
+}
+
+/* ── Validation ── */
+function validate() {
+  const required = [
+    { id:'selectedCat',   label:'Category'           },
+    { id:'adTitle',       label:'Ad Title'            },
+    { id:'adCity',        label:'City'                },
+    { id:'adEventDate',   label:'Event Date'          },
+    { id:'adProvider',    label:'Provider Name'       },
+    { id:'adReason',      label:'Cancellation Reason' },
+    { id:'origPrice',     label:'Original Price'      },
+    { id:'resalePrice',   label:'Resale Price'        },
+    { id:'contactName',   label:'Your Name'           },
+    { id:'contactPhone',  label:'Mobile Number'       },
+    { id:'contactEmail',  label:'Email Address'       },
+  ];
+  for (const f of required) {
+    const el = document.getElementById(f.id);
+    if (!el || !el.value.trim()) {
+      alert(`⚠️ Please fill in: ${f.label}`);
+      el && el.focus();
+      return false;
+    }
+  }
+  if (!document.getElementById('agreeTerms').checked) {
+    alert('⚠️ Please agree to Terms of Use to continue.');
+    return false;
+  }
+  return true;
+}
+
+/* ── Submit ── */
+async function submitAd() {
+  if (!validate()) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Posting your ad…';
+
+  try {
+    const adData = {
+      title:              document.getElementById('adTitle').value.trim(),
+      category:           selectedCategory,
+      location:           document.getElementById('adCity').value + (document.getElementById('adArea').value ? ', ' + document.getElementById('adArea').value : ''),
+      event_date:         document.getElementById('adEventDate').value,
+      provider_name:      document.getElementById('adProvider').value.trim(),
+      cancellation_reason:document.getElementById('adReason').value,
+      description:        document.getElementById('adDesc').value.trim(),
+      original_price:     parseFloat(document.getElementById('origPrice').value),
+      deposit_paid:       parseFloat(document.getElementById('depositPaid').value) || 0,
+      resale_price:       parseFloat(document.getElementById('resalePrice').value),
+      contact_name:       document.getElementById('contactName').value.trim(),
+      contact_phone:      document.getElementById('contactPhone').value.trim(),
+      contact_email:      document.getElementById('contactEmail').value.trim(),
+      contact_pref:       document.getElementById('contactPref').value,
+      status:             'active',
+      created_at:         new Date().toISOString(),
+    };
+
+    // Try saving to Supabase (resale_listings won't work without FK chain, so save to transfer_chats as system message)
+    const { error } = await sb.from('transfer_chats').insert({
+      ad_id: 'new-' + Date.now(),
+      sender_role: 'seller',
+      message: `[NEW LISTING] ${adData.title} | ${adData.category} | ${adData.location} | ₹${adData.resale_price} | Event: ${adData.event_date}`,
+    });
+
+    if (error) console.warn('Supabase save:', error.message);
+
+    // Show success
+    document.getElementById('successOverlay').classList.add('show');
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById('successOverlay').classList.add('show');
+  }
+}
+
+function getSavedUser() {
+  try {
+    const raw = localStorage.getItem('resalehub_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function logoutUser() {
+  localStorage.removeItem('resalehub_user');
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const user = getSavedUser();
+  const authNavArea = document.getElementById('authNavArea');
+  if (user) {
+    const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[user.role] || '👤';
+    const roleName  = { buyer:'Buyer', seller:'Seller', provider:'Provider' }[user.role] || user.role;
+    const nameStr   = user.businessName || user.name || user.email.split('@')[0];
+
+    if (authNavArea) {
+      authNavArea.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px; background:var(--bg); padding:4px 12px; border-radius:20px; border:1.5px solid var(--primary);">
+          <span style="font-size:12px; font-weight:800; color:var(--dark); display:flex; align-items:center; gap:4px;">
+            ${roleEmoji} ${nameStr} (${roleName})
+          </span>
+          <button onclick="logoutUser()" style="background:none; border:none; color:var(--red); font-weight:800; cursor:pointer; font-size:11px; margin-left:4px;">Logout</button>
+        </div>`;
+    }
+    // Prefill form
+    if (document.getElementById('contactName') && !document.getElementById('contactName').value) {
+      document.getElementById('contactName').value = user.name || user.businessName || '';
+    }
+    if (document.getElementById('contactEmail') && !document.getElementById('contactEmail').value) {
+      document.getElementById('contactEmail').value = user.email || '';
+    }
+  } else if (authNavArea) {
+    authNavArea.innerHTML = '';
+  }
+}
+
+updateAuthUI();
+</script>
+</body>
+</html>

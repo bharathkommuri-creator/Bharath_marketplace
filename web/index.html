@@ -675,9 +675,17 @@
     </div>
 
     <div style="display:flex; align-items:center; gap:12px;">
-      <button onclick="openLoginModal()"
-        style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
-        Login Portal</button>
+      <a href="create-ad.html"
+        style="background:#F59E0B; color:#1a1a1a; border:none; padding:9px 20px; border-radius:20px; font-weight:800; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; text-decoration:none; box-shadow:0 2px 8px rgba(245,158,11,0.35);">✚ Post Free Ad</a>
+
+      <a href="chats.html"
+        style="background:#064E3B; color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; text-decoration:none;">💬 My Chats</a>
+
+      <div id="authNavArea">
+        <button onclick="openLoginModal()"
+          style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
+          Login Portal</button>
+      </div>
 
       <div class="role-switcher">
         <span class="role-badge">View Mode:</span>
@@ -1288,7 +1296,7 @@
       }
 
       grid.innerHTML = toShow.map(l => `
-        <div class="card" onclick="openDetail('${l.id}')">
+        <div class="card" onclick="window.open('detail.html?id=${l.id}', '_blank')" style="cursor:pointer;">
           <div class="card-img-wrap">
             <img src="${l.img}" class="card-img" alt="${l.title}">
             <div class="discount-badge">-${l.discount}% OFF</div>
@@ -1521,73 +1529,513 @@
       }
     }
 
+    function getSavedUser() {
+      try {
+        const raw = localStorage.getItem('resalehub_user');
+        return raw ? JSON.parse(raw) : null;
+      } catch(e) { return null; }
+    }
+
+    function saveUserSession(userObj) {
+      localStorage.setItem('resalehub_user', JSON.stringify(userObj));
+      updateAuthUI();
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('resalehub_user');
+      updateAuthUI();
+      alert('🔒 Logged out successfully.');
+    }
+
+    function updateAuthUI() {
+      const user = getSavedUser();
+      const authNavArea = document.getElementById('authNavArea');
+      if (!authNavArea) return;
+
+      if (user) {
+        const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[user.role] || '👤';
+        const roleName  = { buyer:'Buyer', seller:'Seller', provider:'Provider' }[user.role] || user.role;
+        const nameStr   = user.businessName || user.name || user.email.split('@')[0];
+
+        authNavArea.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; background:var(--bg-mint); padding:4px 12px; border-radius:20px; border:1.5px solid var(--primary);">
+            <span style="font-size:12px; font-weight:800; color:var(--dark-forest); display:flex; align-items:center; gap:4px;">
+              ${roleEmoji} ${nameStr} (${roleName})
+            </span>
+            <button onclick="logoutUser()" style="background:none; border:none; color:var(--badge-red); font-weight:800; cursor:pointer; font-size:11px; margin-left:4px;">Logout</button>
+          </div>`;
+        
+        // Sync role dropdown
+        const roleSelect = document.getElementById('roleSelect');
+        if (roleSelect && roleSelect.value !== user.role) {
+          roleSelect.value = user.role;
+          currentRole = user.role;
+        }
+      } else {
+        authNavArea.innerHTML = `
+          <button onclick="openLoginModal()"
+            style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
+            Login Portal</button>`;
+      }
+    }
+
+    function quickLogin(role) {
+      const accounts = {
+        buyer:    { email: 'buyer@resalehub.in',   name: 'Ramesh Kumar',       role: 'buyer'    },
+        seller:   { email: 'seller@resalehub.in',  name: 'Priya Sharma',       role: 'seller'   },
+        provider: { email: 'hyatt@resalehub.in',   businessName: 'Grand Hyatt Hotels', role: 'provider' },
+      };
+      const userObj = accounts[role] || accounts.buyer;
+      saveUserSession(userObj);
+      closeLoginModal();
+      alert(`✅ Successfully logged in as ${userObj.businessName || userObj.name} (${userObj.role.toUpperCase()})!`);
+    }
+
     function submitUserLogin() {
       const role = document.getElementById('userRoleSelect').value;
-      switchRole(role);
-      alert('Successfully logged in as General User (' + (role === 'buyer' ? 'Buyer' : 'Seller') + ')!');
+      const name = document.getElementById('userFullName').value.trim() || 'Ramesh Kumar';
+      const email = document.getElementById('userEmail').value.trim() || 'user@resalehub.in';
+      
+      const userObj = { email, name, role };
+      saveUserSession(userObj);
       closeLoginModal();
+      alert(`✅ Logged in successfully as ${name} (${role.toUpperCase()})!`);
     }
 
     function submitProviderLogin() {
-      switchRole('provider');
-      alert('Successfully authenticated as Service Provider / Vendor Host!');
+      const bName = document.getElementById('providerBusinessName').value.trim() || 'Grand Hyatt Hotels';
+      const email = document.getElementById('providerEmail').value.trim() || 'provider@grandhyatt.com';
+
+      const userObj = { email, businessName: bName, role: 'provider' };
+      saveUserSession(userObj);
       closeLoginModal();
+      alert(`✅ Logged in successfully as ${bName} (SERVICE PROVIDER)!`);
     }
 
     // Initialize
+    updateAuthUI();
     renderListings();
   </script>
 
   <!-- Login Modal -->
-  <div id="loginModal" class="modal-overlay" style="display:none;">
-    <div class="modal-card" style="max-width:440px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+  <div id="loginModal" class="modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(6,78,59,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+    <div class="modal-card" style="max-width:460px; width:92%; background:white; border-radius:24px; padding:28px; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h2 style="font-size:20px; font-weight:800; color:var(--dark-forest);">🔑 ResaleHub Login</h2>
-        <span onclick="closeLoginModal()" style="cursor:pointer; font-size:20px; font-weight:bold;">✕</span>
+        <span onclick="closeLoginModal()" style="cursor:pointer; font-size:22px; font-weight:bold; color:var(--text-muted); padding:4px 10px; background:#f1f5f9; border-radius:50%;">✕</span>
+      </div>
+
+      <!-- Quick 1-Click Login -->
+      <div style="background:#F0FDF4; border:1px solid #bbf7d0; border-radius:14px; padding:12px; margin-bottom:18px;">
+        <div style="font-size:11px; font-weight:800; color:#064E3B; margin-bottom:8px; text-transform:uppercase;">⚡ Quick Demo 1-Click Login:</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button onclick="quickLogin('buyer')" style="background:#3b82f6; color:white; border:none; padding:7px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer;">👤 Buyer Demo</button>
+          <button onclick="quickLogin('seller')" style="background:#0F9D58; color:white; border:none; padding:7px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer;">🙋 Seller Demo</button>
+          <button onclick="quickLogin('provider')" style="background:#064E3B; color:white; border:none; padding:7px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer;">🏢 Provider Demo</button>
+        </div>
       </div>
 
       <!-- Login Tabs -->
-      <div
-        style="display:flex; gap:8px; margin-bottom:20px; background:var(--bg-mint); padding:4px; border-radius:12px;">
-        <button id="tabUser" onclick="switchLoginTab('user')"
-          style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--primary); color:white; cursor:pointer;">👤
-          User Login</button>
-        <button id="tabProvider" onclick="switchLoginTab('provider')"
-          style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--bg-mint); color:var(--text-dark); cursor:pointer;">🏢
-          Provider Login</button>
+      <div style="display:flex; gap:8px; margin-bottom:18px; background:var(--bg-mint); padding:4px; border-radius:12px;">
+        <button id="tabUser" onclick="switchLoginTab('user')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--primary); color:white; cursor:pointer;">👤 User Login</button>
+        <button id="tabProvider" onclick="switchLoginTab('provider')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--bg-mint); color:var(--text-dark); cursor:pointer;">🏢 Provider Login</button>
       </div>
 
       <!-- User Login Form -->
       <div id="userForm">
-        <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Select User Type:</label>
-        <select id="userRoleSelect"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:14px; font-size:14px;">
-          <option value="buyer">New Buyer (Browse & Claim Deals)</option>
-          <option value="seller">Original Buyer (Resell Booking)</option>
-        </select>
-
-        <input type="email" value="buyer@resale.com" placeholder="Email Address"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
-        <input type="password" value="password123" placeholder="Password"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
-        <button class="btn-primary" onclick="submitUserLogin()">Sign In as User</button>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Full Name / Display Name:</label>
+          <input type="text" id="userFullName" value="Ramesh Kumar" placeholder="Your full name" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Select Role:</label>
+          <select id="userRoleSelect" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+            <option value="buyer">New Buyer (Browse &amp; Claim Deals)</option>
+            <option value="seller">Original Buyer (Resell Booking)</option>
+          </select>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Email Address:</label>
+          <input type="email" id="userEmail" value="ramesh@resalehub.in" placeholder="Email Address" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+        </div>
+        <div style="margin-bottom:18px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Password:</label>
+          <input type="password" id="userPassword" value="password123" placeholder="Password" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+        </div>
+        <button class="btn-primary" onclick="submitUserLogin()" style="width:100%; padding:13px; border-radius:12px; font-size:15px; font-weight:800;">Sign In as User</button>
       </div>
 
       <!-- Service Provider Login Form -->
       <div id="providerForm" style="display:none;">
-        <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Business / Hotel Name:</label>
-        <input type="text" value="Grand Hyatt Hotels" placeholder="e.g. Marriott / Grand Hyatt"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
-
-        <input type="email" value="provider@grandhyatt.com" placeholder="Business Email"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:12px; font-size:14px;">
-        <input type="password" value="provider123" placeholder="Password"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-light); margin-bottom:18px; font-size:14px;">
-        <button class="btn-primary" style="background:var(--dark-forest);" onclick="submitProviderLogin()">Sign In as
-          Service Provider</button>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Business / Hotel Name:</label>
+          <input type="text" id="providerBusinessName" value="Grand Hyatt Hotels" placeholder="e.g. Marriott / Grand Hyatt" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Business Email:</label>
+          <input type="email" id="providerEmail" value="provider@grandhyatt.com" placeholder="Business Email" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+        </div>
+        <div style="margin-bottom:18px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Password:</label>
+          <input type="password" id="providerPassword" value="provider123" placeholder="Password" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+        </div>
+        <button class="btn-primary" style="width:100%; padding:13px; border-radius:12px; font-size:15px; font-weight:800; background:var(--dark-forest);" onclick="submitProviderLogin()">Sign In as Service Provider</button>
       </div>
     </div>
   </div>
-</body>
 
-</html>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER — Indian Marketplace Style
+  ══════════════════════════════════════════════════════════════ -->
+  <footer style="background:#0F172A; color:#CBD5E1; font-family:'Plus Jakarta Sans',sans-serif; margin-top:60px;">
+
+    <!-- Main footer grid -->
+    <div style="max-width:1200px; margin:0 auto; padding:48px 32px 32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:36px;">
+
+      <!-- Brand column -->
+      <div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="background:#0F9D58; color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800;">⇄</div>
+          <div style="font-size:18px; font-weight:800; color:white;">ResaleHub</div>
+        </div>
+        <p style="font-size:13px; line-height:1.7; color:#94A3B8; margin-bottom:16px;">India's first 3-party verified marketplace for reselling cancelled hotel, venue & event bookings safely.</p>
+        <div style="display:flex; gap:10px;">
+          <a href="javascript:void(0)" onclick="openInfoModal('community_forum')" style="background:#1e293b; color:#CBD5E1; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:16px;">f</a>
+          <a href="javascript:void(0)" onclick="openInfoModal('community_forum')" style="background:#1e293b; color:#CBD5E1; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:16px;">in</a>
+          <a href="javascript:void(0)" onclick="openInfoModal('community_forum')" style="background:#1e293b; color:#CBD5E1; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:14px;">𝕏</a>
+          <a href="javascript:void(0)" onclick="openInfoModal('community_forum')" style="background:#1e293b; color:#CBD5E1; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:14px;">▶</a>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <div style="font-size:13px; font-weight:800; color:white; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.5px;">Categories</div>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px;">
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Hotels')" style="color:#94A3B8; text-decoration:none; font-size:13px;">🏨 Hotels &amp; Resorts</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Venues')" style="color:#94A3B8; text-decoration:none; font-size:13px;">🏛️ Banquet &amp; Marriage Halls</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Events')" style="color:#94A3B8; text-decoration:none; font-size:13px;">🎉 Events &amp; Celebrations</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Catering')" style="color:#94A3B8; text-decoration:none; font-size:13px;">🍽️ Catering Services</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Photography')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📸 Photography &amp; Videography</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Gyms')" style="color:#94A3B8; text-decoration:none; font-size:13px;">💪 Gym Memberships</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Spa & Wellness')" style="color:#94A3B8; text-decoration:none; font-size:13px;">🌿 Spa &amp; Wellness</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategoryFromFooter('Travel Packages')" style="color:#94A3B8; text-decoration:none; font-size:13px;">✈️ Travel Packages</a></li>
+        </ul>
+      </div>
+
+      <!-- Popular Cities -->
+      <div>
+        <div style="font-size:13px; font-weight:800; color:white; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.5px;">Popular Cities</div>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px;">
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Hyderabad')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Hyderabad</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Bangalore')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Bangalore</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Mumbai')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Mumbai</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Delhi')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Delhi NCR</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Chennai')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Chennai</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Pune')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Pune</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Jaipur')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Jaipur</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCityFromFooter('Goa')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📍 Goa</a></li>
+        </ul>
+      </div>
+
+      <!-- Help & Support -->
+      <div>
+        <div style="font-size:13px; font-weight:800; color:white; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.5px;">Help &amp; Support</div>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px;">
+          <li><a href="javascript:void(0)" onclick="openInfoModal('how_it_works')" style="color:#94A3B8; text-decoration:none; font-size:13px;">❓ How It Works</a></li>
+          <li><a href="javascript:void(0)" onclick="openInfoModal('safety_tips')" style="color:#94A3B8; text-decoration:none; font-size:13px;">🛡️ Safety Tips</a></li>
+          <li><a href="javascript:void(0)" onclick="openInfoModal('posting_guidelines')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📋 Posting Guidelines</a></li>
+          <li><a href="javascript:void(0)" onclick="openInfoModal('pricing_fees')" style="color:#94A3B8; text-decoration:none; font-size:13px;">💸 Pricing &amp; Fees</a></li>
+          <li><a href="javascript:void(0)" onclick="openInfoModal('contact_support')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📞 Contact Support</a></li>
+          <li><a href="javascript:void(0)" onclick="openInfoModal('report_problem')" style="color:#94A3B8; text-decoration:none; font-size:13px;">📝 Report a Problem</a></li>
+          <li><a href="javascript:void(0)" onclick="openInfoModal('community_forum')" style="color:#94A3B8; text-decoration:none; font-size:13px;">💬 Community Forum</a></li>
+        </ul>
+      </div>
+
+      <!-- App Download -->
+      <div>
+        <div style="font-size:13px; font-weight:800; color:white; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.5px;">Download Our App</div>
+        <p style="font-size:12px; color:#94A3B8; margin-bottom:14px; line-height:1.6;">Get real-time deal alerts &amp; chat on the go.</p>
+        <a href="javascript:void(0)" onclick="openInfoModal('download_app')" style="display:flex; align-items:center; gap:10px; background:#1e293b; border:1px solid #334155; border-radius:12px; padding:10px 14px; text-decoration:none; margin-bottom:10px;">
+          <span style="font-size:22px;">🍎</span>
+          <div><div style="font-size:10px; color:#94A3B8;">Download on the</div><div style="font-size:13px; font-weight:700; color:white;">App Store</div></div>
+        </a>
+        <a href="javascript:void(0)" onclick="openInfoModal('download_app')" style="display:flex; align-items:center; gap:10px; background:#1e293b; border:1px solid #334155; border-radius:12px; padding:10px 14px; text-decoration:none;">
+          <span style="font-size:22px;">▶</span>
+          <div><div style="font-size:10px; color:#94A3B8;">Get it on</div><div style="font-size:13px; font-weight:700; color:white;">Google Play</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Trust badges row -->
+    <div style="border-top:1px solid #1e293b; max-width:1200px; margin:0 auto; padding:24px 32px; display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+      <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#64748B;">
+        <span style="font-size:20px;">🔒</span> 256-bit SSL Encrypted
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#64748B;">
+        <span style="font-size:20px;">✅</span> RBI-Compliant Escrow
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#64748B;">
+        <span style="font-size:20px;">🏆</span> 10,000+ Verified Transfers
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#64748B;">
+        <span style="font-size:20px;">⭐</span> 4.8/5 User Rating
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#64748B;">
+        <span style="font-size:20px;">📱</span> UPI &amp; All Cards Accepted
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div style="background:#0a0f1a; padding:18px 32px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div style="font-size:12px; color:#475569;">© 2026 ResaleHub Technologies Pvt. Ltd. · All rights reserved · Made with ❤️ in India 🇮🇳</div>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <a href="javascript:void(0)" onclick="openInfoModal('privacy')" style="font-size:12px; color:#475569; text-decoration:none;">Privacy Policy</a>
+        <a href="javascript:void(0)" onclick="openInfoModal('terms')" style="font-size:12px; color:#475569; text-decoration:none;">Terms of Use</a>
+        <a href="javascript:void(0)" onclick="openInfoModal('cookies')" style="font-size:12px; color:#475569; text-decoration:none;">Cookie Policy</a>
+        <a href="javascript:void(0)" onclick="openInfoModal('grievance')" style="font-size:12px; color:#475569; text-decoration:none;">Grievance Officer</a>
+        <a href="javascript:void(0)" onclick="openInfoModal('sitemap')" style="font-size:12px; color:#475569; text-decoration:none;">Sitemap</a>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Generic Information Modal -->
+  <div id="infoModal" class="modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(6,78,59,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+    <div class="modal-card" style="max-width:650px; width:92%; max-height:85vh; overflow-y:auto; background:white; border-radius:24px; padding:32px; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-light); padding-bottom:14px;">
+        <h2 id="infoModalTitle" style="font-size:20px; font-weight:800; color:var(--dark-forest);">Info Title</h2>
+        <span onclick="closeInfoModal()" style="cursor:pointer; font-size:22px; font-weight:bold; color:var(--text-muted); padding:4px 10px; background:#f1f5f9; border-radius:50%;">✕</span>
+      </div>
+      <div id="infoModalBody" style="font-size:14px; line-height:1.7; color:var(--text-dark);">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function filterCategoryFromFooter(cat) {
+      currentCategory = cat;
+      visibleCount = PAGE_SIZE;
+      renderListings();
+      const target = document.querySelector('.city-search-row');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function filterCityFromFooter(city) {
+      setCity(city, '📍 ' + city);
+      const target = document.querySelector('.city-search-row');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function openInfoModal(type) {
+      const modal = document.getElementById('infoModal');
+      const title = document.getElementById('infoModalTitle');
+      const body = document.getElementById('infoModalBody');
+
+      const infoData = {
+        how_it_works: {
+          title: "❓ How ResaleHub Works",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <p>ResaleHub is India's pioneer <b>3-Party Booking Resale Marketplace</b>. We bring together Original Sellers, New Buyers, and Service Providers (Hotels, Venues, Caterers) to facilitate 100% legal & safe booking transfers.</p>
+              
+              <div style="background:#F0FDF4; border:1px solid #bbf7d0; border-radius:14px; padding:16px;">
+                <h4 style="color:#064E3B; font-size:15px; margin-bottom:8px;">Step 1: Seller Lists Cancelled Booking</h4>
+                <p style="font-size:13px; color:#475569;">Original buyers who cannot make their dates post their booking details along with original invoice proof and offered resale discount.</p>
+              </div>
+
+              <div style="background:#EFF6FF; border:1px solid #bfdbfe; border-radius:14px; padding:16px;">
+                <h4 style="color:#1e40af; font-size:15px; margin-bottom:8px;">Step 2: 3-Party Secure Deal Chat</h4>
+                <p style="font-size:13px; color:#475569;">Buyer connects directly with both the Seller and the Service Provider in a private 3-party chat room to verify booking authenticity.</p>
+              </div>
+
+              <div style="background:#FEF3C7; border:1px solid #fde68a; border-radius:14px; padding:16px;">
+                <h4 style="color:#92400e; font-size:15px; margin-bottom:8px;">Step 3: Provider Re-issues Booking & Transfer</h4>
+                <p style="font-size:13px; color:#475569;">Once payment is locked in RBI-compliant escrow, the Hotel/Venue issues an official updated booking confirmation directly under the new buyer's name.</p>
+              </div>
+            </div>`
+        },
+        safety_tips: {
+          title: "🛡️ Safety & Fraud Prevention Tips",
+          content: `
+            <ul style="display:flex; flex-direction:column; gap:12px; padding-left:20px;">
+              <li><b>Always Use 3-Party Chat:</b> Communicate exclusively inside ResaleHub's Secure Chat so the Host/Provider can officially verify the reservation.</li>
+              <li><b>Verify Booking ID:</b> Ask the Service Provider representative in the chat to confirm the original reservation status before transferring money.</li>
+              <li><b>Never Pay via Direct Personal UPI:</b> Avoid paying sellers directly to personal phone numbers outside our verified payment gateway or escrow system.</li>
+              <li><b>Check Cancellation Reason:</b> Review the seller's reason and requested documentation before finalizing the deal.</li>
+              <li><b>Keep Proof of Transfer:</b> Save a copy of the re-issued booking voucher provided by the Service Provider.</li>
+            </ul>`
+        },
+        posting_guidelines: {
+          title: "📋 Seller Posting Guidelines",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <p>Follow these rules to ensure your ad gets approved and sold quickly:</p>
+              <div style="background:#F8FAFC; padding:14px; border-radius:12px; border:1px solid #E2E8F0;">
+                <p>✅ <b>Genuine Bookings Only:</b> You must hold a valid, paid reservation for a hotel, venue, event, or service in India.</p>
+              </div>
+              <div style="background:#F8FAFC; padding:14px; border-radius:12px; border:1px solid #E2E8F0;">
+                <p>✅ <b>Accurate Pricing:</b> List the exact original price paid and a reasonable resale discount (suggested 20%-50% OFF).</p>
+              </div>
+              <div style="background:#F8FAFC; padding:14px; border-radius:12px; border:1px solid #E2E8F0;">
+                <p>✅ <b>Attach Proof:</b> Uploading booking invoices or confirmation screenshots drastically increases buyer trust.</p>
+              </div>
+              <div style="background:#FEF2F2; padding:14px; border-radius:12px; border:1px solid #fecaca; color:#991b1b;">
+                <p>❌ <b>Prohibited:</b> Fake listings, expired dates, or scalping above original market price will result in permanent account suspension.</p>
+              </div>
+            </div>`
+        },
+        pricing_fees: {
+          title: "💸 Pricing, Fees & Escrow Protection",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div style="display:flex; justify-content:space-between; padding:12px; background:#F0FDF4; border-radius:12px;">
+                <span><b>Ad Posting Fee:</b></span>
+                <span style="color:#0F9D58; font-weight:800;">FREE (₹0)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:12px; background:#F0FDF4; border-radius:12px;">
+                <span><b>Seller Commission:</b></span>
+                <span style="color:#0F9D58; font-weight:800;">0% Commission</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:12px; background:#F0FDF4; border-radius:12px;">
+                <span><b>Buyer Protection Fee:</b></span>
+                <span style="color:#0F9D58; font-weight:800;">Included in Escrow</span>
+              </div>
+              <p style="margin-top:10px;">Our <b>RBI-Compliant Escrow System</b> ensures that funds are held securely until the Service Provider officially transfers the reservation name to the new buyer.</p>
+            </div>`
+        },
+        contact_support: {
+          title: "📞 Contact Support & Customer Care",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <p>Our dedicated Indian support team is available 7 days a week (9:00 AM – 9:00 PM IST).</p>
+              <div style="background:#F8FAFC; padding:16px; border-radius:14px; border:1px solid #E2E8F0;">
+                <p>📞 <b>Toll-Free Helpline:</b> 1800-123-RESALE (737253)</p>
+                <p style="margin-top:6px;">✉️ <b>Support Email:</b> support@resalehub.in</p>
+                <p style="margin-top:6px;">💬 <b>Live WhatsApp Chat:</b> +91 98765 43210</p>
+                <p style="margin-top:6px;">🏢 <b>Headquarters:</b> Hitec City, Hyderabad, Telangana 500081</p>
+              </div>
+            </div>`
+        },
+        report_problem: {
+          title: "📝 Report a Listing or Issue",
+          content: `
+            <form onsubmit="event.preventDefault(); alert('Thank you! Your report has been submitted to our moderation team.'); closeInfoModal();" style="display:flex; flex-direction:column; gap:12px;">
+              <label style="font-size:12px; font-weight:700;">Listing / Ad ID or URL:</label>
+              <input type="text" placeholder="e.g. in-001 or URL" style="padding:10px; border-radius:8px; border:1px solid #cbd5e1;" required>
+              <label style="font-size:12px; font-weight:700;">Issue Category:</label>
+              <select style="padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                <option>Fraudulent or Fake Listing</option>
+                <option>Incorrect Date / Price Details</option>
+                <option>Service Provider Denied Transfer</option>
+                <option>Spam / Misleading Content</option>
+                <option>Other Issue</option>
+              </select>
+              <label style="font-size:12px; font-weight:700;">Description of Issue:</label>
+              <textarea rows="3" placeholder="Provide details..." style="padding:10px; border-radius:8px; border:1px solid #cbd5e1;" required></textarea>
+              <button type="submit" style="background:#0F9D58; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer;">Submit Report</button>
+            </form>`
+        },
+        community_forum: {
+          title: "💬 ResaleHub Community & Discussions",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <p>Join over 50,000+ Indian travellers, event planners & hotel deal hunters discussing resale tips and upcoming cancellations!</p>
+              <div style="background:#F0FDF4; padding:14px; border-radius:12px; border:1px solid #bbf7d0;">
+                <h5 style="color:#064E3B;">🔥 Popular Discussion: How to get hotel providers to agree to name transfers easily?</h5>
+                <p style="font-size:12px; color:#64748B; margin-top:4px;">142 replies · Last active 10 mins ago</p>
+              </div>
+              <div style="background:#F0FDF4; padding:14px; border-radius:12px; border:1px solid #bbf7d0;">
+                <h5 style="color:#064E3B;">📍 Best cities for last-minute resort discounts in August 2026</h5>
+                <p style="font-size:12px; color:#64748B; margin-top:4px;">89 replies · Last active 1 hour ago</p>
+              </div>
+            </div>`
+        },
+        download_app: {
+          title: "📱 Download ResaleHub Mobile App",
+          content: `
+            <div style="text-align:center; padding:10px 0;">
+              <div style="font-size:48px; margin-bottom:10px;">📱⚡</div>
+              <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">Get Instant Push Notifications for Hot Deals</h3>
+              <p style="font-size:13px; color:#64748B; margin-bottom:20px;">Never miss a 50%+ discount on hotel rooms or marriage halls in your city!</p>
+              
+              <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+                <button onclick="alert('App Store link sent to your mobile device!'); closeInfoModal();" style="background:#1e293b; color:white; border:none; padding:12px 24px; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">🍎 iOS App Store</button>
+                <button onclick="alert('Google Play Store link sent to your mobile device!'); closeInfoModal();" style="background:#1e293b; color:white; border:none; padding:12px 24px; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">▶ Android APK / Play Store</button>
+              </div>
+            </div>`
+        },
+        privacy: {
+          title: "🔒 Privacy Policy",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+              <p><b>1. Information Collection:</b> ResaleHub collects account details, phone numbers, and booking proof documents solely for transaction verification and 3-party chat authorization.</p>
+              <p><b>2. Data Protection:</b> All chat records and uploaded invoices are encrypted using 256-bit SSL encryption standards compliant with Indian Digital Personal Data Protection (DPDP) Act 2023.</p>
+              <p><b>3. Third-Party Sharing:</b> We do not sell your personal phone numbers or financial details to third-party marketers.</p>
+            </div>`
+        },
+        terms: {
+          title: "📜 Terms of Use & Marketplace Agreement",
+          content: `
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+              <p><b>1. Marketplace Facilitator Role:</b> ResaleHub acts as an online communication and escrow platform connecting original buyers, new buyers, and service providers.</p>
+              <p><b>2. Host Verification:</b> All name transfers must be formally acknowledged by the hotel, venue, or service vendor within the 3-Party Chat.</p>
+              <p><b>3. Escrow Terms:</b> Funds remain secured in escrow until booking confirmation re-issuance is verified.</p>
+            </div>`
+        },
+        cookies: {
+          title: "🍪 Cookie Policy",
+          content: `
+            <p>ResaleHub uses essential session cookies to keep you logged in, save your city & category filter preferences, and maintain active 3-Party Chat connections. You can disable non-essential analytics cookies anytime in your browser settings.</p>`
+        },
+        grievance: {
+          title: "⚖️ Grievance Officer Contact",
+          content: `
+            <div style="background:#F8FAFC; padding:16px; border-radius:14px; border:1px solid #E2E8F0;">
+              <p><b>Grievance Officer:</b> Mr. Rajesh Kumar</p>
+              <p style="margin-top:6px;"><b>Designation:</b> Nodal Officer – Consumer Protection & Cyber Compliance</p>
+              <p style="margin-top:6px;"><b>Email:</b> grievance@resalehub.in</p>
+              <p style="margin-top:6px;"><b>Address:</b> ResaleHub Technologies, Tech Park Phase 2, Hitec City, Hyderabad, Telangana 500081</p>
+              <p style="margin-top:6px; font-size:12px; color:#64748B;">Turnaround Time: Acknowledgement within 24 hours; Resolution within 15 days as mandated under Indian IT (Intermediary Guidelines) Rules.</p>
+            </div>`
+        },
+        sitemap: {
+          title: "🗺️ ResaleHub Sitemap",
+          content: `
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <div>
+                <h4 style="font-size:14px; margin-bottom:8px;">Main Pages</h4>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#0F9D58;">
+                  <li><a href="index.html">🏠 Home / Available Deals</a></li>
+                  <li><a href="create-ad.html">✚ Post Free Ad</a></li>
+                  <li><a href="chats.html">💬 My Chats</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="font-size:14px; margin-bottom:8px;">Categories</h4>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#0F9D58;">
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Hotels');">Hotels & Resorts</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Venues');">Banquet & Marriage Halls</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Events');">Events & Celebrations</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Catering');">Catering Services</a></li>
+                </ul>
+              </div>
+            </div>`
+        }
+      };
+
+      const item = infoData[type] || { title: "Information", content: "<p>Details coming soon!</p>" };
+      title.innerHTML = item.title;
+      body.innerHTML = item.content;
+      modal.style.display = 'flex';
+    }
+
+    function closeInfoModal() {
+      document.getElementById('infoModal').style.display = 'none';
+    }
+  </script>

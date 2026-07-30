@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Chats – ResaleHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0F9D58; --dark-forest: #064E3B;
+      --bg-mint: #F0FDF4; --text-dark: #0F172A;
+      --text-muted: #64748B; --border-light: #E2E8F0;
+      --badge-red: #DC2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F8FAFC; color: var(--text-dark); min-height: 100vh; }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: white; border-bottom: 1px solid var(--border-light);
+      padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(15,157,88,0.07);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-icon { font-size: 22px; background: var(--dark-forest); color: white; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .brand-title { font-size: 18px; font-weight: 800; color: var(--dark-forest); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none; text-decoration: none; display: flex; align-items: center; gap: 6px;
+    }
+    .nav-btn-outline { background: var(--bg-mint); color: var(--dark-forest); }
+    .nav-btn-primary { background: var(--primary); color: white; }
+
+    /* ── Page ── */
+    .page { max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; }
+    .page-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+
+    /* ── Role tabs ── */
+    .role-tabs {
+      display: flex; gap: 8px; margin-bottom: 24px;
+      background: white; padding: 6px; border-radius: 16px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .role-tab {
+      flex: 1; padding: 12px 8px; border-radius: 12px; border: none;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      background: transparent; color: var(--text-muted);
+      transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .role-tab.active { color: white; }
+    .role-tab[data-role="buyer"].active    { background: #3b82f6; }
+    .role-tab[data-role="seller"].active   { background: var(--primary); }
+    .role-tab[data-role="provider"].active { background: var(--dark-forest); }
+    .role-tab .count-badge {
+      background: rgba(0,0,0,0.1); border-radius: 20px;
+      padding: 2px 8px; font-size: 11px;
+    }
+    .role-tab.active .count-badge { background: rgba(255,255,255,0.25); }
+
+    /* ── Chat list ── */
+    .chat-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .chat-card {
+      background: white; border-radius: 18px;
+      border: 1.5px solid var(--border-light);
+      padding: 18px 20px; display: flex; gap: 16px; align-items: center;
+      cursor: pointer; transition: all 0.18s;
+      text-decoration: none; color: inherit;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .chat-card:hover { border-color: var(--primary); box-shadow: 0 6px 20px rgba(15,157,88,0.1); transform: translateY(-2px); }
+    .chat-card.unread { border-left: 4px solid var(--primary); }
+
+    .chat-thumb {
+      width: 56px; height: 56px; border-radius: 14px;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .chat-thumb-placeholder {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: var(--bg-mint); display: flex; align-items: center;
+      justify-content: center; font-size: 24px; flex-shrink: 0;
+    }
+
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-location { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .chat-last-msg { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-last-msg b { color: var(--text-dark); }
+
+    .chat-right { text-align: right; flex-shrink: 0; }
+    .chat-time { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .unread-dot {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--primary); color: white; font-size: 10px; font-weight: 800;
+    }
+    .chat-participants {
+      display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;
+    }
+    .chip {
+      padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700;
+    }
+    .chip-buyer    { background: #dbeafe; color: #1e40af; }
+    .chip-seller   { background: #dcfce7; color: var(--dark-forest); }
+    .chip-provider { background: #fef3c7; color: #92400e; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .empty-state h3 { font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .empty-state p  { font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+    .browse-btn {
+      background: var(--primary); color: white; border: none;
+      padding: 12px 24px; border-radius: 16px; font-size: 14px;
+      font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;
+    }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="brand" href="index.html">
+    <div class="brand-icon">⇄</div>
+    <div class="brand-title">ResaleHub</div>
+  </a>
+  <div class="nav-right" style="display:flex; align-items:center; gap:10px;">
+    <div id="authNavArea"></div>
+    <a href="index.html" class="nav-btn nav-btn-outline">← All Deals</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">💬 My Chats</div>
+  <div class="page-sub">All your conversations — grouped by your role in each deal</div>
+
+  <!-- Role tabs -->
+  <div class="role-tabs">
+    <button class="role-tab active" data-role="buyer"    onclick="switchTab('buyer')">
+      👤 As Buyer <span class="count-badge" id="count-buyer">0</span>
+    </button>
+    <button class="role-tab" data-role="seller"   onclick="switchTab('seller')">
+      🙋 As Seller <span class="count-badge" id="count-seller">0</span>
+    </button>
+    <button class="role-tab" data-role="provider" onclick="switchTab('provider')">
+      🏢 As Provider <span class="count-badge" id="count-provider">0</span>
+    </button>
+  </div>
+
+  <!-- Chat list -->
+  <div id="chatList">
+    <div class="loading">
+      <div class="spinner"></div><br>Loading your chats…
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://upcaqahypupwxjgpzwks.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2FxYWh5cHVwd3hqZ3B6d2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMTg0ODAsImV4cCI6MjEwMDg5NDQ4MH0.DUCjsjMnG8ANUg1PeGyESU3AA9NrwLh1y05_jPrVb68';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ── All listings metadata (same as index/detail) ───────────────── */
+const LISTINGS = {
+  'in-001': { title:'Cancelled Hotel Room – 2 Nights',              location:'Jaipur, Rajasthan',     img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100', category:'Hotels' },
+  'in-002': { title:'Cancelled Home Stay – 3 Nights',               location:'Goa',                   img:'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=100', category:'Hotels' },
+  'in-003': { title:'Cancelled Farm House – Weekend Stay',           location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=100', category:'Venues' },
+  'in-004': { title:'Cancelled Resort Booking – 4 Nights',          location:'Munnar, Kerala',        img:'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=100', category:'Hotels' },
+  'in-005': { title:'Cancelled Marriage Hall – Full Day',            location:'Vijayawada, AP',        img:'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=100', category:'Venues' },
+  'in-006': { title:'Cancelled Birthday Decoration Service',        location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=100', category:'Events' },
+  'in-007': { title:'Cancelled 100-Plate Food Catering',            location:'Warangal, Telangana',   img:'https://images.unsplash.com/photo-1555244162-803834f70033?w=100', category:'Catering' },
+  'in-008': { title:'Cancelled 9-Month Gym Membership',             location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100', category:'Gyms' },
+  'in-009': { title:'Cancelled Makeup & Bridal Styling',            location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100', category:'Photography' },
+  'in-010': { title:'Cancelled Rooftop Pool Party Package',         location:'Mumbai, Maharashtra',   img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100', category:'Venues' },
+  'in-011': { title:'Cancelled Mehendi & Sangeet Night Decor',      location:'Delhi, NCR',            img:'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=100', category:'Events' },
+  'in-012': { title:'Cancelled Ooty Hill Station Hotel – 3 Nights', location:'Ooty, Tamil Nadu',      img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100', category:'Hotels' },
+  'in-013': { title:'Cancelled 200-Plate Wedding Catering',         location:'Pune, Maharashtra',     img:'https://images.unsplash.com/photo-1555244162-803834f70033?w=100', category:'Catering' },
+  'in-014': { title:'Cancelled Pre-Wedding Photography',            location:'Agra, Uttar Pradesh',   img:'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=100', category:'Photography' },
+  'in-015': { title:'Cancelled Yoga & Meditation Retreat',          location:'Rishikesh, Uttarakhand',img:'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=100', category:'Gyms' },
+  'in-016': { title:'Cancelled Banquet Hall – Corporate Event',     location:'Chennai, Tamil Nadu',   img:'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=100', category:'Venues' },
+  'in-017': { title:'Cancelled Classical Dance Performance (4)',    location:'Chennai, Tamil Nadu',   img:'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100', category:'Events' },
+  'in-018': { title:'Cancelled Luxury Spa Day (2 Persons)',         location:'Bangalore, Karnataka',  img:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=100', category:'Spa & Wellness' },
+  'in-019': { title:'Cancelled Taxi Transfer + Sightseeing',        location:'Jaipur, Rajasthan',     img:'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=100', category:'Transport' },
+  'in-020': { title:'Cancelled DJ Night + Sound System – 5 Hrs',   location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=100', category:'Events' },
+  'in-021': { title:'Cancelled Cooking Class – Italian (8 Seats)',  location:'Bangalore, Karnataka',  img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100', category:'Classes' },
+  'in-022': { title:'Cancelled Houseboat – Alleppey Backwaters',    location:'Alleppey, Kerala',      img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=100', category:'Hotels' },
+  'in-023': { title:'Cancelled Couple Photoshoot – Beach',          location:'Goa',                   img:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=100', category:'Photography' },
+  'in-024': { title:'Cancelled IPL Afterparty Venue',               location:'Mumbai, Maharashtra',   img:'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=100', category:'Venues' },
+  'in-025': { title:'Cancelled Carnatic Concert – 3 Passes',        location:'Chennai, Tamil Nadu',   img:'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=100', category:'Concerts' },
+  'in-026': { title:'Cancelled Zumba 6-Month Pass',                 location:'Pune, Maharashtra',     img:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100', category:'Gyms' },
+  'in-027': { title:'Cancelled Cycling Tour – Coorg',               location:'Coorg, Karnataka',      img:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=100', category:'Sports' },
+  'in-028': { title:'Cancelled Rajasthan Heritage Train Tour',       location:'Jodhpur, Rajasthan',    img:'https://images.unsplash.com/photo-1502784444187-359ac186c5bb?w=100', category:'Travel Packages' },
+  'in-029': { title:'Cancelled Bridal Hair & Makeup',               location:'Vijayawada, AP',        img:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100', category:'Spa & Wellness' },
+  'in-030': { title:'Cancelled Paragliding – Bir Billing',          location:'Bir, Himachal Pradesh', img:'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=100', category:'Sports' },
+  'in-031': { title:'Cancelled Cricket Academy – 3 Months',         location:'Bangalore, Karnataka',  img:'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=100', category:'Sports' },
+  'in-032': { title:'Cancelled Drone Photography – Corporate',      location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=100', category:'Photography' },
+  'in-033': { title:'Cancelled 5-Star Dinner for 10',               location:'Hyderabad, Telangana',  img:'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=100', category:'Catering' },
+  'in-034': { title:'Cancelled Dandiya Night – 50 Passes',          location:'Ahmedabad, Gujarat',    img:'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100', category:'Events' },
+  'in-035': { title:'Cancelled Eco-Cabin Forest Stay – 2 Nights',   location:'Coorg, Karnataka',      img:'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=100', category:'Hotels' },
+  'in-036': { title:'Cancelled Photography Masterclass (8 Seats)',  location:'Bangalore, Karnataka',  img:'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=100', category:'Classes' },
+  'in-037': { title:'Cancelled Open-Air Concert – Fusion Band',     location:'Pune, Maharashtra',     img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=100', category:'Concerts' },
+  'in-038': { title:'Cancelled Ladakh Road-Trip – 7 Days',          location:'Leh, Ladakh',           img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100', category:'Travel Packages' },
+  'in-039': { title:'Cancelled Tent House & Stage Setup',           location:'Warangal, Telangana',   img:'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=100', category:'Venues' },
+};
+
+const ROLE_LABELS = {
+  buyer:    { label:'buyer',            dbRole:'buyer',            emoji:'👤', chipClass:'chip-buyer'    },
+  seller:   { label:'seller',           dbRole:'seller',           emoji:'🙋', chipClass:'chip-seller'   },
+  provider: { label:'service_provider', dbRole:'service_provider', emoji:'🏢', chipClass:'chip-provider' },
+};
+
+let allChats = { buyer:[], seller:[], provider:[] };
+let activeTab = 'buyer';
+
+/* ── Load all chats from Supabase ──────────────────────────────── */
+async function loadAllChats() {
+  try {
+    const { data, error } = await sb
+      .from('transfer_chats')
+      .select('id, ad_id, sender_role, message, created_at')
+      .not('ad_id', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(500);
+
+    if (error) { console.warn('Load error:', error); return; }
+    if (!data || data.length === 0) { renderTab(); return; }
+
+    // Group by ad_id, then by sender_role
+    const grouped = {};
+    data.forEach(m => {
+      const adId = m.ad_id;
+      const role = m.sender_role === 'service_provider' ? 'provider' : m.sender_role;
+      if (!grouped[adId]) grouped[adId] = {};
+      if (!grouped[adId][role]) grouped[adId][role] = [];
+      grouped[adId][role].push(m);
+    });
+
+    // Build chat summaries per role
+    allChats = { buyer:[], seller:[], provider:[] };
+
+    Object.entries(grouped).forEach(([adId, roleMap]) => {
+      const listing = LISTINGS[adId] || { title: adId, location: '', img: '', category: '' };
+      Object.entries(roleMap).forEach(([role, msgs]) => {
+        if (!allChats[role]) return;
+        const last = msgs[0]; // already desc order
+        const allRoles = [...new Set(data.filter(m => m.ad_id === adId).map(m =>
+          m.sender_role === 'service_provider' ? 'provider' : m.sender_role
+        ))];
+        allChats[role].push({ adId, listing, lastMsg: last, msgCount: msgs.length, allRoles });
+      });
+    });
+
+    // Sort by last message time
+    ['buyer','seller','provider'].forEach(r => {
+      allChats[r].sort((a,b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at));
+    });
+
+    // Update counts
+    ['buyer','seller','provider'].forEach(r => {
+      const el = document.getElementById('count-' + r);
+      if (el) el.textContent = allChats[r].length;
+    });
+
+    renderTab();
+  } catch(e) { console.error(e); renderTab(); }
+}
+
+/* ── Render current tab ─────────────────────────────────────────── */
+function renderTab() {
+  const list = allChats[activeTab] || [];
+  const container = document.getElementById('chatList');
+
+  if (list.length === 0) {
+    const roleEmojis = { buyer:'👤', seller:'🙋', provider:'🏢' };
+    const roleLabels = { buyer:'buyer', seller:'seller', provider:'service provider' };
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${roleEmojis[activeTab]}</div>
+        <h3>No chats as ${roleLabels[activeTab]} yet</h3>
+        <p>Open any deal and chat as a ${roleLabels[activeTab]}.<br>Your conversations will appear here.</p>
+        <a href="index.html" class="browse-btn">Browse Available Deals →</a>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(chat => {
+    const l = chat.listing;
+    const roleLabel = chat.lastMsg.sender_role === 'service_provider' ? 'provider' : chat.lastMsg.sender_role;
+    const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[roleLabel] || '💬';
+    const time = new Date(chat.lastMsg.created_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    const date = new Date(chat.lastMsg.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    const otherRoles = ['buyer','seller','provider'].filter(r => r !== activeTab);
+
+    return `
+      <a class="chat-card" href="detail.html?id=${chat.adId}&role=${activeTab}">
+        ${l.img
+          ? `<img class="chat-thumb" src="${l.img}" alt="">`
+          : `<div class="chat-thumb-placeholder">🏷️</div>`}
+        <div class="chat-info">
+          <div class="chat-title">${l.title || chat.adId}</div>
+          <div class="chat-location">📍 ${l.location || ''} ${l.category ? '· ' + l.category : ''}</div>
+          <div class="chat-last-msg"><b>${roleEmoji}</b> ${chat.lastMsg.message.length > 60 ? chat.lastMsg.message.slice(0,60)+'…' : chat.lastMsg.message}</div>
+          <div class="chat-participants">
+            ${otherRoles.map(r => `<span class="chip chip-${r}">${{buyer:'👤 Buyer',seller:'🙋 Seller',provider:'🏢 Provider'}[r]}</span>`).join('')}
+            <span class="chip chip-${activeTab}">${{buyer:'👤 You (Buyer)',seller:'🙋 You (Seller)',provider:'🏢 You (Provider)'}[activeTab]}</span>
+          </div>
+        </div>
+        <div class="chat-right">
+          <div class="chat-time">${date}<br>${time}</div>
+          ${chat.msgCount > 0 ? `<div class="unread-dot">${chat.msgCount}</div>` : ''}
+        </div>
+      </a>`;
+  }).join('');
+}
+
+/* ── Switch tab ─────────────────────────────────────────────────── */
+function switchTab(role) {
+  activeTab = role;
+  document.querySelectorAll('.role-tab').forEach(b => b.classList.toggle('active', b.dataset.role === role));
+  renderTab();
+}
+
+/* ── Realtime: refresh on new messages ─────────────────────────── */
+function subscribeRealtime() {
+  sb.channel('my-chats-global')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transfer_chats' }, () => {
+      loadAllChats(); // reload on any new message
+    })
+    .subscribe();
+}
+
+function getSavedUser() {
+  try {
+    const raw = localStorage.getItem('resalehub_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function logoutUser() {
+  localStorage.removeItem('resalehub_user');
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const user = getSavedUser();
+  const authNavArea = document.getElementById('authNavArea');
+  if (!authNavArea) return;
+
+  if (user) {
+    const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[user.role] || '👤';
+    const roleName  = { buyer:'Buyer', seller:'Seller', provider:'Provider' }[user.role] || user.role;
+    const nameStr   = user.businessName || user.name || user.email.split('@')[0];
+
+    authNavArea.innerHTML = `
+      <div style="display:flex; align-items:center; gap:8px; background:var(--bg-mint); padding:4px 12px; border-radius:20px; border:1.5px solid var(--primary);">
+        <span style="font-size:12px; font-weight:800; color:var(--dark-forest); display:flex; align-items:center; gap:4px;">
+          ${roleEmoji} ${nameStr} (${roleName})
+        </span>
+        <button onclick="logoutUser()" style="background:none; border:none; color:var(--badge-red); font-weight:800; cursor:pointer; font-size:11px; margin-left:4px;">Logout</button>
+      </div>`;
+    
+    // Auto-select tab matching logged in user role if appropriate
+    if (user.role && ['buyer','seller','provider'].includes(user.role)) {
+      switchTab(user.role);
+    }
+  } else {
+    authNavArea.innerHTML = '';
+  }
+}
+
+/* ── Bootstrap ──────────────────────────────────────────────────── */
+updateAuthUI();
+loadAllChats();
+subscribeRealtime();
+</script>
+</body>
+</html>
