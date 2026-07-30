@@ -145,18 +145,15 @@
 
 <div class="page">
   <div class="page-title">💬 My Chats</div>
-  <div class="page-sub">All your conversations — grouped by your role in each deal</div>
+  <div class="page-sub">All your deal communications and resale listings</div>
 
-  <!-- Role tabs -->
+  <!-- Unified tabs -->
   <div class="role-tabs">
-    <button class="role-tab active" data-role="buyer"    onclick="switchTab('buyer')">
-      👤 As Buyer <span class="count-badge" id="count-buyer">0</span>
+    <button class="role-tab active" data-role="buyer" onclick="switchTab('buyer')" style="background:#0F9D58; color:white;">
+      💬 Active Deal Chats <span class="count-badge" id="count-buyer">0</span>
     </button>
-    <button class="role-tab" data-role="seller"   onclick="switchTab('seller')">
-      🙋 As Seller <span class="count-badge" id="count-seller">0</span>
-    </button>
-    <button class="role-tab" data-role="provider" onclick="switchTab('provider')">
-      🏢 As Provider <span class="count-badge" id="count-provider">0</span>
+    <button class="role-tab" data-role="seller" onclick="switchTab('seller')">
+      🤝 My Resale Listings <span class="count-badge" id="count-seller">0</span>
     </button>
   </div>
 
@@ -250,27 +247,25 @@ async function loadAllChats() {
     });
 
     // Build chat summaries per role
-    allChats = { buyer:[], seller:[], provider:[] };
+    allChats = { buyer:[], seller:[] };
 
     Object.entries(grouped).forEach(([adId, roleMap]) => {
       const listing = LISTINGS[adId] || { title: adId, location: '', img: '', category: '' };
       Object.entries(roleMap).forEach(([role, msgs]) => {
         if (!allChats[role]) return;
         const last = msgs[0]; // already desc order
-        const allRoles = [...new Set(data.filter(m => m.ad_id === adId).map(m =>
-          m.sender_role === 'service_provider' ? 'provider' : m.sender_role
-        ))];
+        const allRoles = [...new Set(data.filter(m => m.ad_id === adId).map(m => m.sender_role))];
         allChats[role].push({ adId, listing, lastMsg: last, msgCount: msgs.length, allRoles });
       });
     });
 
     // Sort by last message time
-    ['buyer','seller','provider'].forEach(r => {
+    ['buyer','seller'].forEach(r => {
       allChats[r].sort((a,b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at));
     });
 
     // Update counts
-    ['buyer','seller','provider'].forEach(r => {
+    ['buyer','seller'].forEach(r => {
       const el = document.getElementById('count-' + r);
       if (el) el.textContent = allChats[r].length;
     });
@@ -285,13 +280,13 @@ function renderTab() {
   const container = document.getElementById('chatList');
 
   if (list.length === 0) {
-    const roleEmojis = { buyer:'👤', seller:'🙋', provider:'🏢' };
-    const roleLabels = { buyer:'buyer', seller:'seller', provider:'service provider' };
+    const emptyType = activeTab === 'buyer' ? 'Active Deal Chats' : 'My Resale Listings';
+    const roleEmoji = activeTab === 'buyer' ? '💬' : '🤝';
     container.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">${roleEmojis[activeTab]}</div>
-        <h3>No chats as ${roleLabels[activeTab]} yet</h3>
-        <p>Open any deal and chat as a ${roleLabels[activeTab]}.<br>Your conversations will appear here.</p>
+        <div class="empty-icon">${roleEmoji}</div>
+        <h3>No ${emptyType} yet</h3>
+        <p>Open any deal and chat to see conversations here.</p>
         <a href="index.html" class="browse-btn">Browse Available Deals →</a>
       </div>`;
     return;
@@ -299,14 +294,13 @@ function renderTab() {
 
   container.innerHTML = list.map(chat => {
     const l = chat.listing;
-    const roleLabel = chat.lastMsg.sender_role === 'service_provider' ? 'provider' : chat.lastMsg.sender_role;
-    const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[roleLabel] || '💬';
+    const roleLabel = chat.lastMsg.sender_role;
+    const roleEmoji = { buyer:'👤', seller:'🙋', service_provider:'🏢' }[roleLabel] || '💬';
     const time = new Date(chat.lastMsg.created_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
     const date = new Date(chat.lastMsg.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-    const otherRoles = ['buyer','seller','provider'].filter(r => r !== activeTab);
 
     return `
-      <a class="chat-card" href="detail.html?id=${chat.adId}&role=${activeTab}">
+      <a class="chat-card" href="detail.html?id=${chat.adId}">
         ${l.img
           ? `<img class="chat-thumb" src="${l.img}" alt="">`
           : `<div class="chat-thumb-placeholder">🏷️</div>`}
@@ -314,10 +308,6 @@ function renderTab() {
           <div class="chat-title">${l.title || chat.adId}</div>
           <div class="chat-location">📍 ${l.location || ''} ${l.category ? '· ' + l.category : ''}</div>
           <div class="chat-last-msg"><b>${roleEmoji}</b> ${chat.lastMsg.message.length > 60 ? chat.lastMsg.message.slice(0,60)+'…' : chat.lastMsg.message}</div>
-          <div class="chat-participants">
-            ${otherRoles.map(r => `<span class="chip chip-${r}">${{buyer:'👤 Buyer',seller:'🙋 Seller',provider:'🏢 Provider'}[r]}</span>`).join('')}
-            <span class="chip chip-${activeTab}">${{buyer:'👤 You (Buyer)',seller:'🙋 You (Seller)',provider:'🏢 You (Provider)'}[activeTab]}</span>
-          </div>
         </div>
         <div class="chat-right">
           <div class="chat-time">${date}<br>${time}</div>
@@ -330,7 +320,17 @@ function renderTab() {
 /* ── Switch tab ─────────────────────────────────────────────────── */
 function switchTab(role) {
   activeTab = role;
-  document.querySelectorAll('.role-tab').forEach(b => b.classList.toggle('active', b.dataset.role === role));
+  document.querySelectorAll('.role-tab').forEach(b => {
+    if (b.dataset.role === role) {
+      b.classList.add('active');
+      b.style.background = '#0F9D58';
+      b.style.color = 'white';
+    } else {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text-muted)';
+    }
+  });
   renderTab();
 }
 
@@ -352,7 +352,7 @@ function getSavedUser() {
 
 function logoutUser() {
   localStorage.removeItem('resalehub_user');
-  updateAuthUI();
+  window.location.href = 'index.html';
 }
 
 function updateAuthUI() {
@@ -361,24 +361,20 @@ function updateAuthUI() {
   if (!authNavArea) return;
 
   if (user) {
-    const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[user.role] || '👤';
-    const roleName  = { buyer:'Buyer', seller:'Seller', provider:'Provider' }[user.role] || user.role;
-    const nameStr   = user.businessName || user.name || user.email.split('@')[0];
+    const nameStr = user.name || user.email.split('@')[0];
 
     authNavArea.innerHTML = `
       <div style="display:flex; align-items:center; gap:8px; background:var(--bg-mint); padding:4px 12px; border-radius:20px; border:1.5px solid var(--primary);">
-        <span style="font-size:12px; font-weight:800; color:var(--dark-forest); display:flex; align-items:center; gap:4px;">
-          ${roleEmoji} ${nameStr} (${roleName})
+        <span style="font-size:13px; font-weight:800; color:var(--dark-forest); display:flex; align-items:center; gap:4px;">
+          👤 ${nameStr}
         </span>
         <button onclick="logoutUser()" style="background:none; border:none; color:var(--badge-red); font-weight:800; cursor:pointer; font-size:11px; margin-left:4px;">Logout</button>
       </div>`;
-    
-    // Auto-select tab matching logged in user role if appropriate
-    if (user.role && ['buyer','seller','provider'].includes(user.role)) {
-      switchTab(user.role);
-    }
   } else {
-    authNavArea.innerHTML = '';
+    authNavArea.innerHTML = `
+      <a href="index.html"
+        style="background:var(--primary); color:white; text-decoration:none; padding:8px 18px; border-radius:20px; font-weight:700; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
+        Login Portal</a>`;
   }
 }
 

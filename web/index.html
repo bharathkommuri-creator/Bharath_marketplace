@@ -331,6 +331,11 @@
       overflow-x: auto;
       padding-bottom: 8px;
       margin-bottom: 28px;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    .category-bar::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
     }
 
     .category-chip {
@@ -353,6 +358,39 @@
       color: white;
       border-color: var(--primary);
       box-shadow: 0 4px 12px rgba(15, 157, 88, 0.25);
+    }
+    
+    /* All Categories Modal */
+    .cat-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    .cat-modal-item {
+      background: #F8FAFC;
+      border: 1.5px solid var(--border-light);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cat-modal-item:hover {
+      border-color: var(--primary);
+      background: var(--bg-mint);
+    }
+    .cat-modal-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .cat-modal-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--dark-forest);
     }
 
     /* More dropdown */
@@ -684,16 +722,7 @@
       <div id="authNavArea">
         <button onclick="openLoginModal()"
           style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
-          Login Portal</button>
-      </div>
-
-      <div class="role-switcher">
-        <span class="role-badge">View Mode:</span>
-        <select id="roleSelect" class="role-select" onchange="switchRole(this.value)">
-          <option value="buyer">New Buyer (Claim Slot)</option>
-          <option value="seller">Original Seller (List Booking)</option>
-          <option value="provider">Service Provider (Verify Transfer)</option>
-        </select>
+          Log In / Sign Up</button>
       </div>
     </div>
   </div>
@@ -757,27 +786,29 @@
 
     <!-- Multi-Category Filter Pills -->
     <div class="category-bar">
-      <button class="category-chip active" onclick="setCategory('All', this)">🌐 All Categories</button>
-      <button class="category-chip" onclick="setCategory('Hotels', this)">🏨 Hotels</button>
-      <button class="category-chip" onclick="setCategory('Venues', this)">🏰 Venues</button>
-      <button class="category-chip" onclick="setCategory('Photography', this)">📷 Photography</button>
-      <button class="category-chip" onclick="setCategory('Catering', this)">🍽️ Catering</button>
-      <button class="category-chip" onclick="setCategory('Gyms', this)">🏋️ Gyms</button>
-      <button class="category-chip" onclick="setCategory('Events', this)">🎟️ Events</button>
+      <button class="category-chip" onclick="openAllCategoriesModal()" style="border-color:var(--primary); color:var(--dark-forest);">🌐 All Categories ▾</button>
+      <button class="category-chip active" id="chip-All" onclick="setCategory('All', this)">⚡ Explore All Deals</button>
+      <button class="category-chip" id="chip-Hotels" onclick="setCategory('Hotels', this)">🏨 Hotels</button>
+      <button class="category-chip" id="chip-Venues" onclick="setCategory('Venues', this)">🏰 Venues</button>
+      <button class="category-chip" id="chip-Flights" onclick="setCategory('Flights', this)">✈️ Flights</button>
+      <button class="category-chip" id="chip-Events" onclick="setCategory('Events', this)">🎟️ Events</button>
+      <button class="category-chip" id="chip-Gyms" onclick="setCategory('Gyms', this)">🏋️ Gyms</button>
+      <button class="category-chip" id="chip-Photography" onclick="setCategory('Photography', this)">📷 Photography</button>
+    </div>
 
-      <!-- More dropdown -->
-      <div class="more-chip-wrap" id="moreChipWrap">
-        <button class="more-chip" id="moreChip" onclick="toggleMoreDropdown()">More <span
-            class="chevron">▾</span></button>
-        <div class="more-dropdown" id="moreDropdown">
-          <div class="more-cat-option" onclick="setMoreCategory('Spa & Wellness', '🧖 Spa &amp; Wellness', this)">🧖 Spa
-            &amp; Wellness</div>
-          <div class="more-cat-option" onclick="setMoreCategory('Transport', '🚗 Transport', this)">🚗 Transport</div>
-          <div class="more-cat-option" onclick="setMoreCategory('Classes', '🎓 Classes', this)">🎓 Classes</div>
-          <div class="more-cat-option" onclick="setMoreCategory('Concerts', '🎵 Concerts', this)">🎵 Concerts</div>
-          <div class="more-cat-option" onclick="setMoreCategory('Sports', '⚽ Sports', this)">⚽ Sports</div>
-          <div class="more-cat-option" onclick="setMoreCategory('Travel Packages', '✈️ Travel Packages', this)">✈️
-            Travel Packages</div>
+    <!-- All Categories Modal -->
+    <div id="allCategoriesModal" class="modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px;">
+      <div class="modal-card" style="max-width:800px; width:100%; background:white; border-radius:24px; padding:32px; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h2 style="font-size:22px; font-weight:800; color:var(--dark-forest); margin-bottom:4px;">Browse Categories</h2>
+            <p style="font-size:13px; color:var(--text-muted);">Find great deals on cancelled bookings across all categories</p>
+          </div>
+          <span onclick="closeAllCategoriesModal()" style="cursor:pointer; font-size:24px; font-weight:bold; color:var(--text-muted); padding:4px 12px; background:#f1f5f9; border-radius:50%;">✕</span>
+        </div>
+        
+        <div class="cat-modal-grid">
+          <!-- Modals will be rendered via JS -->
         </div>
       </div>
     </div>
@@ -797,8 +828,7 @@
     </div>
   </div>
 
-  <!-- FAB -->
-  <button class="fab" onclick="openCreateModal()">+ List Canceled Booking</button>
+
 
   <!-- Detail / 3-Party Modal -->
   <div class="modal-overlay" id="detailModal">
@@ -1379,53 +1409,73 @@
       }
     });
 
+    const allCategoriesList = [
+      { id: 'Hotels', icon: '🏨', name: 'Hotels & Resorts' },
+      { id: 'Venues', icon: '🏰', name: 'Banquet & Marriage Halls' },
+      { id: 'Flights', icon: '✈️', name: 'Flight Tickets' },
+      { id: 'Catering', icon: '🍽️', name: 'Food Catering' },
+      { id: 'Events', icon: '🎟️', name: 'Events & Tickets' },
+      { id: 'Photography', icon: '📷', name: 'Photography & Makeup' },
+      { id: 'Co-working', icon: '🏢', name: 'Co-working Spaces' },
+      { id: 'Exhibitions', icon: '⛺', name: 'Exhibition & Market Stalls' },
+      { id: 'Gyms', icon: '🏋️', name: 'Gym Memberships' },
+      { id: 'Spa & Wellness', icon: '🧖', name: 'Spa & Wellness' },
+      { id: 'Travel Packages', icon: '🧳', name: 'Travel Packages' },
+      { id: 'Concerts', icon: '🎵', name: 'Concerts & Shows' },
+      { id: 'Coaching', icon: '🎓', name: 'Coaching & Institutes' },
+      { id: 'Adventure', icon: '🧗', name: 'Adventure & Treks' },
+      { id: 'Car Rentals', icon: '🚘', name: 'Luxury Car Rentals' },
+      { id: 'Sports', icon: '⚽', name: 'Sports & Activities' },
+      { id: 'Daycare', icon: '🧸', name: 'Pre-Schools & Daycare' },
+      { id: 'Transport', icon: '🚕', name: 'Transport & Cabs' }
+    ];
+
+    function initCategoriesModal() {
+      const grid = document.querySelector('.cat-modal-grid');
+      if(grid) {
+        grid.innerHTML = allCategoriesList.map(c => `
+          <div class="cat-modal-item" onclick="setCategory('${c.id}', null)">
+            <div class="cat-modal-icon">${c.icon}</div>
+            <div class="cat-modal-name">${c.name}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function openAllCategoriesModal() {
+      document.getElementById('allCategoriesModal').style.display = 'flex';
+    }
+
+    function closeAllCategoriesModal() {
+      document.getElementById('allCategoriesModal').style.display = 'none';
+    }
+
+    // Close Modal when clicking outside the box
+    document.getElementById('allCategoriesModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAllCategoriesModal();
+      }
+    });
+
     function setCategory(cat, btn) {
       currentCategory = cat;
       visibleCount = PAGE_SIZE;
-      // Deactivate main chips
-      document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // Reset More chip label and items
-      document.getElementById('moreChip').innerHTML = 'More <span class="chevron">▾</span>';
-      document.getElementById('moreChip').classList.remove('open');
-      document.getElementById('moreDropdown').classList.remove('open');
-      document.querySelectorAll('.more-cat-option').forEach(o => o.classList.remove('active'));
+      
+      // Close modal if open
+      closeAllCategoriesModal();
+
+      // Deactivate all main chips
+      document.querySelectorAll('.category-chip').forEach(b => {
+        b.classList.remove('active');
+        if(b.id === `chip-${cat}`) {
+          b.classList.add('active');
+        }
+      });
+      
+      // If a category was chosen from modal that isn't a quick chip, activate "Explore All Deals" (All) chip or create a dynamic one? 
+      // For simplicity, we just won't have any quick chip active if they picked something outside the main tabs.
       renderListings();
     }
-
-    function toggleMoreDropdown() {
-      const chip = document.getElementById('moreChip');
-      const dropdown = document.getElementById('moreDropdown');
-      chip.classList.toggle('open');
-      dropdown.classList.toggle('open');
-    }
-
-    function setMoreCategory(cat, label, el) {
-      currentCategory = cat;
-      visibleCount = PAGE_SIZE;
-      // Deactivate main chips
-      document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
-      // Highlight More chip with selected name
-      const chip = document.getElementById('moreChip');
-      chip.innerHTML = `${label} <span class="chevron">▾</span>`;
-      chip.classList.add('open');
-      // Highlight selected option
-      document.querySelectorAll('.more-cat-option').forEach(o => o.classList.remove('active'));
-      el.classList.add('active');
-      // Close dropdown
-      chip.classList.remove('open');
-      document.getElementById('moreDropdown').classList.remove('open');
-      renderListings();
-    }
-
-    // Close More dropdown on outside click
-    document.addEventListener('click', function (e) {
-      const wrap = document.getElementById('moreChipWrap');
-      if (wrap && !wrap.contains(e.target)) {
-        document.getElementById('moreChip').classList.remove('open');
-        document.getElementById('moreDropdown').classList.remove('open');
-      }
-    });
 
     function filterListings() {
       visibleCount = PAGE_SIZE;
@@ -1511,21 +1561,21 @@
       document.getElementById('loginModal').style.display = 'none';
     }
 
-    function switchLoginTab(tab) {
-      if (tab === 'user') {
-        document.getElementById('userForm').style.display = 'block';
-        document.getElementById('providerForm').style.display = 'none';
-        document.getElementById('tabUser').style.background = 'var(--primary)';
-        document.getElementById('tabUser').style.color = 'white';
-        document.getElementById('tabProvider').style.background = 'var(--bg-mint)';
-        document.getElementById('tabProvider').style.color = 'var(--text-dark)';
+    function switchAuthTab(tab) {
+      if (tab === 'login') {
+        document.getElementById('authFormLogin').style.display = 'block';
+        document.getElementById('authFormSignup').style.display = 'none';
+        document.getElementById('authTabLogin').style.background = '#0F9D58';
+        document.getElementById('authTabLogin').style.color = 'white';
+        document.getElementById('authTabSignup').style.background = 'transparent';
+        document.getElementById('authTabSignup').style.color = '#64748B';
       } else {
-        document.getElementById('userForm').style.display = 'none';
-        document.getElementById('providerForm').style.display = 'block';
-        document.getElementById('tabProvider').style.background = 'var(--dark-forest)';
-        document.getElementById('tabProvider').style.color = 'white';
-        document.getElementById('tabUser').style.background = 'var(--bg-mint)';
-        document.getElementById('tabUser').style.color = 'var(--text-dark)';
+        document.getElementById('authFormLogin').style.display = 'none';
+        document.getElementById('authFormSignup').style.display = 'block';
+        document.getElementById('authTabSignup').style.background = '#0F9D58';
+        document.getElementById('authTabSignup').style.color = 'white';
+        document.getElementById('authTabLogin').style.background = 'transparent';
+        document.getElementById('authTabLogin').style.color = '#64748B';
       }
     }
 
@@ -1553,63 +1603,45 @@
       if (!authNavArea) return;
 
       if (user) {
-        const roleEmoji = { buyer:'👤', seller:'🙋', provider:'🏢' }[user.role] || '👤';
-        const roleName  = { buyer:'Buyer', seller:'Seller', provider:'Provider' }[user.role] || user.role;
-        const nameStr   = user.businessName || user.name || user.email.split('@')[0];
+        const nameStr = user.name || user.email.split('@')[0];
 
         authNavArea.innerHTML = `
           <div style="display:flex; align-items:center; gap:8px; background:var(--bg-mint); padding:4px 12px; border-radius:20px; border:1.5px solid var(--primary);">
-            <span style="font-size:12px; font-weight:800; color:var(--dark-forest); display:flex; align-items:center; gap:4px;">
-              ${roleEmoji} ${nameStr} (${roleName})
+            <span style="font-size:13px; font-weight:800; color:var(--dark-forest); display:flex; align-items:center; gap:4px;">
+              👤 ${nameStr}
             </span>
             <button onclick="logoutUser()" style="background:none; border:none; color:var(--badge-red); font-weight:800; cursor:pointer; font-size:11px; margin-left:4px;">Logout</button>
           </div>`;
-        
-        // Sync role dropdown
-        const roleSelect = document.getElementById('roleSelect');
-        if (roleSelect && roleSelect.value !== user.role) {
-          roleSelect.value = user.role;
-          currentRole = user.role;
-        }
       } else {
         authNavArea.innerHTML = `
           <button onclick="openLoginModal()"
             style="background:var(--primary); color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">🔑
-            Login Portal</button>`;
+            Log In / Sign Up</button>`;
       }
     }
 
-    function quickLogin(role) {
-      const accounts = {
-        buyer:    { email: 'buyer@resalehub.in',   name: 'Ramesh Kumar',       role: 'buyer'    },
-        seller:   { email: 'seller@resalehub.in',  name: 'Priya Sharma',       role: 'seller'   },
-        provider: { email: 'hyatt@resalehub.in',   businessName: 'Grand Hyatt Hotels', role: 'provider' },
-      };
-      const userObj = accounts[role] || accounts.buyer;
+    function quickLogin() {
+      const userObj = { email: 'ramesh@resalehub.in', name: 'Ramesh Kumar' };
       saveUserSession(userObj);
       closeLoginModal();
-      alert(`✅ Successfully logged in as ${userObj.businessName || userObj.name} (${userObj.role.toUpperCase()})!`);
+      alert(`✅ Welcome back, ${userObj.name}! Logged into your account.`);
     }
 
-    function submitUserLogin() {
-      const role = document.getElementById('userRoleSelect').value;
-      const name = document.getElementById('userFullName').value.trim() || 'Ramesh Kumar';
-      const email = document.getElementById('userEmail').value.trim() || 'user@resalehub.in';
-      
-      const userObj = { email, name, role };
+    function submitOlxLogin() {
+      const email = document.getElementById('olxLoginInput').value.trim() || 'user@resalehub.in';
+      const userObj = { email, name: email.split('@')[0] };
       saveUserSession(userObj);
       closeLoginModal();
-      alert(`✅ Logged in successfully as ${name} (${role.toUpperCase()})!`);
+      alert(`✅ Logged in successfully!`);
     }
 
-    function submitProviderLogin() {
-      const bName = document.getElementById('providerBusinessName').value.trim() || 'Grand Hyatt Hotels';
-      const email = document.getElementById('providerEmail').value.trim() || 'provider@grandhyatt.com';
-
-      const userObj = { email, businessName: bName, role: 'provider' };
+    function submitOlxSignup() {
+      const name = document.getElementById('signupName').value.trim() || 'New User';
+      const email = document.getElementById('signupEmail').value.trim() || 'newuser@resalehub.in';
+      const userObj = { email, name };
       saveUserSession(userObj);
       closeLoginModal();
-      alert(`✅ Logged in successfully as ${bName} (SERVICE PROVIDER)!`);
+      alert(`✅ Account created! Welcome ${name}.`);
     }
 
     // Initialize
@@ -1619,68 +1651,83 @@
 
   <!-- Login Modal -->
   <div id="loginModal" class="modal-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(6,78,59,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-    <div class="modal-card" style="max-width:460px; width:92%; background:white; border-radius:24px; padding:28px; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+    <div class="modal-card" style="max-width:440px; width:92%; background:white; border-radius:24px; padding:30px; box-shadow:0 24px 60px rgba(0,0,0,0.3); text-align:center;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h2 style="font-size:20px; font-weight:800; color:var(--dark-forest);">🔑 ResaleHub Login</h2>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="background:#0F9D58; color:white; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800;">⇄</div>
+          <span style="font-size:18px; font-weight:800; color:var(--dark-forest);">ResaleHub</span>
+        </div>
         <span onclick="closeLoginModal()" style="cursor:pointer; font-size:22px; font-weight:bold; color:var(--text-muted); padding:4px 10px; background:#f1f5f9; border-radius:50%;">✕</span>
       </div>
 
-      <!-- Quick 1-Click Login -->
-      <div style="background:#F0FDF4; border:1px solid #bbf7d0; border-radius:14px; padding:12px; margin-bottom:18px;">
-        <div style="font-size:11px; font-weight:800; color:#064E3B; margin-bottom:8px; text-transform:uppercase;">⚡ Quick Demo 1-Click Login:</div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button onclick="quickLogin('buyer')" style="background:#3b82f6; color:white; border:none; padding:7px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer;">👤 Buyer Demo</button>
-          <button onclick="quickLogin('seller')" style="background:#0F9D58; color:white; border:none; padding:7px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer;">🙋 Seller Demo</button>
-          <button onclick="quickLogin('provider')" style="background:#064E3B; color:white; border:none; padding:7px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer;">🏢 Provider Demo</button>
-        </div>
+      <!-- Tabs: Login vs Sign Up -->
+      <div style="display:flex; gap:6px; background:#F1F5F9; padding:4px; border-radius:14px; margin-bottom:20px;">
+        <button id="authTabLogin" onclick="switchAuthTab('login')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:800; font-size:14px; background:#0F9D58; color:white; cursor:pointer; transition:all 0.2s;">
+          🔑 Log In
+        </button>
+        <button id="authTabSignup" onclick="switchAuthTab('signup')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:800; font-size:14px; background:transparent; color:#64748B; cursor:pointer; transition:all 0.2s;">
+          ✨ Sign Up
+        </button>
       </div>
 
-      <!-- Login Tabs -->
-      <div style="display:flex; gap:8px; margin-bottom:18px; background:var(--bg-mint); padding:4px; border-radius:12px;">
-        <button id="tabUser" onclick="switchLoginTab('user')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--primary); color:white; cursor:pointer;">👤 User Login</button>
-        <button id="tabProvider" onclick="switchLoginTab('provider')" style="flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; background:var(--bg-mint); color:var(--text-dark); cursor:pointer;">🏢 Provider Login</button>
+      <!-- Login Form View -->
+      <div id="authFormLogin">
+        <div style="text-align:left; margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Mobile Number or Email Address:</label>
+          <input type="text" id="olxLoginInput" value="ramesh@resalehub.in" placeholder="+91 98765 43210 or email" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border-light); font-size:14px; outline:none;">
+        </div>
+
+        <div style="text-align:left; margin-bottom:18px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Password / OTP:</label>
+          <input type="password" id="olxPasswordInput" value="password123" placeholder="Password" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border-light); font-size:14px; outline:none;">
+        </div>
+
+        <button onclick="submitOlxLogin()" style="width:100%; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,#0F9D58,#064E3B); color:white; font-size:15px; font-weight:800; cursor:pointer; margin-bottom:16px; box-shadow:0 4px 14px rgba(15,157,88,0.3);">
+          Log In to Account →
+        </button>
       </div>
 
-      <!-- User Login Form -->
-      <div id="userForm">
-        <div style="margin-bottom:10px;">
-          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Full Name / Display Name:</label>
-          <input type="text" id="userFullName" value="Ramesh Kumar" placeholder="Your full name" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+      <!-- Sign Up Form View -->
+      <div id="authFormSignup" style="display:none;">
+        <div style="text-align:left; margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Full Name:</label>
+          <input type="text" id="signupName" placeholder="e.g. Ramesh Kumar" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border-light); font-size:14px; outline:none;">
         </div>
-        <div style="margin-bottom:10px;">
-          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Select Role:</label>
-          <select id="userRoleSelect" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
-            <option value="buyer">New Buyer (Browse &amp; Claim Deals)</option>
-            <option value="seller">Original Buyer (Resell Booking)</option>
-          </select>
+
+        <div style="text-align:left; margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Mobile Number:</label>
+          <input type="tel" id="signupPhone" placeholder="+91 98765 43210" maxlength="10" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border-light); font-size:14px; outline:none;">
         </div>
-        <div style="margin-bottom:10px;">
+
+        <div style="text-align:left; margin-bottom:12px;">
           <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Email Address:</label>
-          <input type="email" id="userEmail" value="ramesh@resalehub.in" placeholder="Email Address" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+          <input type="email" id="signupEmail" placeholder="name@example.com" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border-light); font-size:14px; outline:none;">
         </div>
-        <div style="margin-bottom:18px;">
-          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Password:</label>
-          <input type="password" id="userPassword" value="password123" placeholder="Password" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
+
+        <div style="text-align:left; margin-bottom:18px;">
+          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Create Password:</label>
+          <input type="password" id="signupPassword" placeholder="Minimum 6 characters" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border-light); font-size:14px; outline:none;">
         </div>
-        <button class="btn-primary" onclick="submitUserLogin()" style="width:100%; padding:13px; border-radius:12px; font-size:15px; font-weight:800;">Sign In as User</button>
+
+        <button onclick="submitOlxSignup()" style="width:100%; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,#0F9D58,#064E3B); color:white; font-size:15px; font-weight:800; cursor:pointer; margin-bottom:16px; box-shadow:0 4px 14px rgba(15,157,88,0.3);">
+          Create Free Account →
+        </button>
       </div>
 
-      <!-- Service Provider Login Form -->
-      <div id="providerForm" style="display:none;">
-        <div style="margin-bottom:10px;">
-          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Business / Hotel Name:</label>
-          <input type="text" id="providerBusinessName" value="Grand Hyatt Hotels" placeholder="e.g. Marriott / Grand Hyatt" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
-        </div>
-        <div style="margin-bottom:10px;">
-          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Business Email:</label>
-          <input type="email" id="providerEmail" value="provider@grandhyatt.com" placeholder="Business Email" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
-        </div>
-        <div style="margin-bottom:18px;">
-          <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">Password:</label>
-          <input type="password" id="providerPassword" value="provider123" placeholder="Password" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border-light); font-size:14px;">
-        </div>
-        <button class="btn-primary" style="width:100%; padding:13px; border-radius:12px; font-size:15px; font-weight:800; background:var(--dark-forest);" onclick="submitProviderLogin()">Sign In as Service Provider</button>
+      <div style="display:flex; align-items:center; margin:16px 0; color:var(--text-muted); font-size:12px;">
+        <hr style="flex:1; border:none; border-top:1px solid var(--border-light);">
+        <span style="padding:0 10px;">OR 1-CLICK QUICK DEMO</span>
+        <hr style="flex:1; border:none; border-top:1px solid var(--border-light);">
       </div>
+
+      <!-- Quick Demo Login Button -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button onclick="quickLogin()" style="width:100%; background:#F0FDF4; border:1.5px solid #bbf7d0; padding:12px; border-radius:12px; font-size:14px; font-weight:700; color:#064E3B; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span>👤</span> Continue as Demo User (Ramesh Kumar)
+        </button>
+      </div>
+
+      <p style="font-size:11px; color:var(--text-muted); margin-top:18px; line-height:1.4;">By continuing, you agree to ResaleHub's <a href="javascript:void(0)" onclick="closeLoginModal(); openInfoModal('terms');" style="color:var(--primary);">Terms of Use</a> and <a href="javascript:void(0)" onclick="closeLoginModal(); openInfoModal('privacy');" style="color:var(--primary);">Privacy Policy</a>.</p>
     </div>
   </div>
 
@@ -2019,10 +2066,12 @@
               <div>
                 <h4 style="font-size:14px; margin-bottom:8px;">Categories</h4>
                 <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#0F9D58;">
-                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Hotels');">Hotels & Resorts</a></li>
-                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Venues');">Banquet & Marriage Halls</a></li>
-                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Events');">Events & Celebrations</a></li>
-                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); filterCategoryFromFooter('Catering');">Catering Services</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); setCategory('Hotels', null);">Hotels & Resorts</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); setCategory('Venues', null);">Banquet & Marriage Halls</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); setCategory('Flights', null);">Flight Tickets</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); setCategory('Events', null);">Events & Celebrations</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); setCategory('Photography', null);">Photography & Makeup</a></li>
+                  <li><a href="javascript:void(0)" onclick="closeInfoModal(); setCategory('Gyms', null);">Gym Memberships</a></li>
                 </ul>
               </div>
             </div>`
@@ -2038,4 +2087,7 @@
     function closeInfoModal() {
       document.getElementById('infoModal').style.display = 'none';
     }
+
+    // Initialize Categories Modal on Load
+    initCategoriesModal();
   </script>

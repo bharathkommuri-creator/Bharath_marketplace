@@ -616,6 +616,33 @@ function render(it) {
 
       ${it.reason ? `<div class="reason-box"><b>💬 Why listed?</b><br>${it.reason}</div>` : ''}
 
+      <!-- Collaborative Seller + Provider Verification -->
+      <div style="background:#F0FDF4; border:1.5px solid #bbf7d0; border-radius:16px; padding:16px; margin-bottom:24px; margin-top:24px;">
+        <div style="font-weight:800; font-size:14px; margin-bottom:12px; color:#064E3B;">🛡️ Verified Collaborative Listing</div>
+        <div style="font-size:13px; color:#0F172A; margin-bottom:10px;">
+          This ad was securely co-created by:
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; background:white; padding:10px; border-radius:10px; border:1px solid #E2E8F0;">
+            <div style="font-size:18px;">🙋</div>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#0F172A;">Original Buyer (Seller)</div>
+              <div style="font-size:11px; color:#64748B;">Initiated resale to recover deposit</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:white; padding:10px; border-radius:10px; border:1px solid #E2E8F0;">
+            <div style="font-size:18px;">🏢</div>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#0F172A;">Service Provider (${it.providerName})</div>
+              <div style="font-size:11px; color:#64748B;">Verified booking validity &amp; permits transfer</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px; color:#064E3B; font-weight:700; margin-top:12px; background:#e6f4ea; padding:8px; border-radius:8px; text-align:center;">
+          Chat safely in a 3-way verified escrow environment.
+        </div>
+      </div>
+
       <div class="section-head">Transfer Progress</div>
       <div class="stepper">
         <div class="step-item ${it.step >= 1 ? 'active' : ''}">1. Listed</div>
@@ -628,13 +655,12 @@ function render(it) {
     <!-- RIGHT: Chat Panel -->
     <div class="chat-col">
 
-      <!-- Chat header (no tabs) -->
+      <!-- Chat header -->
       <div class="chat-header-bar">
         <div>
           <div class="chat-header-title">💬 Secure Deal Chat</div>
           <div class="chat-header-sub" id="chatHeaderSub">Loading…</div>
         </div>
-        <button class="switch-role-btn" onclick="showRolePicker()">⇄ Switch Role</button>
       </div>
 
       <!-- Participant bar (shows the OTHER two parties) -->
@@ -682,14 +708,30 @@ function render(it) {
 /* ── Bootstrap ───────────────────────────────────────────────────────── */
 const _params = new URLSearchParams(window.location.search);
 const found   = mockListings.find(l => l.id === _params.get('id'));
-const _roleParam = _params.get('role'); // 'buyer' | 'seller' | 'provider' (from chats page)
+
+// Get logged-in user from localStorage
+let loggedInUser = null;
+try {
+  const raw = localStorage.getItem('resalehub_user');
+  if (raw) loggedInUser = JSON.parse(raw);
+} catch(e) {}
+
+// Auto-determine role based on user email/name matching ad (mock logic)
+let autoRole = 'buyer'; // default to buyer for any normal user
+if (loggedInUser) {
+  // If the logged in user is the seller or provider, we would assign here
+  // For the demo, we assume they are browsing as buyer unless specified by URL
+}
+
+const _roleParam = _params.get('role'); // e.g., 'seller' when navigating from My Listings
+if (_roleParam && ['buyer','seller','service_provider'].includes(_roleParam)) {
+  autoRole = _roleParam;
+}
 
 if (found) {
   render(found);
-  // If role is passed via URL, skip the picker and auto-enter
-  if (_roleParam && ['buyer','seller','provider'].includes(_roleParam)) {
-    chooseRole(_roleParam);
-  }
+  // Auto-enter chat as determined role
+  chooseRole(autoRole);
 } else {
   document.getElementById('pageContent').innerHTML = `
     <div class="not-found">

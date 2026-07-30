@@ -210,17 +210,23 @@
       <div class="card-sub">Choose the category that best describes your cancelled booking</div>
       <div class="cat-grid">
         <div class="cat-pill" onclick="selectCat(this,'Hotels')"><span class="cat-icon">🏨</span>Hotels & Resorts</div>
-        <div class="cat-pill" onclick="selectCat(this,'Venues')"><span class="cat-icon">🏛️</span>Marriage Hall / Venue</div>
+        <div class="cat-pill" onclick="selectCat(this,'Venues')"><span class="cat-icon">🏰</span>Marriage Halls</div>
+        <div class="cat-pill" onclick="selectCat(this,'Flights')"><span class="cat-icon">✈️</span>Flight Tickets</div>
         <div class="cat-pill" onclick="selectCat(this,'Catering')"><span class="cat-icon">🍽️</span>Food Catering</div>
-        <div class="cat-pill" onclick="selectCat(this,'Events')"><span class="cat-icon">🎉</span>Event & Decoration</div>
-        <div class="cat-pill" onclick="selectCat(this,'Photography')"><span class="cat-icon">📸</span>Photography / Makeup</div>
-        <div class="cat-pill" onclick="selectCat(this,'Gyms')"><span class="cat-icon">💪</span>Gym Membership</div>
-        <div class="cat-pill" onclick="selectCat(this,'Spa & Wellness')"><span class="cat-icon">🌿</span>Spa & Wellness</div>
-        <div class="cat-pill" onclick="selectCat(this,'Travel Packages')"><span class="cat-icon">✈️</span>Travel Package</div>
-        <div class="cat-pill" onclick="selectCat(this,'Sports')"><span class="cat-icon">🏏</span>Sports & Activities</div>
-        <div class="cat-pill" onclick="selectCat(this,'Concerts')"><span class="cat-icon">🎶</span>Concert / Show Tickets</div>
-        <div class="cat-pill" onclick="selectCat(this,'Classes')"><span class="cat-icon">🎓</span>Classes & Workshops</div>
-        <div class="cat-pill" onclick="selectCat(this,'Transport')"><span class="cat-icon">🚗</span>Transport / Cab Booking</div>
+        <div class="cat-pill" onclick="selectCat(this,'Events')"><span class="cat-icon">🎟️</span>Events & Tickets</div>
+        <div class="cat-pill" onclick="selectCat(this,'Photography')"><span class="cat-icon">📷</span>Photography</div>
+        <div class="cat-pill" onclick="selectCat(this,'Co-working')"><span class="cat-icon">🏢</span>Co-working</div>
+        <div class="cat-pill" onclick="selectCat(this,'Exhibitions')"><span class="cat-icon">⛺</span>Market Stalls</div>
+        <div class="cat-pill" onclick="selectCat(this,'Gyms')"><span class="cat-icon">🏋️</span>Gym Memberships</div>
+        <div class="cat-pill" onclick="selectCat(this,'Spa & Wellness')"><span class="cat-icon">🧖</span>Spa & Wellness</div>
+        <div class="cat-pill" onclick="selectCat(this,'Travel Packages')"><span class="cat-icon">🧳</span>Travel Packages</div>
+        <div class="cat-pill" onclick="selectCat(this,'Concerts')"><span class="cat-icon">🎵</span>Concerts</div>
+        <div class="cat-pill" onclick="selectCat(this,'Coaching')"><span class="cat-icon">🎓</span>Coaching</div>
+        <div class="cat-pill" onclick="selectCat(this,'Adventure')"><span class="cat-icon">🧗</span>Adventure</div>
+        <div class="cat-pill" onclick="selectCat(this,'Car Rentals')"><span class="cat-icon">🚘</span>Car Rentals</div>
+        <div class="cat-pill" onclick="selectCat(this,'Sports')"><span class="cat-icon">⚽</span>Sports</div>
+        <div class="cat-pill" onclick="selectCat(this,'Daycare')"><span class="cat-icon">🧸</span>Daycare</div>
+        <div class="cat-pill" onclick="selectCat(this,'Transport')"><span class="cat-icon">🚕</span>Transport</div>
       </div>
       <input type="hidden" id="selectedCat" value="">
     </div>
@@ -229,6 +235,19 @@
     <div class="card" id="step2Card">
       <div class="card-title">📝 Booking Details</div>
       <div class="card-sub">Tell buyers exactly what they are getting</div>
+
+      <!-- Collaborative Seller + Provider Verification Notice -->
+      <div style="background:#F0FDF4; border:1.5px solid #bbf7d0; border-radius:14px; padding:16px; margin-bottom:20px;">
+        <div style="display:flex; align-items:flex-start; gap:12px;">
+          <div style="font-size:24px; margin-top:-2px;">🛡️</div>
+          <div>
+            <div style="font-size:13px; font-weight:800; color:#064E3B; margin-bottom:4px;">Collaborative Ad Creation</div>
+            <div style="font-size:12px; color:#0F172A; line-height:1.5;">
+              To ensure 100% safety for buyers, your ad will be shown as a <b>verified collaborative listing</b> between you (the Original Buyer) and the Service Provider (the Hotel/Venue). This 3-party transparency builds buyer trust and speeds up your sale.
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="field">
         <label>Ad Title <span class="req">*</span></label>
