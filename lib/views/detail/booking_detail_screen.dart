@@ -277,14 +277,28 @@ class BookingDetailScreen extends StatelessWidget {
           icon: const Icon(Icons.shopping_cart_checkout_rounded),
           label: const Text('Buy / Claim Slot Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           onPressed: () {
-            transferProvider.claimSlot(listing.id, authProvider.currentProfile);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Slot claimed! Funds held in 3-party escrow until Provider approves.'),
-                backgroundColor: AppTheme.primaryGreen,
-              ),
-            );
-          },
+              // V-05 FIX: Pass full listing (not just ID) so the provider can
+              // verify ownership. Also handle nullable currentProfile.
+              final profile = authProvider.currentProfile;
+              if (profile == null) return;
+              try {
+                transferProvider.claimSlot(listing, profile);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Slot claimed! Funds held in 3-party escrow until Provider approves.'),
+                    backgroundColor: AppTheme.primaryGreen,
+                  ),
+                );
+              } on UnimplementedError catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Not allowed: $e'), backgroundColor: Colors.red),
+                );
+              } on StateError catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('State error: $e'), backgroundColor: Colors.orange),
+                );
+              }
+            },
         ),
       );
     }
@@ -298,14 +312,27 @@ class BookingDetailScreen extends StatelessWidget {
           icon: const Icon(Icons.verified_user_rounded),
           label: const Text('Verify Guest Transfer & Approve', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           onPressed: () {
-            transferProvider.providerApprove(listing.id, authProvider.currentProfile);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Service Provider approved reservation transfer!'),
-                backgroundColor: Color(0xFF2563EB),
-              ),
-            );
-          },
+              // V-05 FIX: Passes full listing for ownership verification.
+              final profile = authProvider.currentProfile;
+              if (profile == null) return;
+              try {
+                transferProvider.providerApprove(listing, profile);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Service Provider approved reservation transfer!'),
+                    backgroundColor: Color(0xFF2563EB),
+                  ),
+                );
+              } on UnimplementedError catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Unauthorized: $e'), backgroundColor: Colors.red),
+                );
+              } on StateError catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('State error: $e'), backgroundColor: Colors.orange),
+                );
+              }
+            },
         ),
       );
     }
@@ -319,14 +346,27 @@ class BookingDetailScreen extends StatelessWidget {
           icon: const Icon(Icons.lock_open_rounded),
           label: const Text('Release Slot & Receive Payout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           onPressed: () {
-            transferProvider.completeTransfer(listing.id, authProvider.currentProfile);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Payout released! Transaction complete.'),
-                backgroundColor: Color(0xFFD97706),
-              ),
-            );
-          },
+              // V-05 FIX: Passes full listing for seller ownership verification.
+              final profile = authProvider.currentProfile;
+              if (profile == null) return;
+              try {
+                transferProvider.completeTransfer(listing, profile);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Payout released! Transaction complete.'),
+                    backgroundColor: Color(0xFFD97706),
+                  ),
+                );
+              } on UnimplementedError catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Unauthorized: $e'), backgroundColor: Colors.red),
+                );
+              } on StateError catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('State error: $e'), backgroundColor: Colors.orange),
+                );
+              }
+            },
         ),
       );
     }

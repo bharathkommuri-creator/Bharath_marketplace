@@ -206,7 +206,12 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(hintText: '1000'),
                           onChanged: (_) => _recalculateDiscount(),
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                           validator: (v) {
+                            if (v == null || v.isEmpty) return 'Required';
+                            final val = double.tryParse(v);
+                            if (val == null || val <= 0) return 'Must be > 0';
+                            return null;
+                          },
                         ),
                       ],
                     ),
@@ -239,7 +244,17 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(hintText: '600'),
                           onChanged: (_) => _recalculateDiscount(),
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                          // V-07 FIX: Client-side guard — resale must be < original.
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return 'Required';
+                            final resell = double.tryParse(v);
+                            if (resell == null || resell <= 0) return 'Must be > 0';
+                            final orig = double.tryParse(_originalPriceController.text) ?? 0;
+                            if (orig > 0 && resell >= orig) {
+                              return 'Must be less than original (\$$orig)';
+                            }
+                            return null;
+                          },
                         ),
                       ],
                     ),
@@ -303,25 +318,38 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                   label: const Text('Publish Resale Listing', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      marketplace.addListing(
-                        title: _titleController.text.trim(),
-                        category: _selectedCategory,
-                        providerName: _providerController.text.trim(),
-                        location: _locationController.text.trim(),
-                        originalPrice: double.parse(_originalPriceController.text.trim()),
-                        depositPaid: double.parse(_depositPaidController.text.trim()),
-                        resalePrice: double.parse(_resalePriceController.text.trim()),
-                        eventDate: _eventDate,
-                        cancellationReason: _reasonController.text.trim(),
-                        imageUrl: _imageUrlController.text.trim(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Listing posted! Provider notified for verification.'),
-                          backgroundColor: AppTheme.primaryGreen,
-                        ),
-                      );
-                      Navigator.pop(context);
+                      try {
+                        // V-06/V-07/V-08: addListing() validates all inputs and
+                        // throws ArgumentError on any violation.
+                        marketplace.addListing(
+                          title: _titleController.text.trim(),
+                          category: _selectedCategory,
+                          providerName: _providerController.text.trim(),
+                          location: _locationController.text.trim(),
+                          originalPrice: double.parse(_originalPriceController.text.trim()),
+                          depositPaid: double.parse(_depositPaidController.text.trim()),
+                          resalePrice: double.parse(_resalePriceController.text.trim()),
+                          eventDate: _eventDate,
+                          cancellationReason: _reasonController.text.trim(),
+                          imageUrl: _imageUrlController.text.trim(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Listing posted! Provider notified for verification.'),
+                            backgroundColor: AppTheme.primaryGreen,
+                          ),
+                        );
+                        Navigator.pop(context);
+                      } on ArgumentError catch (e) {
+                        // Show server-side validation error to the user.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Validation error: ${e.message}'),
+                            backgroundColor: Colors.red.shade700,
+                            duration: const Duration(seconds: 4),
+                          ),
+                        );
+                      }
                     }
                   },
                 ),

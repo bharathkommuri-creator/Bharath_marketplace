@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../models/profile.dart';
 import '../../../models/resale_listing.dart';
-import '../../../models/transfer_chat.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/transfer_provider.dart';
 import '../../../theme/app_theme.dart';
@@ -201,10 +200,12 @@ class _TriPartyChatState extends State<TriPartyChat> {
                 ),
                 icon: const Icon(Icons.send_rounded, size: 20),
                 onPressed: () {
-                  if (_msgController.text.trim().isNotEmpty) {
+                  // V-02 FIX: guard against null profile (unauthenticated)
+                  final profile = authProvider.currentProfile;
+                  if (_msgController.text.trim().isNotEmpty && profile != null) {
                     transferProvider.sendMessage(
                       widget.listing.id,
-                      authProvider.currentProfile,
+                      profile,
                       _msgController.text.trim(),
                     );
                     _msgController.clear();

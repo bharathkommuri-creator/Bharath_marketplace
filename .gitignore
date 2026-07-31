@@ -12,3 +12,8 @@ build/
 *.swp
 *.lock
 .DS_Store
+
+# V-01 Security: Environment secrets — NEVER commit to git
+.env
+.env.local
+.env.*.local

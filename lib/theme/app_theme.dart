@@ -19,7 +19,6 @@ class AppTheme {
         primary: primaryGreen,
         secondary: accentMint,
         surface: cardWhite,
-        background: lightMintBg,
         onPrimary: Colors.white,
         onSurface: textDark,
       ),

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/profile.dart';
-import '../../models/resale_listing.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/marketplace_provider.dart';
 import '../../theme/app_theme.dart';
-import '../auth/auth_screen.dart';
 import '../seller/create_listing_screen.dart';
 import 'widgets/category_selector.dart';
 import 'widgets/how_it_works_banner.dart';
@@ -58,27 +56,26 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
           ],
         ),
         actions: [
-          // Login / Account Portal Button
+          // V-02 FIX: Replace 'Login Portal' with 'Logout' since auth is now enforced.
+          // AuthGate in main.dart will route back to AuthScreen on logout.
           InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AuthScreen()),
-              );
+              authProvider.logout();
+              // No Navigator needed — AuthGate re-renders AuthScreen automatically.
             },
             borderRadius: BorderRadius.circular(20),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen,
+                color: Colors.red.shade600,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: const [
-                  Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                  Icon(Icons.logout_rounded, size: 16, color: Colors.white),
                   SizedBox(width: 6),
                   Text(
-                    'Login Portal',
+                    'Logout',
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ],

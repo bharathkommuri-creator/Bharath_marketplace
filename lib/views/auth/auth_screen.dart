@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../models/profile.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
-import '../feed/marketplace_feed_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -16,14 +15,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   late TabController _tabController;
   UserRole _selectedUserRole = UserRole.buyer;
   
-  // User Login controllers
-  final _userEmailController = TextEditingController(text: 'buyer@resale.com');
-  final _userPasswordController = TextEditingController(text: 'password123');
+  // V-04 FIX: No hardcoded credentials — all fields start empty.
+  final _userEmailController = TextEditingController();
+  final _userPasswordController = TextEditingController();
 
   // Provider Login controllers
-  final _providerEmailController = TextEditingController(text: 'provider@grandhyatt.com');
-  final _providerPasswordController = TextEditingController(text: 'provider123');
-  final _businessNameController = TextEditingController(text: 'Grand Hyatt Hotels');
+  final _providerEmailController = TextEditingController();
+  final _providerPasswordController = TextEditingController();
+  final _businessNameController = TextEditingController();
 
   bool _isSignUp = false;
 
@@ -253,15 +252,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           child: ElevatedButton(
             onPressed: () {
               final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              // V-03 FIX: role param is ignored by login() — server resolves it.
+              // V-02 FIX: AuthGate in main.dart handles navigation automatically.
               authProvider.login(
                 _userEmailController.text,
                 _userPasswordController.text,
-                _selectedUserRole,
+                _selectedUserRole, // passed but ignored server-side
               );
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const MarketplaceFeedScreen()),
-              );
+              // No manual navigation needed — AuthGate listens to isLoggedIn.
             },
             child: Text(
               _isSignUp ? 'Sign Up User Account' : 'Login as ${_selectedUserRole == UserRole.buyer ? "Buyer" : "Seller"}',
@@ -342,15 +340,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             ),
             onPressed: () {
               final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              // V-03 FIX: role param passed but ignored — server resolves role from profile.
+              // V-02 FIX: AuthGate handles navigation after isLoggedIn changes.
               authProvider.login(
                 _providerEmailController.text,
                 _providerPasswordController.text,
                 UserRole.serviceProvider,
               );
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const MarketplaceFeedScreen()),
-              );
+              // No manual navigation needed — AuthGate listens to isLoggedIn.
             },
           ),
         ),
