@@ -4,8 +4,8 @@ import '../../models/profile.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/marketplace_provider.dart';
 import '../../theme/app_theme.dart';
-import '../seller/create_listing_screen.dart';
 import 'widgets/category_selector.dart';
+
 import 'widgets/how_it_works_banner.dart';
 import 'widgets/listing_card.dart';
 
@@ -29,32 +29,51 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppTheme.lightMintBg,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.swap_horizontal_circle_rounded, color: AppTheme.primaryGreen, size: 24),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        title: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              _searchController.clear();
+              marketplace.setSearchQuery('');
+              marketplace.selectCategory('All');
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'ResaleHub',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.darkForest),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightMintBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 28,
+                    height: 28,
+                    fit: BoxFit.contain,
+                  ),
+
                 ),
-                Text(
-                  'Role: ${authProvider.currentRole.nameString}',
-                  style: const TextStyle(fontSize: 11, color: AppTheme.primaryGreen, fontWeight: FontWeight.w600),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'ResaleHub',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.darkForest),
+                    ),
+                    Text(
+                      'Role: ${authProvider.currentRole.nameString}',
+                      style: const TextStyle(fontSize: 11, color: AppTheme.primaryGreen, fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
+
         actions: [
           // V-02 FIX: Replace 'Login Portal' with 'Logout' since auth is now enforced.
           // AuthGate in main.dart will route back to AuthScreen on logout.
@@ -207,7 +226,7 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
             ),
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 310,
+                height: 265,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -270,10 +289,11 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
                   sliver: SliverGrid(
                     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 260,
-                      mainAxisExtent: 250,
+                      mainAxisExtent: 265,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
+
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => ListingCard(listing: filteredListings[index]),
                       childCount: filteredListings.length,
@@ -283,20 +303,7 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
-
-      // Floating Action Button to List a Booking Slot
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppTheme.primaryGreen,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('List Canceled Booking', style: TextStyle(fontWeight: FontWeight.bold)),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CreateListingScreen()),
-          );
-        },
-      ),
     );
   }
 }
+

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deal Detail – ResaleHub</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -31,7 +33,9 @@
       transition: background 0.2s; display:flex; align-items:center; gap:6px;
     }
     .back-btn:hover { background: #d1fae5; }
-    .brand-title { font-size: 18px; font-weight: 800; color: var(--dark-forest); }
+    .brand-title { font-size: 18px; font-weight: 800; color: var(--dark-forest); text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .brand-title:hover { opacity: 0.85; }
+
 
     /* ── Layout ── */
     .layout {
@@ -246,13 +250,19 @@
     .role-card-icon { font-size: 28px; flex-shrink: 0; }
     .role-card-label { font-size: 15px; font-weight: 800; color: var(--text-dark); }
     .role-card-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .brand-title { font-size: 18px; font-weight: 800; color: var(--dark-forest); text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .brand-title:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
 
 <nav class="navbar">
   <a class="back-btn" href="javascript:history.back()">← Back</a>
-  <div class="brand-title">⇄ ResaleHub</div>
+  <a class="brand" href="index.html" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+    <img src="logo.png" alt="ResaleHub" style="width:34px; height:34px; object-fit:contain; flex-shrink:0;">
+    <span class="brand-title" style="font-size:18px; font-weight:800; color:var(--dark-forest);">ResaleHub</span>
+  </a>
+
 </nav>
 
 <!-- Role picker overlay (shown on first load) -->

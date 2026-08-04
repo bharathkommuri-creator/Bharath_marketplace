@@ -6,6 +6,7 @@ import '../../models/resale_listing.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/transfer_provider.dart';
 import '../../theme/app_theme.dart';
+import '../feed/marketplace_feed_screen.dart';
 import 'widgets/tri_party_chat.dart';
 import 'widgets/tri_party_status_stepper.dart';
 
@@ -24,7 +25,59 @@ class BookingDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Booking Resale Details'),
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        leading: IconButton(
+          tooltip: 'Go to Home',
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppTheme.lightMintBg,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 24,
+              height: 24,
+              fit: BoxFit.contain,
+            ),
+
+          ),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const MarketplaceFeedScreen()),
+              );
+            }
+          },
+        ),
+        title: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const MarketplaceFeedScreen()),
+              );
+            }
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Text(
+              'ResaleHub',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkForest,
+              ),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

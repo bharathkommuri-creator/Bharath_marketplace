@@ -45,17 +45,18 @@ class ListingCard extends StatelessWidget {
               children: [
                 Image.network(
                   listing.booking.imageUrl,
-                  height: 125,
+                  height: 118,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    height: 125,
+                    height: 118,
                     color: AppTheme.lightMintBg,
                     child: const Center(
                       child: Icon(Icons.hotel, color: AppTheme.primaryGreen, size: 36),
                     ),
                   ),
                 ),
+
                 // Gradient Overlay
                 Positioned.fill(
                   child: Container(
@@ -145,10 +146,11 @@ class ListingCard extends StatelessWidget {
 
             // Card Body Content
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   Text(
                     listing.booking.title,
                     maxLines: 1,

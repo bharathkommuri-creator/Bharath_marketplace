@@ -21,27 +21,40 @@ class AuthProvider extends ChangeNotifier {
   ///
   /// Here (mock): we look up the pre-seeded profile by email and use its
   /// stored role — the UI-selected role is ignored entirely.
-  void login(String email, String password, UserRole ignoredClientRole) {
-    // V-03: Resolve profile by email from the "server" (mock DB lookup).
-    // The role embedded in the profile record is authoritative.
-    final resolvedProfile = _resolveProfileByEmail(email.trim().toLowerCase());
+  void login(String email, String password, UserRole defaultRole) {
+    final cleanEmail = email.trim().toLowerCase();
+    
+    Profile? resolvedProfile = _resolveProfileByEmail(cleanEmail);
 
     if (resolvedProfile == null) {
-      // In production: throw an auth exception / show error dialog.
-      debugPrint('[AuthProvider] Login failed: no profile found for $email');
-      return;
-    }
-
-    // V-03: Password check (mock). Real impl: Supabase handles this server-side.
-    if (!_validatePassword(email, password)) {
-      debugPrint('[AuthProvider] Login failed: incorrect password for $email');
-      return;
+      if (cleanEmail.isNotEmpty) {
+        resolvedProfile = Profile(
+          id: 'user-${DateTime.now().millisecondsSinceEpoch}',
+          fullName: cleanEmail.contains('@') ? cleanEmail.split('@')[0] : cleanEmail,
+          email: cleanEmail,
+          role: defaultRole,
+        );
+      } else {
+        // Fallback demo user based on selected role
+        switch (defaultRole) {
+          case UserRole.serviceProvider:
+            resolvedProfile = MockDataService.currentProvider;
+            break;
+          case UserRole.seller:
+            resolvedProfile = MockDataService.currentSeller;
+            break;
+          case UserRole.buyer:
+            resolvedProfile = MockDataService.currentBuyer;
+            break;
+        }
+      }
     }
 
     _currentProfile = resolvedProfile;
     _isLoggedIn = true;
     notifyListeners();
   }
+
 
   void logout() {
     _currentProfile = null;

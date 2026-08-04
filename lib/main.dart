@@ -8,7 +8,7 @@ import 'providers/marketplace_provider.dart';
 import 'providers/transfer_provider.dart';
 import 'theme/app_theme.dart';
 import 'views/auth/auth_screen.dart';
-import 'views/feed/marketplace_feed_screen.dart';
+import 'views/navigation/main_navigation_shell.dart';
 
 // V-01 FIX: Supabase credentials loaded from .env, NOT hardcoded in source.
 // V-02 FIX: App's home is determined by actual auth state — auth screen shown first.
@@ -52,7 +52,7 @@ class ResaleMarketplaceApp extends StatelessWidget {
 
 /// V-02 FIX: AuthGate enforces authentication on app startup.
 /// Listens to [AuthProvider.isLoggedIn] and routes accordingly.
-/// Users can ONLY reach [MarketplaceFeedScreen] after successful login.
+/// Users can ONLY reach [MainNavigationShell] after successful login.
 class AuthGate extends StatelessWidget {
   const AuthGate({Key? key}) : super(key: key);
 
@@ -60,8 +60,9 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     if (auth.isLoggedIn) {
-      return const MarketplaceFeedScreen();
+      return const MainNavigationShell();
     }
     return const AuthScreen();
   }
 }
+

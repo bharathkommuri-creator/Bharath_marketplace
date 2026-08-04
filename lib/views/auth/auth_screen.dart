@@ -82,11 +82,13 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                         color: AppTheme.lightMintBg,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(
-                        Icons.swap_horizontal_circle_rounded,
-                        color: AppTheme.primaryGreen,
-                        size: 30,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 32,
+                        height: 32,
+                        fit: BoxFit.contain,
                       ),
+
                     ),
                     const SizedBox(width: 14),
                     Column(

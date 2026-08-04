@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ResaleHub - 3-Party Booking Resale Marketplace</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
@@ -57,16 +59,11 @@
     }
 
     .brand-icon {
-      background: var(--bg-mint);
-      color: var(--primary);
       width: 40px;
       height: 40px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: bold;
+      border-radius: 10px;
+      object-fit: contain;
+      display: block;
     }
 
     .brand-title {
@@ -704,13 +701,15 @@
 
   <!-- Top Navigation -->
   <div class="navbar">
-    <div class="brand">
-      <div class="brand-icon">⇄</div>
-      <div>
-        <div class="brand-title">ResaleHub</div>
-        <div style="font-size:11px; color:var(--text-muted);">3-Party Booking Resale Marketplace</div>
+    <a class="brand" href="index.html" style="text-decoration:none; cursor:pointer; display:flex; align-items:center; gap:10px;">
+      <img src="logo.png" alt="ResaleHub Logo" style="width:38px; height:38px; object-fit:contain; flex-shrink:0;">
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <div class="brand-title" style="font-size:19px; font-weight:800; color:var(--dark-forest); line-height:1.1; margin-bottom:2px;">ResaleHub</div>
+        <div style="font-size:11px; color:var(--text-muted); font-weight:600; line-height:1;">3-Party Booking Resale Marketplace</div>
       </div>
-    </div>
+    </a>
+
+
 
     <div style="display:flex; align-items:center; gap:12px;">
       <a href="create-ad.html"
@@ -718,6 +717,10 @@
 
       <a href="chats.html"
         style="background:#064E3B; color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; text-decoration:none;">💬 My Chats</a>
+
+      <a href="chats.html"
+        style="background:#0F9D58; color:white; border:none; padding:8px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; text-decoration:none;">📋 My Ads</a>
+
 
       <div id="authNavArea">
         <button onclick="openLoginModal()"
