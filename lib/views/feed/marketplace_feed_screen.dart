@@ -101,52 +101,6 @@ class _MarketplaceFeedScreenState extends State<MarketplaceFeedScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
-
-          // Role Toggle Dropdown for quick testing
-          PopupMenuButton<UserRole>(
-            tooltip: 'Switch 3-Party Perspective',
-            icon: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppTheme.lightMintBg,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.person_outline, size: 16, color: AppTheme.primaryGreen),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_drop_down, size: 16, color: AppTheme.primaryGreen),
-                ],
-              ),
-            ),
-            onSelected: (role) {
-              authProvider.switchRole(role);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Switched view to: ${role.nameString}'),
-                  backgroundColor: AppTheme.primaryGreen,
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: UserRole.buyer,
-                child: Text('View as New Buyer'),
-              ),
-              const PopupMenuItem(
-                value: UserRole.seller,
-                child: Text('View as Original Seller'),
-              ),
-              const PopupMenuItem(
-                value: UserRole.serviceProvider,
-                child: Text('View as Service Provider'),
-              ),
-            ],
-          ),
           const SizedBox(width: 12),
         ],
       ),

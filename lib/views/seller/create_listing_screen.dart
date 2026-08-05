@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../models/profile.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/marketplace_provider.dart';
+import '../../services/storage_service.dart';
 import '../../theme/app_theme.dart';
 import '../feed/marketplace_feed_screen.dart';
 
@@ -23,11 +25,45 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final _depositPaidController = TextEditingController();
   final _resalePriceController = TextEditingController();
   final _reasonController = TextEditingController();
-  final _imageUrlController = TextEditingController();
 
   String _selectedCategory = 'Hotels';
   DateTime _eventDate = DateTime.now().add(const Duration(days: 14));
   int _calculatedDiscount = 0;
+  File? _pickedImageFile;
+  bool _isUploading = false;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Add Listing Photo',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.primaryGreen),
+              title: const Text('Take Photo'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded, color: AppTheme.primaryGreen),
+              title: const Text('Choose from Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    final picked = await picker.pickImage(source: source, imageQuality: 80, maxWidth: 1200);
+    if (picked != null) setState(() => _pickedImageFile = File(picked.path));
+  }
 
   void _recalculateDiscount() {
     final orig = double.tryParse(_originalPriceController.text) ?? 0;
@@ -406,86 +442,118 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Image URL
-              const Text('Photo Image URL (Optional)',
+              // Image Picker
+              const Text('Listing Photo (Optional)',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _imageUrlController,
-                decoration: const InputDecoration(
-                  hintText: 'https://images.unsplash.com/...',
-                  prefixIcon:
-                      Icon(Icons.image_outlined, color: AppTheme.primaryGreen),
+              GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightMintBg,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.4), style: BorderStyle.solid),
+                  ),
+                  child: _pickedImageFile != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(_pickedImageFile!, fit: BoxFit.cover, width: double.infinity),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.add_photo_alternate_outlined,
+                                size: 40, color: AppTheme.primaryGreen),
+                            SizedBox(height: 8),
+                            Text('Tap to add a photo',
+                                style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.w600)),
+                            Text('Camera or Gallery',
+                                style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                          ],
+                        ),
                 ),
               ),
               const SizedBox(height: 28),
 
-              // Submit Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton.icon(
-                  icon: const Icon(Icons.publish_rounded),
-                  label: const Text('Publish Resale Listing',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      try {
-                        final seller =
-                            context.read<AuthProvider>().currentProfile;
-                        if (seller == null || seller.role != UserRole.seller) {
-                          throw StateError(
-                              'Only seller accounts can publish resale listings.');
-                        }
+                  icon: _isUploading
+                      ? const SizedBox(
+                          width: 18, height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.publish_rounded),
+                  label: Text(
+                      _isUploading ? 'Uploading Photo...' : 'Publish Resale Listing',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  onPressed: _isUploading
+                      ? null
+                      : () async {
+                          if (_formKey.currentState!.validate()) {
+                            setState(() => _isUploading = true);
+                            try {
+                              final seller =
+                                  context.read<AuthProvider>().currentProfile;
+                              if (seller == null) {
+                                throw StateError('You must be logged in to post a listing.');
+                              }
 
-                        await marketplace.addListing(
-                          sellerId: seller.id,
-                          sellerName: seller.fullName,
-                          title: _titleController.text.trim(),
-                          category: _selectedCategory,
-                          providerName: _providerController.text.trim(),
-                          location: _locationController.text.trim(),
-                          originalPrice: double.parse(
-                              _originalPriceController.text.trim()),
-                          depositPaid:
-                              double.parse(_depositPaidController.text.trim()),
-                          resalePrice:
-                              double.parse(_resalePriceController.text.trim()),
-                          eventDate: _eventDate,
-                          cancellationReason: _reasonController.text.trim(),
-                          imageUrl: _imageUrlController.text.trim(),
-                        );
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Listing posted! Provider notified for verification.'),
-                            backgroundColor: AppTheme.primaryGreen,
-                          ),
-                        );
-                        Navigator.pop(context);
-                      } on ArgumentError catch (e) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Validation error: ${e.message}'),
-                            backgroundColor: Colors.red.shade700,
-                            duration: const Duration(seconds: 4),
-                          ),
-                        );
-                      } on StateError catch (e) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(e.message),
-                            backgroundColor: Colors.red.shade700,
-                            duration: const Duration(seconds: 4),
-                          ),
-                        );
-                      }
-                    }
-                  },
+                              // Upload image to Supabase Storage if one was picked.
+                              String imageUrl = '';
+                              if (_pickedImageFile != null) {
+                                imageUrl = await StorageService.uploadListingImage(
+                                  imageFile: _pickedImageFile!,
+                                  userId: seller.id,
+                                );
+                              }
+
+                              await marketplace.addListing(
+                                sellerId: seller.id,
+                                sellerName: seller.fullName,
+                                title: _titleController.text.trim(),
+                                category: _selectedCategory,
+                                providerName: _providerController.text.trim(),
+                                location: _locationController.text.trim(),
+                                originalPrice: double.parse(_originalPriceController.text.trim()),
+                                depositPaid: double.parse(_depositPaidController.text.trim()),
+                                resalePrice: double.parse(_resalePriceController.text.trim()),
+                                eventDate: _eventDate,
+                                cancellationReason: _reasonController.text.trim(),
+                                imageUrl: imageUrl,
+                              );
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Listing posted! Provider notified for verification.'),
+                                  backgroundColor: AppTheme.primaryGreen,
+                                ),
+                              );
+                              Navigator.pop(context);
+                            } on ArgumentError catch (e) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Validation error: ${e.message}'),
+                                  backgroundColor: Colors.red.shade700,
+                                  duration: const Duration(seconds: 4),
+                                ),
+                              );
+                            } on StateError catch (e) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.message),
+                                  backgroundColor: Colors.red.shade700,
+                                  duration: const Duration(seconds: 4),
+                                ),
+                              );
+                            } finally {
+                              if (mounted) setState(() => _isUploading = false);
+                            }
+                          }
+                        },
                 ),
               ),
               const SizedBox(height: 30),

@@ -3,7 +3,6 @@ import '../models/profile.dart';
 import '../models/resale_listing.dart';
 import '../models/transfer_chat.dart';
 import '../services/chat_service.dart';
-import '../services/mock_data_service.dart';
 
 class TransferProvider extends ChangeNotifier {
   // In-memory cache — used for optimistic UI updates while Supabase responds.
@@ -20,9 +19,8 @@ class TransferProvider extends ChangeNotifier {
   /// in TriPartyChat directly.
   List<TransferChatMessage> getMessages(String listingId) {
     if (!_chatThreads.containsKey(listingId)) {
-      // Seed mock messages immediately so the UI isn't empty while loading.
-      _chatThreads[listingId] = MockDataService.getInitialChatMessages(listingId);
-      // Then fetch real messages from Supabase in the background.
+      // Start with empty list — real messages load from Supabase.
+      _chatThreads[listingId] = [];
       _loadFromSupabase(listingId);
     }
     return _chatThreads[listingId]!;

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/profile.dart';
@@ -200,61 +199,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 else
                   _buildSignupFormView(context),
 
-                if (kDebugMode) ...[
-                  const SizedBox(height: 16),
-
-                  // Divider: OR 1-CLICK QUICK DEMO
-                  Row(
-                    children: const [
-                      Expanded(child: Divider(color: AppTheme.borderLight)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          'OR 1-CLICK QUICK DEMO',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textMuted),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: AppTheme.borderLight)),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-
-                  // 1-Click Quick Demo Login Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF0FDF4),
-                        side: const BorderSide(
-                            color: Color(0xFFBBF7D0), width: 1.5),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: () => context
-                          .read<AuthProvider>()
-                          .signInAsDemo(UserRole.buyer),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('👤', style: TextStyle(fontSize: 16)),
-                          SizedBox(width: 8),
-                          Text(
-                            'Continue as Demo User (Ramesh Kumar)',
-                            style: TextStyle(
-                              color: AppTheme.darkForest,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                const SizedBox(height: 20),
 
                 // Terms Note
                 const Text(

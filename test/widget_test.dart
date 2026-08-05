@@ -1,31 +1,34 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:resale_marketplace/main.dart';
+import 'package:provider/provider.dart';
+import 'package:resale_marketplace/providers/auth_provider.dart';
+import 'package:resale_marketplace/providers/marketplace_provider.dart';
+import 'package:resale_marketplace/providers/transfer_provider.dart';
+import 'package:resale_marketplace/views/auth/auth_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const ResaleMarketplaceApp());
+  testWidgets('TC-AUTH-002: AuthGate shows AuthScreen when logged out',
+      (WidgetTester tester) async {
+    final authProvider = AuthProvider();
+    // Not logged in — should show auth screen
 
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: authProvider),
+          ChangeNotifierProvider(create: (_) => MarketplaceProvider()),
+          ChangeNotifierProvider(create: (_) => TransferProvider()),
+        ],
+        child: const MaterialApp(
+          home: AuthScreen(),
+        ),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Auth screen should show login/signup tabs
+    expect(find.text('Log In'), findsWidgets);
+    expect(find.text('Sign Up'), findsWidgets);
   });
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/profile.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
 
@@ -82,74 +81,6 @@ class ProfileAccountScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Demo Role Switcher Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.lightMintBg.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.borderLight),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(Icons.swap_horiz_rounded, color: AppTheme.primaryGreen),
-                      SizedBox(width: 8),
-                      Text(
-                        'Switch Demo Role Persona',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.darkForest),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Tap a role persona to test 3-party escrow workflow interactions from different perspectives:',
-                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: auth.currentRole == UserRole.buyer ? AppTheme.primaryGreen : Colors.white,
-                            foregroundColor: auth.currentRole == UserRole.buyer ? Colors.white : AppTheme.textDark,
-                          ),
-                          onPressed: () => auth.switchRole(UserRole.buyer),
-                          child: const Text('Buyer', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: auth.currentRole == UserRole.seller ? AppTheme.primaryGreen : Colors.white,
-                            foregroundColor: auth.currentRole == UserRole.seller ? Colors.white : AppTheme.textDark,
-                          ),
-                          onPressed: () => auth.switchRole(UserRole.seller),
-                          child: const Text('Seller', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: auth.currentRole == UserRole.serviceProvider ? AppTheme.primaryGreen : Colors.white,
-                            foregroundColor: auth.currentRole == UserRole.serviceProvider ? Colors.white : AppTheme.textDark,
-                          ),
-                          onPressed: () => auth.switchRole(UserRole.serviceProvider),
-                          child: const Text('Provider', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),

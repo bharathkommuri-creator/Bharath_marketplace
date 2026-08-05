@@ -1,49 +1,7 @@
--- =============================================================================
--- RESALEHUB 3-PARTY BOOKING RESALE MARKETPLACE - IDEMPOTENT SUPABASE SCHEMA
--- Production-Grade: 500k DAU Ready
--- =============================================================================
-
--- 1. Create Enums Safely (Idempotent)
--- If enum doesn't exist: create it. If it exists: add any missing values.
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-        CREATE TYPE public.user_role AS ENUM ('buyer', 'seller', 'service_provider');
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'listing_status') THEN
-        CREATE TYPE public.listing_status AS ENUM ('listed', 'buyer_paid', 'provider_verified', 'transfer_completed');
-    END IF;
-END $$;
-
--- Add any missing enum values to existing enums (safe if value already exists in Postgres 12+)
-DO $$
-BEGIN
-    -- user_role values
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'user_role' AND e.enumlabel = 'buyer') THEN
-        ALTER TYPE public.user_role ADD VALUE 'buyer';
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'user_role' AND e.enumlabel = 'seller') THEN
-        ALTER TYPE public.user_role ADD VALUE 'seller';
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'user_role' AND e.enumlabel = 'service_provider') THEN
-        ALTER TYPE public.user_role ADD VALUE 'service_provider';
-    END IF;
-
-    -- listing_status values
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'listing_status' AND e.enumlabel = 'listed') THEN
-        ALTER TYPE public.listing_status ADD VALUE 'listed';
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'listing_status' AND e.enumlabel = 'buyer_paid') THEN
-        ALTER TYPE public.listing_status ADD VALUE 'buyer_paid';
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'listing_status' AND e.enumlabel = 'provider_verified') THEN
-        ALTER TYPE public.listing_status ADD VALUE 'provider_verified';
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid WHERE t.typname = 'listing_status' AND e.enumlabel = 'transfer_completed') THEN
-        ALTER TYPE public.listing_status ADD VALUE 'transfer_completed';
-    END IF;
-END $$;
-
+﻿-- ============================================================
+-- STEP 2 OF 2: Run AFTER step 1 has been run and committed.
+-- Creates tables, policies, indexes, triggers, realtime.
+-- ============================================================
 
 -- 2. User Profiles Table
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -72,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.resale_listings (
     resale_price NUMERIC(10,2) NOT NULL CHECK (resale_price > 0 AND resale_price < original_price),
     provider_name TEXT NOT NULL,
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    image_url TEXT NOT NULL,
+    image_url TEXT NOT NULL DEFAULT '',
     cancellation_reason TEXT,
     proof_url TEXT,
     status public.listing_status NOT NULL DEFAULT 'listed',
@@ -81,53 +39,41 @@ CREATE TABLE IF NOT EXISTS public.resale_listings (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Idempotent column additions — adds ANY column that may be missing from an older table.
--- Safe to run multiple times; ADD COLUMN IF NOT EXISTS is a no-op when column already exists.
-
--- Core listing columns
+-- Idempotent column additions for existing deployments
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS seller_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE;
+ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS buyer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT '';
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT '';
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS location TEXT NOT NULL DEFAULT '';
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS event_date TIMESTAMPTZ NOT NULL DEFAULT NOW();
+ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS original_price NUMERIC(10,2);
+ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS deposit_paid NUMERIC(10,2);
+ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS resale_price NUMERIC(10,2);
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS provider_name TEXT NOT NULL DEFAULT '';
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS image_url TEXT NOT NULL DEFAULT '';
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS cancellation_reason TEXT;
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS proof_url TEXT;
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS status public.listing_status NOT NULL DEFAULT 'listed';
-
--- Price columns
-ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS original_price NUMERIC(10,2);
-ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS resale_price NUMERIC(10,2);
-ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS deposit_paid NUMERIC(10,2);
-
--- New production columns
-ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS buyer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE public.resale_listings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
-
--- Profile new columns
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS business_name TEXT;
 
--- Set safe defaults for any NULL price values before applying NOT NULL constraints
+-- Safe NULL fills before NOT NULL enforcement
 UPDATE public.resale_listings SET original_price = 0 WHERE original_price IS NULL;
 UPDATE public.resale_listings SET resale_price = 0 WHERE resale_price IS NULL;
 UPDATE public.resale_listings SET deposit_paid = 0 WHERE deposit_paid IS NULL;
-
--- Apply NOT NULL constraints on price columns
 ALTER TABLE public.resale_listings ALTER COLUMN original_price SET NOT NULL;
 ALTER TABLE public.resale_listings ALTER COLUMN resale_price SET NOT NULL;
 ALTER TABLE public.resale_listings ALTER COLUMN deposit_paid SET NOT NULL;
 
--- Re-apply check constraints idempotently
+-- Idempotent constraint management
 ALTER TABLE public.resale_listings DROP CONSTRAINT IF EXISTS resale_listings_deposit_paid_check;
 ALTER TABLE public.resale_listings DROP CONSTRAINT IF EXISTS resale_listings_resale_price_check;
 ALTER TABLE public.resale_listings DROP CONSTRAINT IF EXISTS resale_listings_original_price_check;
-
-
 
 -- 4. Transfer Chats Table
 CREATE TABLE IF NOT EXISTS public.transfer_chats (
@@ -140,7 +86,7 @@ CREATE TABLE IF NOT EXISTS public.transfer_chats (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 5. Notifications Table (in-app + push alerts)
+-- 5. Notifications Table
 CREATE TABLE IF NOT EXISTS public.notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -166,8 +112,7 @@ BEGIN
     )
     ON CONFLICT (id) DO UPDATE SET
         full_name = EXCLUDED.full_name,
-        email = EXCLUDED.email,
-        role = EXCLUDED.role;
+        email = EXCLUDED.email;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -177,22 +122,18 @@ CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Auto-update updated_at timestamps
+-- Auto updated_at trigger
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS set_profiles_updated_at ON public.profiles;
 CREATE TRIGGER set_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
-
 DROP TRIGGER IF EXISTS set_listings_updated_at ON public.resale_listings;
 CREATE TRIGGER set_listings_updated_at BEFORE UPDATE ON public.resale_listings FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
--- 7. Performance Indexes (500k DAU)
+-- 7. Performance Indexes
 CREATE INDEX IF NOT EXISTS idx_listings_category   ON public.resale_listings(category);
 CREATE INDEX IF NOT EXISTS idx_listings_status     ON public.resale_listings(status);
 CREATE INDEX IF NOT EXISTS idx_listings_seller     ON public.resale_listings(seller_id);
@@ -228,26 +169,24 @@ DROP POLICY IF EXISTS "Users can send their own transfer chats" ON public.transf
 DROP POLICY IF EXISTS "Users can read their own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Users can mark their own notifications read" ON public.notifications;
 
--- Profiles
+-- Profiles policies
 CREATE POLICY "Users can read their own profile" ON public.profiles FOR SELECT TO authenticated USING (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
-
 REVOKE UPDATE ON public.profiles FROM anon, authenticated;
 GRANT UPDATE (full_name, business_name, phone, avatar_url) ON public.profiles TO authenticated;
 
--- Listings
+-- Listings policies
 CREATE POLICY "Public can read listed listings" ON public.resale_listings FOR SELECT TO anon, authenticated USING (status = 'listed' OR seller_id = auth.uid());
-CREATE POLICY "Sellers can create their own listings" ON public.resale_listings FOR INSERT TO authenticated WITH CHECK (seller_id = auth.uid() AND status = 'listed' AND is_verified = FALSE);
+CREATE POLICY "Sellers can create their own listings" ON public.resale_listings FOR INSERT TO authenticated WITH CHECK (seller_id = auth.uid() AND is_verified = FALSE);
 CREATE POLICY "Sellers can update their own listed listings" ON public.resale_listings FOR UPDATE TO authenticated USING (seller_id = auth.uid() AND status = 'listed') WITH CHECK (seller_id = auth.uid() AND status = 'listed');
-
 REVOKE UPDATE ON public.resale_listings FROM anon, authenticated;
 GRANT UPDATE (title, category, location, event_date, original_price, deposit_paid, resale_price, provider_name, image_url, cancellation_reason) ON public.resale_listings TO authenticated;
 
--- Chats
+-- Chats policies
 CREATE POLICY "Authenticated users can read transfer chats" ON public.transfer_chats FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Users can send their own transfer chats" ON public.transfer_chats FOR INSERT TO authenticated WITH CHECK (sender_id = auth.uid());
 
--- Notifications
+-- Notifications policies
 CREATE POLICY "Users can read their own notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid());
 CREATE POLICY "Users can mark their own notifications read" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid());
 

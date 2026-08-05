@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart'; // V-09: cryptographically safe IDs
+import 'package:uuid/uuid.dart';
 import '../models/booking.dart';
 import '../models/resale_listing.dart';
-import '../services/mock_data_service.dart';
 
 const _uuid = Uuid();
 
+/// Allowed image hosts for listing photos (CDN / known safe hosts only).
 const _allowedImageHosts = <String>{
   'images.unsplash.com',
   'upload.wikimedia.org',
@@ -15,11 +15,18 @@ const _allowedImageHosts = <String>{
   'plus.unsplash.com',
 };
 
+/// Page size for feed pagination — keeps initial loads fast at scale.
+const _pageSize = 20;
+
 class MarketplaceProvider extends ChangeNotifier {
   List<ResaleListing> _listings = [];
   String _selectedCategory = 'All';
   String _searchQuery = '';
   bool _isLoading = false;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _currentPage = 0;
+  String? _lastError;
 
   List<String> get categories =>
       ['All', 'Hotels', 'Venues', 'Photography', 'Catering', 'Gyms', 'Events'];
@@ -28,85 +35,94 @@ class MarketplaceProvider extends ChangeNotifier {
   String get selectedCategory => _selectedCategory;
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
+  bool get hasMore => _hasMore;
+  String? get lastError => _lastError;
 
   MarketplaceProvider() {
     loadListings();
   }
 
-  /// Production Supabase database loader with fallback
+  // ---------------------------------------------------------------------------
+  // LOAD: Initial feed — first page from Supabase, JOINed with profiles
+  // ---------------------------------------------------------------------------
+
+  /// Loads the first page of live listings from Supabase.
+  /// Resets pagination state and clears any previous listings.
   Future<void> loadListings() async {
     _isLoading = true;
+    _currentPage = 0;
+    _hasMore = true;
+    _lastError = null;
     notifyListeners();
 
     try {
       final rows = await Supabase.instance.client
           .from('resale_listings')
-          .select('*')
-          .order('created_at', ascending: false);
+          .select('''
+            id, title, category, location, event_date, original_price,
+            deposit_paid, resale_price, provider_name, is_verified,
+            image_url, cancellation_reason, status, created_at, seller_id,
+            profiles!resale_listings_seller_id_fkey(full_name)
+          ''')
+          .eq('status', 'listed')
+          .order('created_at', ascending: false)
+          .range(0, _pageSize - 1);
 
-      if (rows.isNotEmpty) {
-        final List<ResaleListing> dbListings = [];
-        for (final row in rows) {
-          try {
-            final origPrice = (row['original_price'] as num).toDouble();
-            final resalePrice = (row['resale_price'] as num).toDouble();
-            final discount = origPrice > 0
-                ? (((origPrice - resalePrice) / origPrice) * 100).round()
-                : 0;
-
-            final booking = Booking(
-              id: 'b-${row['id']}',
-              title: row['title'] ?? 'Resale Slot',
-              category: row['category'] ?? 'Events',
-              providerId: row['provider_id'] ?? 'provider-001',
-              providerName: row['provider_name'] ?? 'Verified Provider',
-              originalBuyerId: row['seller_id'] ?? 'seller-001',
-              originalPrice: origPrice,
-              depositPaid:
-                  (row['deposit_paid'] as num?)?.toDouble() ?? origPrice * 0.5,
-              eventDate: DateTime.tryParse(row['event_date'] ?? '') ??
-                  DateTime.now().add(const Duration(days: 30)),
-              location: row['location'] ?? 'Seattle, WA',
-              imageUrl: _resolveImageUrl(row['image_url'] ?? ''),
-              isVerified: row['is_verified'] ?? false,
-            );
-
-            dbListings.add(
-              ResaleListing(
-                id: row['id'].toString(),
-                booking: booking,
-                sellerId: row['seller_id'] ?? 'seller-001',
-                sellerName: 'Listing Seller',
-                resalePrice: resalePrice,
-                discountPercentage: discount > 0 ? discount : 0,
-                cancellationReason:
-                    row['cancellation_reason'] ?? 'Schedule conflict',
-                status: ListingStatus.active,
-                createdAt: DateTime.tryParse(row['created_at'] ?? '') ??
-                    DateTime.now(),
-              ),
-            );
-          } catch (parseErr) {
-            debugPrint('[MarketplaceProvider] DB row parse notice: $parseErr');
-          }
-        }
-
-        if (dbListings.isNotEmpty) {
-          _listings = dbListings;
-          _isLoading = false;
-          notifyListeners();
-          return;
-        }
-      }
+      _listings = _parseRows(rows);
+      _hasMore = rows.length == _pageSize;
+      _currentPage = 1;
     } catch (e) {
-      debugPrint(
-          '[MarketplaceProvider] Supabase fetch notice (using fallback seed data): $e');
+      debugPrint('[MarketplaceProvider] loadListings error: $e');
+      _lastError = 'Failed to load listings. Please check your connection.';
+      _listings = [];
     }
 
-    _listings = MockDataService.getInitialListings();
     _isLoading = false;
     notifyListeners();
   }
+
+  // ---------------------------------------------------------------------------
+  // PAGINATION: Load more listings (infinite scroll)
+  // ---------------------------------------------------------------------------
+
+  /// Fetches the next page of listings and appends to the existing list.
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasMore) return;
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      final start = _currentPage * _pageSize;
+      final end = start + _pageSize - 1;
+
+      final rows = await Supabase.instance.client
+          .from('resale_listings')
+          .select('''
+            id, title, category, location, event_date, original_price,
+            deposit_paid, resale_price, provider_name, is_verified,
+            image_url, cancellation_reason, status, created_at, seller_id,
+            profiles!resale_listings_seller_id_fkey(full_name)
+          ''')
+          .eq('status', 'listed')
+          .order('created_at', ascending: false)
+          .range(start, end);
+
+      _listings.addAll(_parseRows(rows));
+      _hasMore = rows.length == _pageSize;
+      _currentPage++;
+    } catch (e) {
+      debugPrint('[MarketplaceProvider] loadMore error: $e');
+    }
+
+    _isLoadingMore = false;
+    notifyListeners();
+  }
+
+  // ---------------------------------------------------------------------------
+  // FILTER & SEARCH (client-side on cached page)
+  // ---------------------------------------------------------------------------
 
   void selectCategory(String category) {
     _selectedCategory = category;
@@ -134,7 +150,10 @@ class MarketplaceProvider extends ChangeNotifier {
     return _listings.where((l) => l.discountPercentage >= 35).toList();
   }
 
-  /// Production Listing Creation (Persists to Supabase DB)
+  // ---------------------------------------------------------------------------
+  // CREATE: Publish a new listing to Supabase
+  // ---------------------------------------------------------------------------
+
   Future<ResaleListing> createListing({
     required String sellerId,
     required String sellerName,
@@ -183,8 +202,7 @@ class MarketplaceProvider extends ChangeNotifier {
     final discount =
         (((originalPrice - resalePrice) / originalPrice) * 100).round();
 
-    // Persist to Supabase. RLS independently verifies that sellerId is the
-    // authenticated user, so a caller cannot create a listing for another user.
+    // RLS independently verifies seller_id = auth.uid() server-side.
     try {
       await Supabase.instance.client.from('resale_listings').insert({
         'id': listingId,
@@ -238,7 +256,7 @@ class MarketplaceProvider extends ChangeNotifier {
     return newListing;
   }
 
-  /// Alias for backward compatibility
+  /// Backward-compatible alias for createListing.
   Future<ResaleListing> addListing({
     required String sellerId,
     required String sellerName,
@@ -268,6 +286,64 @@ class MarketplaceProvider extends ChangeNotifier {
         imageUrl: imageUrl,
       );
 
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
+  List<ResaleListing> _parseRows(List<dynamic> rows) {
+    final result = <ResaleListing>[];
+    for (final row in rows) {
+      try {
+        final origPrice = (row['original_price'] as num).toDouble();
+        final resalePrice = (row['resale_price'] as num).toDouble();
+        final discount = origPrice > 0
+            ? (((origPrice - resalePrice) / origPrice) * 100).round()
+            : 0;
+
+        // Resolve seller name from the JOINed profiles row.
+        final profileMap = row['profiles'] as Map<String, dynamic>?;
+        final sellerName =
+            profileMap?['full_name'] as String? ?? 'Verified Seller';
+
+        final booking = Booking(
+          id: 'b-${row['id']}',
+          title: row['title'] ?? 'Resale Slot',
+          category: row['category'] ?? 'Events',
+          providerId: '',
+          providerName: row['provider_name'] ?? 'Verified Provider',
+          originalBuyerId: row['seller_id'] ?? '',
+          originalPrice: origPrice,
+          depositPaid:
+              (row['deposit_paid'] as num?)?.toDouble() ?? origPrice * 0.5,
+          eventDate: DateTime.tryParse(row['event_date'] ?? '') ??
+              DateTime.now().add(const Duration(days: 30)),
+          location: row['location'] ?? 'Location TBD',
+          imageUrl: _resolveImageUrl(row['image_url'] ?? ''),
+          isVerified: row['is_verified'] ?? false,
+        );
+
+        result.add(
+          ResaleListing(
+            id: row['id'].toString(),
+            booking: booking,
+            sellerId: row['seller_id'] ?? '',
+            sellerName: sellerName,
+            resalePrice: resalePrice,
+            discountPercentage: discount > 0 ? discount : 0,
+            cancellationReason:
+                row['cancellation_reason'] ?? 'Schedule conflict',
+            status: ListingStatus.active,
+            createdAt: DateTime.tryParse(row['created_at'] ?? '') ??
+                DateTime.now(),
+          ),
+        );
+      } catch (parseErr) {
+        debugPrint('[MarketplaceProvider] Row parse error: $parseErr');
+      }
+    }
+    return result;
+  }
+
   void _requireNonBlank(String value, String fieldName) {
     if (value.trim().isEmpty) {
       throw ArgumentError('$fieldName cannot be empty or blank.');
@@ -275,9 +351,7 @@ class MarketplaceProvider extends ChangeNotifier {
   }
 
   String _resolveImageUrl(String imageUrl) {
-    if (imageUrl.trim().isEmpty) {
-      return _defaultImageUrl;
-    }
+    if (imageUrl.trim().isEmpty) return _defaultImageUrl;
 
     final uri = Uri.tryParse(imageUrl.trim());
     if (uri == null || !uri.hasAbsolutePath || uri.scheme != 'https') {
@@ -285,9 +359,7 @@ class MarketplaceProvider extends ChangeNotifier {
     }
 
     final host = uri.host.replaceFirst('www.', '');
-    if (!_allowedImageHosts.contains(host)) {
-      return _defaultImageUrl;
-    }
+    if (!_allowedImageHosts.contains(host)) return _defaultImageUrl;
 
     return imageUrl.trim();
   }
@@ -295,3 +367,4 @@ class MarketplaceProvider extends ChangeNotifier {
   static const _defaultImageUrl =
       'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=80';
 }
+

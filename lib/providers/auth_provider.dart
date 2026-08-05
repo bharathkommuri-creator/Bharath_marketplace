@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 import '../models/profile.dart';
-import '../services/mock_data_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   Profile? _currentProfile;
@@ -152,38 +151,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Demo-only sign-in. Production builds cannot enter a local session.
-  bool signInAsDemo(UserRole role) {
-    if (!kDebugMode) {
-      _setFailure('Demo accounts are unavailable in production.');
-      return false;
-    }
-    switchRole(role);
-    _isLoggedIn = true;
-    _lastError = null;
-    notifyListeners();
-    return true;
-  }
-
-  /// Demo Role Persona Switcher
-  bool switchRole(UserRole newRole) {
-    if (!kDebugMode) {
-      return false;
-    }
-    switch (newRole) {
-      case UserRole.serviceProvider:
-        _currentProfile = MockDataService.currentProvider;
-        break;
-      case UserRole.seller:
-        _currentProfile = MockDataService.currentSeller;
-        break;
-      case UserRole.buyer:
-        _currentProfile = MockDataService.currentBuyer;
-        break;
-    }
-    notifyListeners();
-    return true;
-  }
 
   void _setFailure(String message) {
     _isLoading = false;
