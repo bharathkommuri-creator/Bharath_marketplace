@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../models/profile.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/marketplace_provider.dart';
 import '../../theme/app_theme.dart';
 import '../feed/marketplace_feed_screen.dart';
@@ -44,7 +46,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final marketplace = Provider.of<MarketplaceProvider>(context, listen: false);
+    final marketplace =
+        Provider.of<MarketplaceProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -65,7 +68,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               height: 24,
               fit: BoxFit.contain,
             ),
-
           ),
           onPressed: () {
             if (Navigator.canPop(context)) {
@@ -73,7 +75,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const MarketplaceFeedScreen()),
+                MaterialPageRoute(
+                    builder: (_) => const MarketplaceFeedScreen()),
               );
             }
           },
@@ -86,7 +89,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const MarketplaceFeedScreen()),
+                MaterialPageRoute(
+                    builder: (_) => const MarketplaceFeedScreen()),
               );
             }
           },
@@ -103,7 +107,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           ),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -117,16 +120,21 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 decoration: BoxDecoration(
                   color: AppTheme.lightMintBg,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
+                  border:
+                      Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: const [
-                    Icon(Icons.info_outline_rounded, color: AppTheme.primaryGreen),
+                    Icon(Icons.info_outline_rounded,
+                        color: AppTheme.primaryGreen),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'List your non-refundable booking. The service provider will verify your reservation before transfer.',
-                        style: TextStyle(fontSize: 12, color: AppTheme.darkForest, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.darkForest,
+                            fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],
@@ -135,15 +143,25 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               const SizedBox(height: 24),
 
               // Category Selection
-              const Text('Booking Category', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text('Booking Category',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.category_outlined, color: AppTheme.primaryGreen),
+                  prefixIcon: Icon(Icons.category_outlined,
+                      color: AppTheme.primaryGreen),
                 ),
-                items: ['Hotels', 'Venues', 'Photography', 'Catering', 'Gyms', 'Events']
-                    .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+                items: [
+                  'Hotels',
+                  'Venues',
+                  'Photography',
+                  'Catering',
+                  'Gyms',
+                  'Events'
+                ]
+                    .map(
+                        (cat) => DropdownMenuItem(value: cat, child: Text(cat)))
                     .toList(),
                 onChanged: (val) {
                   if (val != null) setState(() => _selectedCategory = val);
@@ -152,15 +170,18 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               const SizedBox(height: 16),
 
               // Title
-              const Text('Listing Title', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text('Listing Title',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
                   hintText: 'e.g. 2 Nights Ocean View Deluxe Suite',
-                  prefixIcon: Icon(Icons.title_rounded, color: AppTheme.primaryGreen),
+                  prefixIcon:
+                      Icon(Icons.title_rounded, color: AppTheme.primaryGreen),
                 ),
-                validator: (v) => v == null || v.isEmpty ? 'Title is required' : null,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Title is required' : null,
               ),
               const SizedBox(height: 16),
 
@@ -171,15 +192,20 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Service Provider / Host', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const Text('Service Provider / Host',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _providerController,
                           decoration: const InputDecoration(
                             hintText: 'e.g. Hilton Hotel',
-                            prefixIcon: Icon(Icons.business_rounded, color: AppTheme.primaryGreen),
+                            prefixIcon: Icon(Icons.business_rounded,
+                                color: AppTheme.primaryGreen),
                           ),
-                          validator: (v) => v == null || v.isEmpty ? 'Provider required' : null,
+                          validator: (v) => v == null || v.isEmpty
+                              ? 'Provider required'
+                              : null,
                         ),
                       ],
                     ),
@@ -189,15 +215,20 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const Text('Location',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _locationController,
                           decoration: const InputDecoration(
                             hintText: 'e.g. Miami, FL',
-                            prefixIcon: Icon(Icons.location_on_outlined, color: AppTheme.primaryGreen),
+                            prefixIcon: Icon(Icons.location_on_outlined,
+                                color: AppTheme.primaryGreen),
                           ),
-                          validator: (v) => v == null || v.isEmpty ? 'Location required' : null,
+                          validator: (v) => v == null || v.isEmpty
+                              ? 'Location required'
+                              : null,
                         ),
                       ],
                     ),
@@ -207,7 +238,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               const SizedBox(height: 16),
 
               // Date Picker
-              const Text('Event / Reservation Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text('Event / Reservation Date',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               InkWell(
                 onTap: () async {
@@ -220,7 +252,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                   if (picked != null) setState(() => _eventDate = picked);
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppTheme.cardWhite,
                     borderRadius: BorderRadius.circular(12),
@@ -231,15 +264,20 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today_rounded, color: AppTheme.primaryGreen, size: 20),
+                          const Icon(Icons.calendar_today_rounded,
+                              color: AppTheme.primaryGreen, size: 20),
                           const SizedBox(width: 10),
                           Text(
                             DateFormat('EEE, MMM dd, yyyy').format(_eventDate),
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textDark),
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textDark),
                           ),
                         ],
                       ),
-                      const Icon(Icons.arrow_drop_down, color: AppTheme.textMuted),
+                      const Icon(Icons.arrow_drop_down,
+                          color: AppTheme.textMuted),
                     ],
                   ),
                 ),
@@ -253,14 +291,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Original Price (\$)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const Text('Original Price (\$)',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _originalPriceController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(hintText: '1000'),
                           onChanged: (_) => _recalculateDiscount(),
-                           validator: (v) {
+                          validator: (v) {
                             if (v == null || v.isEmpty) return 'Required';
                             final val = double.tryParse(v);
                             if (val == null || val <= 0) return 'Must be > 0';
@@ -275,13 +315,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Deposit Paid (\$)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const Text('Deposit Paid (\$)',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _depositPaidController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(hintText: '500'),
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Required' : null,
                         ),
                       ],
                     ),
@@ -291,7 +334,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Resale Price (\$)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const Text('Resale Price (\$)',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _resalePriceController,
@@ -302,8 +347,11 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Required';
                             final resell = double.tryParse(v);
-                            if (resell == null || resell <= 0) return 'Must be > 0';
-                            final orig = double.tryParse(_originalPriceController.text) ?? 0;
+                            if (resell == null || resell <= 0)
+                              return 'Must be > 0';
+                            final orig = double.tryParse(
+                                    _originalPriceController.text) ??
+                                0;
                             if (orig > 0 && resell >= orig) {
                               return 'Must be less than original (\$$orig)';
                             }
@@ -320,18 +368,23 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               // Calculated Discount Tag Preview
               if (_calculatedDiscount > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppTheme.lightMintBg,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.local_offer_rounded, color: AppTheme.primaryGreen, size: 18),
+                      const Icon(Icons.local_offer_rounded,
+                          color: AppTheme.primaryGreen, size: 18),
                       const SizedBox(width: 8),
                       Text(
                         'Calculated Savings for Buyer: -$_calculatedDiscount% OFF',
-                        style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: const TextStyle(
+                            color: AppTheme.primaryGreen,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
                       ),
                     ],
                   ),
@@ -339,26 +392,30 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               const SizedBox(height: 16),
 
               // Reason
-              const Text('Reason for Reselling', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text('Reason for Reselling',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _reasonController,
                 maxLines: 2,
                 decoration: const InputDecoration(
                   hintText: 'e.g. Flight schedule change prevents travel.',
-                  prefixIcon: Icon(Icons.note_alt_outlined, color: AppTheme.primaryGreen),
+                  prefixIcon: Icon(Icons.note_alt_outlined,
+                      color: AppTheme.primaryGreen),
                 ),
               ),
               const SizedBox(height: 16),
 
               // Image URL
-              const Text('Photo Image URL (Optional)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text('Photo Image URL (Optional)',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _imageUrlController,
                 decoration: const InputDecoration(
                   hintText: 'https://images.unsplash.com/...',
-                  prefixIcon: Icon(Icons.image_outlined, color: AppTheme.primaryGreen),
+                  prefixIcon:
+                      Icon(Icons.image_outlined, color: AppTheme.primaryGreen),
                 ),
               ),
               const SizedBox(height: 28),
@@ -369,36 +426,59 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 height: 52,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.publish_rounded),
-                  label: const Text('Publish Resale Listing', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  onPressed: () {
+                  label: const Text('Publish Resale Listing',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       try {
-                        // V-06/V-07/V-08: addListing() validates all inputs and
-                        // throws ArgumentError on any violation.
-                        marketplace.addListing(
+                        final seller =
+                            context.read<AuthProvider>().currentProfile;
+                        if (seller == null || seller.role != UserRole.seller) {
+                          throw StateError(
+                              'Only seller accounts can publish resale listings.');
+                        }
+
+                        await marketplace.addListing(
+                          sellerId: seller.id,
+                          sellerName: seller.fullName,
                           title: _titleController.text.trim(),
                           category: _selectedCategory,
                           providerName: _providerController.text.trim(),
                           location: _locationController.text.trim(),
-                          originalPrice: double.parse(_originalPriceController.text.trim()),
-                          depositPaid: double.parse(_depositPaidController.text.trim()),
-                          resalePrice: double.parse(_resalePriceController.text.trim()),
+                          originalPrice: double.parse(
+                              _originalPriceController.text.trim()),
+                          depositPaid:
+                              double.parse(_depositPaidController.text.trim()),
+                          resalePrice:
+                              double.parse(_resalePriceController.text.trim()),
                           eventDate: _eventDate,
                           cancellationReason: _reasonController.text.trim(),
                           imageUrl: _imageUrlController.text.trim(),
                         );
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Listing posted! Provider notified for verification.'),
+                            content: Text(
+                                'Listing posted! Provider notified for verification.'),
                             backgroundColor: AppTheme.primaryGreen,
                           ),
                         );
                         Navigator.pop(context);
                       } on ArgumentError catch (e) {
-                        // Show server-side validation error to the user.
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Validation error: ${e.message}'),
+                            backgroundColor: Colors.red.shade700,
+                            duration: const Duration(seconds: 4),
+                          ),
+                        );
+                      } on StateError catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(e.message),
                             backgroundColor: Colors.red.shade700,
                             duration: const Duration(seconds: 4),
                           ),

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart'; // V-09: cryptographically safe IDs
 import '../models/booking.dart';
 import '../models/resale_listing.dart';
 import '../services/mock_data_service.dart';
 
-// V-09 FIX: Single shared UUID generator instance.
 const _uuid = Uuid();
 
-// V-08 FIX: Allowlist of trusted image URL domains.
-// Only images from these hosts are accepted; all others are rejected.
 const _allowedImageHosts = <String>{
   'images.unsplash.com',
   'upload.wikimedia.org',
@@ -23,7 +21,8 @@ class MarketplaceProvider extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
 
-  List<String> get categories => ['All', 'Hotels', 'Venues', 'Photography', 'Catering', 'Gyms', 'Events'];
+  List<String> get categories =>
+      ['All', 'Hotels', 'Venues', 'Photography', 'Catering', 'Gyms', 'Events'];
 
   List<ResaleListing> get allListings => _listings;
   String get selectedCategory => _selectedCategory;
@@ -34,9 +33,76 @@ class MarketplaceProvider extends ChangeNotifier {
     loadListings();
   }
 
-  void loadListings() {
+  /// Production Supabase database loader with fallback
+  Future<void> loadListings() async {
     _isLoading = true;
     notifyListeners();
+
+    try {
+      final rows = await Supabase.instance.client
+          .from('resale_listings')
+          .select('*')
+          .order('created_at', ascending: false);
+
+      if (rows.isNotEmpty) {
+        final List<ResaleListing> dbListings = [];
+        for (final row in rows) {
+          try {
+            final origPrice = (row['original_price'] as num).toDouble();
+            final resalePrice = (row['resale_price'] as num).toDouble();
+            final discount = origPrice > 0
+                ? (((origPrice - resalePrice) / origPrice) * 100).round()
+                : 0;
+
+            final booking = Booking(
+              id: 'b-${row['id']}',
+              title: row['title'] ?? 'Resale Slot',
+              category: row['category'] ?? 'Events',
+              providerId: row['provider_id'] ?? 'provider-001',
+              providerName: row['provider_name'] ?? 'Verified Provider',
+              originalBuyerId: row['seller_id'] ?? 'seller-001',
+              originalPrice: origPrice,
+              depositPaid:
+                  (row['deposit_paid'] as num?)?.toDouble() ?? origPrice * 0.5,
+              eventDate: DateTime.tryParse(row['event_date'] ?? '') ??
+                  DateTime.now().add(const Duration(days: 30)),
+              location: row['location'] ?? 'Seattle, WA',
+              imageUrl: _resolveImageUrl(row['image_url'] ?? ''),
+              isVerified: row['is_verified'] ?? false,
+            );
+
+            dbListings.add(
+              ResaleListing(
+                id: row['id'].toString(),
+                booking: booking,
+                sellerId: row['seller_id'] ?? 'seller-001',
+                sellerName: 'Listing Seller',
+                resalePrice: resalePrice,
+                discountPercentage: discount > 0 ? discount : 0,
+                cancellationReason:
+                    row['cancellation_reason'] ?? 'Schedule conflict',
+                status: ListingStatus.active,
+                createdAt: DateTime.tryParse(row['created_at'] ?? '') ??
+                    DateTime.now(),
+              ),
+            );
+          } catch (parseErr) {
+            debugPrint('[MarketplaceProvider] DB row parse notice: $parseErr');
+          }
+        }
+
+        if (dbListings.isNotEmpty) {
+          _listings = dbListings;
+          _isLoading = false;
+          notifyListeners();
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint(
+          '[MarketplaceProvider] Supabase fetch notice (using fallback seed data): $e');
+    }
+
     _listings = MockDataService.getInitialListings();
     _isLoading = false;
     notifyListeners();
@@ -54,7 +120,8 @@ class MarketplaceProvider extends ChangeNotifier {
 
   List<ResaleListing> get filteredListings {
     return _listings.where((listing) {
-      final matchesCategory = _selectedCategory == 'All' || listing.booking.category == _selectedCategory;
+      final matchesCategory = _selectedCategory == 'All' ||
+          listing.booking.category == _selectedCategory;
       final matchesSearch = _searchQuery.isEmpty ||
           listing.booking.title.toLowerCase().contains(_searchQuery) ||
           listing.booking.location.toLowerCase().contains(_searchQuery) ||
@@ -63,104 +130,102 @@ class MarketplaceProvider extends ChangeNotifier {
     }).toList();
   }
 
-  List<ResaleListing> getListingsByCategory(String category) {
-    return _listings.where((listing) => listing.booking.category == category).toList();
-  }
-
   List<ResaleListing> get highSavingsDeals {
-    return _listings.where((listing) => listing.discountPercentage >= 40).toList();
+    return _listings.where((l) => l.discountPercentage >= 35).toList();
   }
 
-  // ---------------------------------------------------------------------------
-  // V-06 FIX: addListing() now validates ALL inputs before creating any object.
-  // V-07 FIX: resalePrice must be strictly less than originalPrice.
-  // V-08 FIX: imageUrl is validated against an allowlist of trusted domains.
-  // V-09 FIX: IDs use UUID v4 instead of millisecondsSinceEpoch.
-  // ---------------------------------------------------------------------------
-
-  /// Validates and adds a new resale listing to the marketplace.
-  ///
-  /// Throws [ArgumentError] if any field fails validation.
-  /// Returns the created [ResaleListing] on success.
-  ResaleListing addListing({
+  /// Production Listing Creation (Persists to Supabase DB)
+  Future<ResaleListing> createListing({
+    required String sellerId,
+    required String sellerName,
     required String title,
     required String category,
-    required String providerName,
     required String location,
+    required DateTime eventDate,
     required double originalPrice,
     required double depositPaid,
     required double resalePrice,
-    required DateTime eventDate,
+    required String providerName,
     required String cancellationReason,
-    required String imageUrl,
-  }) {
-    // V-06: Validate required text fields are non-empty.
+    String imageUrl = '',
+  }) async {
+    _requireNonBlank(sellerId, 'Seller ID');
+    _requireNonBlank(sellerName, 'Seller name');
     _requireNonBlank(title, 'Title');
-    _requireNonBlank(providerName, 'Provider name');
+    _requireNonBlank(category, 'Category');
     _requireNonBlank(location, 'Location');
-    _requireNonBlank(cancellationReason, 'Cancellation reason');
+    _requireNonBlank(providerName, 'Provider Name');
+    _requireNonBlank(cancellationReason, 'Cancellation Reason');
 
-    // V-06: Validate category is one of the allowed values.
-    if (!categories.contains(category)) {
-      throw ArgumentError('Invalid category "$category". Must be one of: ${categories.join(', ')}');
-    }
-
-    // V-06: Validate prices are positive numbers.
     if (originalPrice <= 0) {
-      throw ArgumentError('Original price must be greater than zero. Got: $originalPrice');
+      throw ArgumentError('Original price must be greater than 0.');
     }
-    if (depositPaid < 0) {
-      throw ArgumentError('Deposit paid cannot be negative. Got: $depositPaid');
+    if (depositPaid < 0 || depositPaid > originalPrice) {
+      throw ArgumentError(
+          'Deposit paid must be between 0 and the original price.');
     }
-    if (depositPaid > originalPrice) {
-      throw ArgumentError('Deposit paid (\$$depositPaid) cannot exceed the original price (\$$originalPrice).');
-    }
-
-    // V-07 FIX: Resale price must be strictly less than original price.
     if (resalePrice <= 0) {
-      throw ArgumentError('Resale price must be greater than zero. Got: $resalePrice');
+      throw ArgumentError('Resale price must be greater than 0.');
     }
     if (resalePrice >= originalPrice) {
       throw ArgumentError(
-        'Resale price (\$$resalePrice) must be less than the original price (\$$originalPrice). '
-        'Listing at or above original price is not allowed.',
-      );
+          'Resale price must be lower than original price to provide discount.');
     }
-
-    // V-06: Validate event date is in the future.
     if (!eventDate.isAfter(DateTime.now())) {
-      throw ArgumentError('Event date must be in the future. Got: $eventDate');
+      throw ArgumentError('Event date must be in the future.');
+    }
+    if (!categories.contains(category) || category == 'All') {
+      throw ArgumentError('Choose a valid listing category.');
     }
 
-    // V-08 FIX: Validate image URL against allowlist — or use default.
     final resolvedImageUrl = _resolveImageUrl(imageUrl);
+    final listingId = _uuid.v4();
+    final discount =
+        (((originalPrice - resalePrice) / originalPrice) * 100).round();
 
-    // V-09 FIX: Use UUID v4 for unpredictable IDs.
-    final bookingId = 'b-${_uuid.v4()}';
-    final listingId = 'l-${_uuid.v4()}';
-
-    final discount = (((originalPrice - resalePrice) / originalPrice) * 100).round();
+    // Persist to Supabase. RLS independently verifies that sellerId is the
+    // authenticated user, so a caller cannot create a listing for another user.
+    try {
+      await Supabase.instance.client.from('resale_listings').insert({
+        'id': listingId,
+        'seller_id': sellerId,
+        'title': title.trim(),
+        'category': category,
+        'location': location.trim(),
+        'event_date': eventDate.toIso8601String(),
+        'original_price': originalPrice,
+        'deposit_paid': depositPaid,
+        'resale_price': resalePrice,
+        'provider_name': providerName.trim(),
+        'image_url': resolvedImageUrl,
+        'cancellation_reason': cancellationReason.trim(),
+        'status': 'listed',
+      });
+    } catch (dbErr) {
+      debugPrint('[MarketplaceProvider] DB listing insert error: $dbErr');
+      throw StateError('Unable to publish the listing. Please try again.');
+    }
 
     final newBooking = Booking(
-      id: bookingId,
+      id: 'b-$listingId',
       title: title.trim(),
       category: category,
-      providerId: 'provider-001',
+      providerId: '',
       providerName: providerName.trim(),
-      originalBuyerId: 'seller-001',
+      originalBuyerId: sellerId,
       originalPrice: originalPrice,
       depositPaid: depositPaid,
       eventDate: eventDate,
       location: location.trim(),
       imageUrl: resolvedImageUrl,
-      isVerified: true,
+      isVerified: false,
     );
 
     final newListing = ResaleListing(
       id: listingId,
       booking: newBooking,
-      sellerId: 'seller-001',
-      sellerName: 'David Miller',
+      sellerId: sellerId,
+      sellerName: sellerName.trim(),
       resalePrice: resalePrice,
       discountPercentage: discount > 0 ? discount : 0,
       cancellationReason: cancellationReason.trim(),
@@ -173,19 +238,42 @@ class MarketplaceProvider extends ChangeNotifier {
     return newListing;
   }
 
-  // ---------------------------------------------------------------------------
-  // Private validation helpers
-  // ---------------------------------------------------------------------------
+  /// Alias for backward compatibility
+  Future<ResaleListing> addListing({
+    required String sellerId,
+    required String sellerName,
+    required String title,
+    required String category,
+    required String location,
+    required DateTime eventDate,
+    required double originalPrice,
+    required double resalePrice,
+    required String providerName,
+    required String cancellationReason,
+    required double depositPaid,
+    String imageUrl = '',
+  }) =>
+      createListing(
+        sellerId: sellerId,
+        sellerName: sellerName,
+        title: title,
+        category: category,
+        location: location,
+        eventDate: eventDate,
+        originalPrice: originalPrice,
+        depositPaid: depositPaid,
+        resalePrice: resalePrice,
+        providerName: providerName,
+        cancellationReason: cancellationReason,
+        imageUrl: imageUrl,
+      );
 
-  /// V-06: Throws [ArgumentError] if [value] is null, empty, or whitespace-only.
   void _requireNonBlank(String value, String fieldName) {
     if (value.trim().isEmpty) {
       throw ArgumentError('$fieldName cannot be empty or blank.');
     }
   }
 
-  /// V-08: Returns [imageUrl] if it is from an allowed domain,
-  /// or the safe Unsplash fallback if the URL is empty or untrusted.
   String _resolveImageUrl(String imageUrl) {
     if (imageUrl.trim().isEmpty) {
       return _defaultImageUrl;
@@ -193,14 +281,11 @@ class MarketplaceProvider extends ChangeNotifier {
 
     final uri = Uri.tryParse(imageUrl.trim());
     if (uri == null || !uri.hasAbsolutePath || uri.scheme != 'https') {
-      debugPrint('[MarketplaceProvider] Rejected image URL (not HTTPS or invalid): $imageUrl');
       return _defaultImageUrl;
     }
 
-    // Strip "www." prefix for consistent matching.
     final host = uri.host.replaceFirst('www.', '');
     if (!_allowedImageHosts.contains(host)) {
-      debugPrint('[MarketplaceProvider] Rejected image URL from untrusted host "$host": $imageUrl');
       return _defaultImageUrl;
     }
 

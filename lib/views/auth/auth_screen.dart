@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/profile.dart';
@@ -5,42 +6,42 @@ import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen({super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  UserRole _selectedUserRole = UserRole.buyer;
-  
-  // V-04 FIX: No hardcoded credentials — all fields start empty.
-  final _userEmailController = TextEditingController();
-  final _userPasswordController = TextEditingController();
-
-  // Provider Login controllers
-  final _providerEmailController = TextEditingController();
-  final _providerPasswordController = TextEditingController();
-  final _businessNameController = TextEditingController();
-
+class _AuthScreenState extends State<AuthScreen> {
   bool _isSignUp = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
+  // Login Controllers
+  final _loginIdentifierController =
+      TextEditingController(text: 'ramesh@resalehub.in');
+  final _loginPasswordController = TextEditingController(text: 'password123');
+
+  // Sign Up Controllers
+  final _signupNameController = TextEditingController();
+  final _signupPhoneController = TextEditingController();
+  final _signupEmailController = TextEditingController();
+  final _signupPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _userEmailController.dispose();
-    _userPasswordController.dispose();
-    _providerEmailController.dispose();
-    _providerPasswordController.dispose();
-    _businessNameController.dispose();
+    _loginIdentifierController.dispose();
+    _loginPasswordController.dispose();
+    _signupNameController.dispose();
+    _signupPhoneController.dispose();
+    _signupEmailController.dispose();
+    _signupPasswordController.dispose();
     super.dispose();
+  }
+
+  void _showAuthError(String? message) {
+    if (message == null || message.isEmpty) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red.shade700),
+    );
   }
 
   @override
@@ -48,23 +49,26 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Account Login'),
+        title: const Text('ResaleHub Login Portal'),
         elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: AppTheme.darkForest,
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 480),
+            constraints: const BoxConstraints(maxWidth: 440),
             padding: const EdgeInsets.all(28.0),
             decoration: BoxDecoration(
               color: AppTheme.cardWhite,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppTheme.borderLight),
+              border: Border.all(color: AppTheme.borderLight, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primaryGreen.withOpacity(0.08),
-                  blurRadius: 20,
+                  color: AppTheme.darkForest.withOpacity(0.08),
+                  blurRadius: 24,
+                  spreadRadius: 2,
                   offset: const Offset(0, 8),
                 ),
               ],
@@ -73,40 +77,45 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header Logo
+                // Brand Header (Exact 1:1 match with Web)
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: AppTheme.lightMintBg,
-                        borderRadius: BorderRadius.circular(14),
+                        color: AppTheme.primaryGreen,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 32,
-                        height: 32,
-                        fit: BoxFit.contain,
+                      child: const Center(
+                        child: Text(
+                          '⇄',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                       ),
-
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
-                          'ResaleHub Portal',
+                          'ResaleHub',
                           style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
                             color: AppTheme.darkForest,
                           ),
                         ),
                         Text(
-                          'Sign in to access 3-Party Resale Services',
+                          '3-Party Booking Resale Marketplace',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             color: AppTheme.textMuted,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -115,47 +124,144 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                 ),
                 const SizedBox(height: 24),
 
-                // Top Login Type Tabs
+                // Pill Tabs: Log In vs Sign Up (Exact 1:1 match with Web)
                 Container(
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: AppTheme.lightMintBg,
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: AppTheme.primaryGreen,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    labelColor: Colors.white,
-                    unselectedLabelColor: AppTheme.textDark,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    tabs: const [
-                      Tab(
-                        icon: Icon(Icons.person_rounded, size: 18),
-                        text: 'User Login',
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => setState(() => _isSignUp = false),
+                          borderRadius: BorderRadius.circular(10),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: !_isSignUp
+                                  ? AppTheme.primaryGreen
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '🔑 Log In',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: !_isSignUp
+                                      ? Colors.white
+                                      : AppTheme.textMuted,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      Tab(
-                        icon: Icon(Icons.business_center_rounded, size: 18),
-                        text: 'Service Provider Login',
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => setState(() => _isSignUp = true),
+                          borderRadius: BorderRadius.circular(10),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: _isSignUp
+                                  ? AppTheme.primaryGreen
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '✨ Sign Up',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: _isSignUp
+                                      ? Colors.white
+                                      : AppTheme.textMuted,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                SizedBox(
-                  height: 380,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      // TAB 1: USER LOGIN (BUYER / SELLER)
-                      _buildUserLoginForm(context),
+                // Form Views
+                if (!_isSignUp)
+                  _buildLoginFormView(context)
+                else
+                  _buildSignupFormView(context),
 
-                      // TAB 2: SERVICE PROVIDER LOGIN
-                      _buildProviderLoginForm(context),
+                if (kDebugMode) ...[
+                  const SizedBox(height: 16),
+
+                  // Divider: OR 1-CLICK QUICK DEMO
+                  Row(
+                    children: const [
+                      Expanded(child: Divider(color: AppTheme.borderLight)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'OR 1-CLICK QUICK DEMO',
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textMuted),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: AppTheme.borderLight)),
                     ],
                   ),
+                  const SizedBox(height: 14),
+
+                  // 1-Click Quick Demo Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF0FDF4),
+                        side: const BorderSide(
+                            color: Color(0xFFBBF7D0), width: 1.5),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () => context
+                          .read<AuthProvider>()
+                          .signInAsDemo(UserRole.buyer),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('👤', style: TextStyle(fontSize: 16)),
+                          SizedBox(width: 8),
+                          Text(
+                            'Continue as Demo User (Ramesh Kumar)',
+                            style: TextStyle(
+                              color: AppTheme.darkForest,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+
+                // Terms Note
+                const Text(
+                  'By continuing, you agree to ResaleHub\'s Terms of Use and Privacy Policy.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.textMuted, height: 1.4),
                 ),
               ],
             ),
@@ -165,118 +271,88 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildUserLoginForm(BuildContext context) {
+  /// Log In Form View (Exact Match with Web)
+  Widget _buildLoginFormView(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _isSignUp ? 'Create General User Account' : 'Sign in as User',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textDark),
-        ),
-        const SizedBox(height: 4),
         const Text(
-          'Buy discounted slots or resell your cancelled bookings.',
-          style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+          'Mobile Number or Email Address:',
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkForest),
         ),
-        const SizedBox(height: 16),
-
-        // User Sub-Role Selection (Buyer vs Seller)
-        Row(
-          children: [
-            Expanded(
-              child: ChoiceChip(
-                label: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.shopping_bag_outlined, size: 16),
-                    SizedBox(width: 6),
-                    Text('New Buyer'),
-                  ],
-                ),
-                selected: _selectedUserRole == UserRole.buyer,
-                selectedColor: AppTheme.primaryGreen,
-                labelStyle: TextStyle(
-                  color: _selectedUserRole == UserRole.buyer ? Colors.white : AppTheme.textDark,
-                  fontWeight: FontWeight.bold,
-                ),
-                onSelected: (selected) {
-                  if (selected) setState(() => _selectedUserRole = UserRole.buyer);
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ChoiceChip(
-                label: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.sell_outlined, size: 16),
-                    SizedBox(width: 6),
-                    Text('Original Seller'),
-                  ],
-                ),
-                selected: _selectedUserRole == UserRole.seller,
-                selectedColor: AppTheme.primaryGreen,
-                labelStyle: TextStyle(
-                  color: _selectedUserRole == UserRole.seller ? Colors.white : AppTheme.textDark,
-                  fontWeight: FontWeight.bold,
-                ),
-                onSelected: (selected) {
-                  if (selected) setState(() => _selectedUserRole = UserRole.seller);
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
+        const SizedBox(height: 6),
         TextField(
-          controller: _userEmailController,
+          controller: _loginIdentifierController,
           decoration: const InputDecoration(
-            labelText: 'Email Address',
-            prefixIcon: Icon(Icons.email_outlined, color: AppTheme.textMuted),
+            hintText: '+91 98765 43210 or email',
+            prefixIcon:
+                Icon(Icons.email_outlined, color: AppTheme.textMuted, size: 20),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
+        const Text(
+          'Password / OTP:',
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkForest),
+        ),
+        const SizedBox(height: 6),
         TextField(
-          controller: _userPasswordController,
+          controller: _loginPasswordController,
           obscureText: true,
           decoration: const InputDecoration(
-            labelText: 'Password',
-            prefixIcon: Icon(Icons.lock_outline, color: AppTheme.textMuted),
+            hintText: 'Password',
+            prefixIcon:
+                Icon(Icons.lock_outline, color: AppTheme.textMuted, size: 20),
           ),
         ),
-        const Spacer(),
-
+        const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
           height: 48,
-          child: ElevatedButton(
-            onPressed: () {
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
-              // V-03 FIX: role param is ignored by login() — server resolves it.
-              // V-02 FIX: AuthGate in main.dart handles navigation automatically.
-              authProvider.login(
-                _userEmailController.text,
-                _userPasswordController.text,
-                _selectedUserRole, // passed but ignored server-side
-              );
-              // No manual navigation needed — AuthGate listens to isLoggedIn.
-            },
-            child: Text(
-              _isSignUp ? 'Sign Up User Account' : 'Login as ${_selectedUserRole == UserRole.buyer ? "Buyer" : "Seller"}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppTheme.primaryGreen, AppTheme.darkForest],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryGreen.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ),
-        ),
-        const SizedBox(height: 10),
-
-        Center(
-          child: TextButton(
-            onPressed: () => setState(() => _isSignUp = !_isSignUp),
-            child: Text(
-              _isSignUp ? 'Already have an account? Sign In' : "Need an account? Sign Up",
-              style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.w600, fontSize: 13),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () async {
+                final authProvider = context.read<AuthProvider>();
+                final loggedIn = await authProvider.login(
+                  _loginIdentifierController.text,
+                  _loginPasswordController.text,
+                );
+                if (!loggedIn && mounted)
+                  _showAuthError(authProvider.lastError);
+              },
+              child: const Text(
+                'Log In to Account →',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white),
+              ),
             ),
           ),
         ),
@@ -284,83 +360,130 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildProviderLoginForm(BuildContext context) {
+  /// Sign Up Form View (Exact Match with Web)
+  Widget _buildSignupFormView(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _isSignUp ? 'Register Business Provider' : 'Sign in as Service Provider',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textDark),
-        ),
-        const SizedBox(height: 4),
         const Text(
-          'For Hotels, Venues, Photographers & Caterers to manage transfers.',
-          style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+          'Full Name:',
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkForest),
         ),
-        const SizedBox(height: 16),
-
-        if (_isSignUp) ...[
-          TextField(
-            controller: _businessNameController,
-            decoration: const InputDecoration(
-              labelText: 'Business / Hotel Name',
-              prefixIcon: Icon(Icons.domain_rounded, color: AppTheme.textMuted),
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
-
+        const SizedBox(height: 6),
         TextField(
-          controller: _providerEmailController,
+          controller: _signupNameController,
           decoration: const InputDecoration(
-            labelText: 'Business Email',
-            prefixIcon: Icon(Icons.business_outlined, color: AppTheme.textMuted),
+            hintText: 'e.g. Ramesh Kumar',
+            prefixIcon:
+                Icon(Icons.person_outline, color: AppTheme.textMuted, size: 20),
           ),
         ),
         const SizedBox(height: 12),
+        const Text(
+          'Mobile Number:',
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkForest),
+        ),
+        const SizedBox(height: 6),
         TextField(
-          controller: _providerPasswordController,
-          obscureText: true,
+          controller: _signupPhoneController,
+          keyboardType: TextInputType.phone,
           decoration: const InputDecoration(
-            labelText: 'Password',
-            prefixIcon: Icon(Icons.lock_outline, color: AppTheme.textMuted),
+            hintText: '+91 98765 43210',
+            prefixIcon: Icon(Icons.phone_android_outlined,
+                color: AppTheme.textMuted, size: 20),
           ),
         ),
-        const Spacer(),
-
+        const SizedBox(height: 12),
+        const Text(
+          'Email Address:',
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkForest),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: _signupEmailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(
+            hintText: 'name@example.com',
+            prefixIcon:
+                Icon(Icons.mail_outline, color: AppTheme.textMuted, size: 20),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Create Password:',
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkForest),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: _signupPasswordController,
+          obscureText: true,
+          decoration: const InputDecoration(
+            hintText: 'Minimum 6 characters',
+            prefixIcon:
+                Icon(Icons.lock_outline, color: AppTheme.textMuted, size: 20),
+          ),
+        ),
+        const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
           height: 48,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.darkForest,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppTheme.primaryGreen, AppTheme.darkForest],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryGreen.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            icon: const Icon(Icons.verified_user_rounded, size: 18),
-            label: Text(
-              _isSignUp ? 'Register Provider Account' : 'Login as Service Provider',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            onPressed: () {
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
-              // V-03 FIX: role param passed but ignored — server resolves role from profile.
-              // V-02 FIX: AuthGate handles navigation after isLoggedIn changes.
-              authProvider.login(
-                _providerEmailController.text,
-                _providerPasswordController.text,
-                UserRole.serviceProvider,
-              );
-              // No manual navigation needed — AuthGate listens to isLoggedIn.
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
-
-        Center(
-          child: TextButton(
-            onPressed: () => setState(() => _isSignUp = !_isSignUp),
-            child: Text(
-              _isSignUp ? 'Already registered? Provider Sign In' : "New Vendor? Register Business",
-              style: const TextStyle(color: AppTheme.darkForest, fontWeight: FontWeight.w600, fontSize: 13),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () async {
+                final authProvider = context.read<AuthProvider>();
+                final signedUp = await authProvider.signUp(
+                  email: _signupEmailController.text,
+                  password: _signupPasswordController.text,
+                  fullName: _signupNameController.text.isEmpty
+                      ? (_signupEmailController.text.contains('@')
+                          ? _signupEmailController.text.split('@')[0]
+                          : 'Ramesh Kumar')
+                      : _signupNameController.text,
+                  role: UserRole.buyer,
+                );
+                if (!signedUp && mounted)
+                  _showAuthError(authProvider.lastError);
+              },
+              child: const Text(
+                'Create Free Account →',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white),
+              ),
             ),
           ),
         ),

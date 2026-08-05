@@ -1,78 +1,175 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
 import '../services/mock_data_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  // V-02 FIX: Start as NOT logged in. Profile is nullable until authenticated.
   Profile? _currentProfile;
   bool _isLoggedIn = false;
+  bool _isLoading = false;
+  String? _lastError;
 
   Profile? get currentProfile => _currentProfile;
-
-  // Safe getter — callers must handle null (e.g. check isLoggedIn first).
   UserRole get currentRole => _currentProfile?.role ?? UserRole.buyer;
   bool get isLoggedIn => _isLoggedIn;
+  bool get isLoading => _isLoading;
+  String? get lastError => _lastError;
 
-  /// V-03 FIX: Role is resolved from the server-side profile record,
-  /// NOT from whatever role the client passes in.
-  ///
-  /// In production this would: call Supabase signInWithPassword(), then
-  /// fetch the `profiles` table row to get the server-authoritative role.
-  ///
-  /// Here (mock): we look up the pre-seeded profile by email and use its
-  /// stored role — the UI-selected role is ignored entirely.
-  void login(String email, String password, UserRole defaultRole) {
-    final cleanEmail = email.trim().toLowerCase();
-    
-    Profile? resolvedProfile = _resolveProfileByEmail(cleanEmail);
+  AuthProvider() {
+    _initSupabaseSession();
+  }
 
-    if (resolvedProfile == null) {
-      if (cleanEmail.isNotEmpty) {
-        resolvedProfile = Profile(
-          id: 'user-${DateTime.now().millisecondsSinceEpoch}',
-          fullName: cleanEmail.contains('@') ? cleanEmail.split('@')[0] : cleanEmail,
-          email: cleanEmail,
-          role: defaultRole,
-        );
-      } else {
-        // Fallback demo user based on selected role
-        switch (defaultRole) {
-          case UserRole.serviceProvider:
-            resolvedProfile = MockDataService.currentProvider;
-            break;
-          case UserRole.seller:
-            resolvedProfile = MockDataService.currentSeller;
-            break;
-          case UserRole.buyer:
-            resolvedProfile = MockDataService.currentBuyer;
-            break;
+  /// Restores active Supabase Auth session on app launch
+  Future<void> _initSupabaseSession() async {
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session != null) {
+        final profile = await _fetchProfileFromSupabase(session.user.id);
+
+        if (profile != null) {
+          _currentProfile = profile;
+          _isLoggedIn = true;
+          notifyListeners();
         }
       }
+    } catch (e) {
+      debugPrint('[AuthProvider] Supabase session init notice: $e');
+    }
+  }
+
+  /// Production Supabase Signup
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    required String fullName,
+    required UserRole role,
+    String? businessName,
+  }) async {
+    _isLoading = true;
+    _lastError = null;
+    notifyListeners();
+
+    if (role != UserRole.buyer) {
+      _setFailure('New accounts must be registered as buyers.');
+      return false;
     }
 
-    _currentProfile = resolvedProfile;
-    _isLoggedIn = true;
-    notifyListeners();
+    try {
+      final response = await Supabase.instance.client.auth.signUp(
+        email: email.trim(),
+        password: password,
+        data: {
+          'full_name': fullName.trim(),
+          // Account roles are assigned server-side. Never trust role metadata
+          // supplied by a client during public registration.
+          'role': UserRole.buyer.dbValue,
+          if (businessName != null) 'business_name': businessName.trim(),
+        },
+      );
+
+      if (response.user == null) {
+        throw const AuthException('Account creation did not return a user.');
+      }
+
+      // With email confirmation enabled Supabase creates a user but no session.
+      // The app must not grant authenticated access until confirmation is done.
+      if (response.session == null) {
+        _setFailure(
+            'Check your email and confirm your account before signing in.');
+        return false;
+      }
+
+      final profile = await _fetchProfileFromSupabase(response.user!.id);
+      if (profile == null) {
+        throw const AuthException(
+            'Your account was created, but its profile is not ready. Please sign in again shortly.');
+      }
+
+      _currentProfile = profile;
+      _isLoggedIn = true;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on AuthException catch (e) {
+      _setFailure(e.message);
+    } catch (e) {
+      debugPrint('[AuthProvider] Supabase signUp exception: $e');
+      _setFailure('Unable to create your account. Please try again.');
+    }
+    return false;
   }
 
+  /// Production Supabase login. Roles always come from the profile record.
+  Future<bool> login(String email, String password) async {
+    final cleanEmail = email.trim().toLowerCase();
+    _isLoading = true;
+    _lastError = null;
+    notifyListeners();
 
-  void logout() {
+    try {
+      if (cleanEmail.isEmpty || password.isEmpty) {
+        throw const AuthException(
+            'Enter both your email address and password.');
+      }
+
+      final response = await Supabase.instance.client.auth.signInWithPassword(
+        email: cleanEmail,
+        password: password,
+      );
+      if (response.user == null) {
+        throw const AuthException('Sign in did not return a user.');
+      }
+
+      final profile = await _fetchProfileFromSupabase(response.user!.id);
+      if (profile == null) {
+        throw const AuthException('Your account profile could not be loaded.');
+      }
+
+      _currentProfile = profile;
+      _isLoggedIn = true;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on AuthException catch (e) {
+      _setFailure(e.message);
+    } catch (e) {
+      debugPrint('[AuthProvider] Supabase signIn error: $e');
+      _setFailure('Unable to sign in. Please try again.');
+    }
+    return false;
+  }
+
+  /// Production Supabase Logout
+  Future<void> logout() async {
+    try {
+      await Supabase.instance.client.auth.signOut();
+    } catch (e) {
+      debugPrint('[AuthProvider] Supabase signOut notice: $e');
+    }
     _currentProfile = null;
     _isLoggedIn = false;
+    _lastError = null;
     notifyListeners();
   }
 
-  /// V-03 FIX: switchRole() is now restricted to DEMO/development use only.
-  /// In production this endpoint must be protected by server-side authorization.
-  /// A buyer must NEVER be able to switch to serviceProvider role unilaterally.
-  void switchRole(UserRole newRole) {
-    // Guard: only allow in demo mode. In production, remove this entirely.
-    assert(() {
-      debugPrint('[AuthProvider] WARNING: switchRole() is for DEMO only. '
-          'Real apps must validate role changes server-side.');
-      return true;
-    }());
+  /// Demo-only sign-in. Production builds cannot enter a local session.
+  bool signInAsDemo(UserRole role) {
+    if (!kDebugMode) {
+      _setFailure('Demo accounts are unavailable in production.');
+      return false;
+    }
+    switchRole(role);
+    _isLoggedIn = true;
+    _lastError = null;
+    notifyListeners();
+    return true;
+  }
 
+  /// Demo Role Persona Switcher
+  bool switchRole(UserRole newRole) {
+    if (!kDebugMode) {
+      return false;
+    }
     switch (newRole) {
       case UserRole.serviceProvider:
         _currentProfile = MockDataService.currentProvider;
@@ -85,31 +182,40 @@ class AuthProvider extends ChangeNotifier {
         break;
     }
     notifyListeners();
+    return true;
   }
 
-  // ---------------------------------------------------------------------------
-  // Private helpers (mock "server-side" lookups)
-  // ---------------------------------------------------------------------------
-
-  /// V-03: Simulates a server-side profile lookup by email.
-  /// In production: replaced by a Supabase `profiles` table query.
-  Profile? _resolveProfileByEmail(String email) {
-
-    // Mock lookup table keyed by email
-    final profileMap = {
-      MockDataService.currentBuyer.email.toLowerCase(): MockDataService.currentBuyer,
-      MockDataService.currentSeller.email.toLowerCase(): MockDataService.currentSeller,
-      MockDataService.currentProvider.email.toLowerCase(): MockDataService.currentProvider,
-    };
-
-    return profileMap[email];
+  void _setFailure(String message) {
+    _isLoading = false;
+    _lastError = message;
+    notifyListeners();
   }
 
-  /// V-04 (partial) / V-03: Mock password validation.
-  /// In production: Supabase.auth.signInWithPassword() handles this securely.
-  bool _validatePassword(String email, String password) {
-    // In a real app this is NEVER done client-side.
-    // Kept minimal here since real auth is delegated to Supabase.
-    return password.isNotEmpty && password.length >= 6;
+  /// Fetches profile row from PostgreSQL `profiles` table
+  Future<Profile?> _fetchProfileFromSupabase(String userId) async {
+    try {
+      final row = await Supabase.instance.client
+          .from('profiles')
+          .select('id, full_name, email, role')
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (row != null) {
+        UserRole role = UserRole.buyer;
+        final roleStr = row['role'] as String?;
+        if (roleStr == 'seller') role = UserRole.seller;
+        if (roleStr == 'service_provider') role = UserRole.serviceProvider;
+
+        return Profile(
+          id: row['id'] as String,
+          fullName: row['full_name'] as String,
+          email: row['email'] as String,
+          role: role,
+        );
+      }
+    } catch (e) {
+      debugPrint('[AuthProvider] _fetchProfileFromSupabase error: $e');
+    }
+    return null;
   }
 }
